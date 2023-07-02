@@ -10,21 +10,21 @@
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="There are plenty of sources online explaining the Flyweight design pattern in depth. The most common description of the pattern is that it designed to reduce memory footprint of a program without losing any capability. But the ideas behind it can be extended to a broader, system-wide scale." />
 <meta property="og:description" content="There are plenty of sources online explaining the Flyweight design pattern in depth. The most common description of the pattern is that it designed to reduce memory footprint of a program without losing any capability. But the ideas behind it can be extended to a broader, system-wide scale." />
-<link rel="canonical" href="https://jpira88.github.io/jacobshapira.github.io/https://jpira88.github.io/jacobshapira.github.io/jekyll/update/2022/07/10/leveraging-flyweight-pattern-to-system-arch.html" />
-<meta property="og:url" content="https://jpira88.github.io/jacobshapira.github.io/https://jpira88.github.io/jacobshapira.github.io/jekyll/update/2022/07/10/leveraging-flyweight-pattern-to-system-arch.html" />
+<link rel="canonical" href="https://jpira88.github.io/jacobshapira.github.io/jekyll/update/2022/07/10/leveraging-flyweight-pattern-to-system-arch.html" />
+<meta property="og:url" content="https://jpira88.github.io/jacobshapira.github.io/jekyll/update/2022/07/10/leveraging-flyweight-pattern-to-system-arch.html" />
 <meta property="og:site_name" content="Jacob Shapira" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2022-07-10T19:31:29+03:00" />
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="Extending Flyweight pattern ideas to improve system-wide performance and reduce costs" />
 <script type="application/ld+json">
-{"@type":"BlogPosting","url":"https://jpira88.github.io/jacobshapira.github.io/https://jpira88.github.io/jacobshapira.github.io/jekyll/update/2022/07/10/leveraging-flyweight-pattern-to-system-arch.html","headline":"Extending Flyweight pattern ideas to improve system-wide performance and reduce costs","dateModified":"2022-07-10T19:31:29+03:00","datePublished":"2022-07-10T19:31:29+03:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://jpira88.github.io/jacobshapira.github.io/https://jpira88.github.io/jacobshapira.github.io/jekyll/update/2022/07/10/leveraging-flyweight-pattern-to-system-arch.html"},"author":{"@type":"Person","name":"Jacob Shapira"},"description":"There are plenty of sources online explaining the Flyweight design pattern in depth. The most common description of the pattern is that it designed to reduce memory footprint of a program without losing any capability. But the ideas behind it can be extended to a broader, system-wide scale.","@context":"https://schema.org"}</script>
+{"@type":"BlogPosting","headline":"Extending Flyweight pattern ideas to improve system-wide performance and reduce costs","dateModified":"2022-07-10T19:31:29+03:00","datePublished":"2022-07-10T19:31:29+03:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://jpira88.github.io/jacobshapira.github.io/jekyll/update/2022/07/10/leveraging-flyweight-pattern-to-system-arch.html"},"url":"https://jpira88.github.io/jacobshapira.github.io/jekyll/update/2022/07/10/leveraging-flyweight-pattern-to-system-arch.html","author":{"@type":"Person","name":"Jacob Shapira"},"description":"There are plenty of sources online explaining the Flyweight design pattern in depth. The most common description of the pattern is that it designed to reduce memory footprint of a program without losing any capability. But the ideas behind it can be extended to a broader, system-wide scale.","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/assets/css/styles.css">
-  <link rel="stylesheet" href="/https://jpira88.github.io/jacobshapira.github.io/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://jpira88.github.io/jacobshapira.github.io/https://jpira88.github.io/jacobshapira.github.io/feed.xml" title="Jacob Shapira" /></head>
+<link rel="stylesheet" href="/jacobshapira.github.io/assets/css/styles.css">
+  <link rel="stylesheet" href="/jacobshapira.github.io/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://jpira88.github.io/jacobshapira.github.io/feed.xml" title="Jacob Shapira" /></head>
 <body><header class="site-header" role="banner">
 
-  <div class="wrapper"><a class="site-title" rel="author" href="/https://jpira88.github.io/jacobshapira.github.io/">Jacob Shapira</a><nav class="site-nav">
+  <div class="wrapper"><a class="site-title" rel="author" href="/jacobshapira.github.io/">Jacob Shapira</a><nav class="site-nav">
         <input type="checkbox" id="nav-trigger" class="nav-trigger" />
         <label for="nav-trigger">
           <span class="menu-icon">
@@ -34,7 +34,7 @@
           </span>
         </label>
 
-        <div class="trigger"><a class="page-link" href="/https://jpira88.github.io/jacobshapira.github.io/about/">About</a><a class="page-link" href="/https://jpira88.github.io/jacobshapira.github.io/tag/%23FE/">#FE</a><a class="page-link" href="/https://jpira88.github.io/jacobshapira.github.io/tag/%23JS/TS/">#JS/TS</a><a class="page-link" href="/https://jpira88.github.io/jacobshapira.github.io/tag/%23BE/">#BE</a><a class="page-link" href="/https://jpira88.github.io/jacobshapira.github.io/tag/%23PHP/">#PHP</a><a class="page-link" href="/https://jpira88.github.io/jacobshapira.github.io/tag/%23Performance/">#Performance</a><a class="page-link" href="/https://jpira88.github.io/jacobshapira.github.io/tag/%23DataEngineering/">#DataEngineering</a><a class="page-link" href="/https://jpira88.github.io/jacobshapira.github.io/tag/%23Java/">#Java</a><a class="page-link" href="/https://jpira88.github.io/jacobshapira.github.io/tag/%23Python/">#Python</a><a class="page-link" href="/https://jpira88.github.io/jacobshapira.github.io/tag/%23Architecture/">#Architecture</a><a class="page-link" href="/https://jpira88.github.io/jacobshapira.github.io/tag/%23Devops/">#Devops</a><a class="page-link" href="/https://jpira88.github.io/jacobshapira.github.io/tag/%23Cloud/">#Cloud</a></div>
+        <div class="trigger"><a class="page-link" href="/jacobshapira.github.io/about/">About</a><a class="page-link" href="/jacobshapira.github.io/tag/%23FE/">#FE</a><a class="page-link" href="/jacobshapira.github.io/tag/%23JS/TS/">#JS/TS</a><a class="page-link" href="/jacobshapira.github.io/tag/%23BE/">#BE</a><a class="page-link" href="/jacobshapira.github.io/tag/%23PHP/">#PHP</a><a class="page-link" href="/jacobshapira.github.io/tag/%23Performance/">#Performance</a><a class="page-link" href="/jacobshapira.github.io/tag/%23DataEngineering/">#DataEngineering</a><a class="page-link" href="/jacobshapira.github.io/tag/%23Java/">#Java</a><a class="page-link" href="/jacobshapira.github.io/tag/%23Python/">#Python</a><a class="page-link" href="/jacobshapira.github.io/tag/%23Architecture/">#Architecture</a><a class="page-link" href="/jacobshapira.github.io/tag/%23Devops/">#Devops</a><a class="page-link" href="/jacobshapira.github.io/tag/%23Cloud/">#Cloud</a></div>
       </nav></div>
 </header>
 <main class="page-content" aria-label="Content">
@@ -174,12 +174,12 @@ which will mean two things:</p>
 can we preload the intrinsic data in the analytics? If not, will JOINing (with spark, for example) of small amount of intrinsic data
 will be faster than working with 84% more data which is already in the same dataframes?</p>
 
-  </div><a class="u-url" href="/https://jpira88.github.io/jacobshapira.github.io/jekyll/update/2022/07/10/leveraging-flyweight-pattern-to-system-arch.html" hidden></a>
+  </div><a class="u-url" href="/jacobshapira.github.io/jekyll/update/2022/07/10/leveraging-flyweight-pattern-to-system-arch.html" hidden></a>
 </article>
 
       </div>
     </main><footer class="site-footer h-card">
-  <data class="u-url" href="/https://jpira88.github.io/jacobshapira.github.io/"></data>
+  <data class="u-url" href="/jacobshapira.github.io/"></data>
 
   <div class="wrapper">
 

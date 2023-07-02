@@ -10,18 +10,18 @@
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="In this post I’m not going to discuss long polling VS short polling VS sockets, I’m also not going to say anything against (or in favor) of long polling. I assume that anyone reading this already done their research and considerations and aware of most (or all) of the pros and the cons of each method. I just wanted to share something that is not mentioned in most of the discussions i heard about the polling methods: PHP’s sessions locks." />
 <meta property="og:description" content="In this post I’m not going to discuss long polling VS short polling VS sockets, I’m also not going to say anything against (or in favor) of long polling. I assume that anyone reading this already done their research and considerations and aware of most (or all) of the pros and the cons of each method. I just wanted to share something that is not mentioned in most of the discussions i heard about the polling methods: PHP’s sessions locks." />
-<link rel="canonical" href="/jekyll/update/2016/03/03/php-session-lock.html" />
-<meta property="og:url" content="/jekyll/update/2016/03/03/php-session-lock.html" />
+<link rel="canonical" href="https://jpira88.github.io/jacobshapira.github.io/jekyll/update/2016/03/03/php-session-lock.html" />
+<meta property="og:url" content="https://jpira88.github.io/jacobshapira.github.io/jekyll/update/2016/03/03/php-session-lock.html" />
 <meta property="og:site_name" content="Jacob Shapira" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2016-03-03T18:33:28+02:00" />
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="Session locking – big bad and sometimes (or mostly) unnoticed until it’s too late con of long polling" />
 <script type="application/ld+json">
-{"@type":"BlogPosting","headline":"Session locking – big bad and sometimes (or mostly) unnoticed until it’s too late con of long polling","dateModified":"2016-03-03T18:33:28+02:00","datePublished":"2016-03-03T18:33:28+02:00","mainEntityOfPage":{"@type":"WebPage","@id":"/jekyll/update/2016/03/03/php-session-lock.html"},"url":"/jekyll/update/2016/03/03/php-session-lock.html","author":{"@type":"Person","name":"Jacob Shapira"},"description":"In this post I’m not going to discuss long polling VS short polling VS sockets, I’m also not going to say anything against (or in favor) of long polling. I assume that anyone reading this already done their research and considerations and aware of most (or all) of the pros and the cons of each method. I just wanted to share something that is not mentioned in most of the discussions i heard about the polling methods: PHP’s sessions locks.","@context":"https://schema.org"}</script>
+{"@type":"BlogPosting","url":"https://jpira88.github.io/jacobshapira.github.io/jekyll/update/2016/03/03/php-session-lock.html","headline":"Session locking – big bad and sometimes (or mostly) unnoticed until it’s too late con of long polling","dateModified":"2016-03-03T18:33:28+02:00","datePublished":"2016-03-03T18:33:28+02:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://jpira88.github.io/jacobshapira.github.io/jekyll/update/2016/03/03/php-session-lock.html"},"author":{"@type":"Person","name":"Jacob Shapira"},"description":"In this post I’m not going to discuss long polling VS short polling VS sockets, I’m also not going to say anything against (or in favor) of long polling. I assume that anyone reading this already done their research and considerations and aware of most (or all) of the pros and the cons of each method. I just wanted to share something that is not mentioned in most of the discussions i heard about the polling methods: PHP’s sessions locks.","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/assets/css/styles.css">
-  <link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="/feed.xml" title="Jacob Shapira" /></head>
+  <link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://jpira88.github.io/jacobshapira.github.io/feed.xml" title="Jacob Shapira" /></head>
 <body><header class="site-header" role="banner">
 
   <div class="wrapper"><a class="site-title" rel="author" href="/">Jacob Shapira</a><nav class="site-nav">

@@ -1,0 +1,962 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2023-07-02T17:19:56+03:00</updated><id>/feed.xml</id><title type="html">Jacob Shapira</title><subtitle></subtitle><entry><title type="html">Reducing I/O latency on EBS restored from snapshots with AWS FSR</title><link href="/jekyll/update/2023/03/26/aws-fast-snapshot-restore.html" rel="alternate" type="text/html" title="Reducing I/O latency on EBS restored from snapshots with AWS FSR" /><published>2023-03-26T12:31:29+03:00</published><updated>2023-03-26T12:31:29+03:00</updated><id>/jekyll/update/2023/03/26/aws-fast-snapshot-restore</id><content type="html" xml:base="/jekyll/update/2023/03/26/aws-fast-snapshot-restore.html"><![CDATA[<p>When creating an EBS snapshot the data is saved to S3.<br />
+Snapshots are incremental, meaning that only the blocks that have been modified later than the most recent snapshot - are saved.<br />
+For obvious reasons this makes the snapshot faster to save and cheaper to store.</p>
+
+<p>When initiating an EBS volume from a snapshot, the EBS is almost immediately ready for use.<br />
+This is a very neat feature which is available due to the asynchronous nature of how storage blocks are loaded from S3 to EBS.</p>
+
+<p>The data is loaded in 2 ways:</p>
+<ol>
+  <li>Ongoing process in the background</li>
+  <li>In case an access attempt is made to a block which isn’t loaded yet, it immediately downloaded from S3.</li>
+</ol>
+
+<p>The caveat in this approach is that if we’ll attempt to access a block which is not downloaded yet,
+there will be an I/O latency while the data is being downloaded from S3.</p>
+
+<p>To solve this problem, AWS announced a new feature called Fast Snapshot Restore (FSR).<br />
+Enabling FSR for a snapshot increases the amount of resources allocated for the download process.</p>
+
+<p>According to the documentation, enabling FSR on a snapshot can speed up the data loading to ~1TB/Hour,
+with current cost of 0.75$ per hour.
+So for example, initiating EBS from an FSR enabled snapshot of 10TB will take 10 hours and 7.5$.</p>
+
+<p>Some limitations:<br />
+You can enable up to 5 FSR enabled snapshots per region and only to snapshots sized 16TiB or less.</p>
+
+<p>A full documentation of FSR can be found <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-fast-snapshot-restore.html" target="_blank">here</a>.</p>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="#DataEngineering" /><category term="#BE" /><category term="#Performance" /><category term="#Cloud" /><category term="#Architecture" /><summary type="html"><![CDATA[When creating an EBS snapshot the data is saved to S3. Snapshots are incremental, meaning that only the blocks that have been modified later than the most recent snapshot - are saved. For obvious reasons this makes the snapshot faster to save and cheaper to store.]]></summary></entry><entry><title type="html">Leverage AWS Direct Connect to use AWS services without exposing your data to the public internet</title><link href="/jekyll/update/2023/03/26/using-aws-without-exposing-data-to-public-internet.html" rel="alternate" type="text/html" title="Leverage AWS Direct Connect to use AWS services without exposing your data to the public internet" /><published>2023-03-26T12:31:29+03:00</published><updated>2023-03-26T12:31:29+03:00</updated><id>/jekyll/update/2023/03/26/using-aws-without-exposing-data-to-public-internet</id><content type="html" xml:base="/jekyll/update/2023/03/26/using-aws-without-exposing-data-to-public-internet.html"><![CDATA[<p>While there are a lot of tools to secure your data while being transferred over the internet,
+the most secured method of them all is not to do it at all.<br />
+Obviously this approach limits us in many ways, including (but not limited to) leveraging the power of public clouds.</p>
+
+<p>Luckily, AWS (and GCP, but it’s out of scope for this post) provides us with a way to use its services without transferring the data over the public internet via AWS Direct Connect.</p>
+
+<p>The general idea of Direct Connect is to create physical connections between AWS Backbone network and your data center via AWS Direct connect location partner.</p>
+
+<p><a href="/assets/post-images/2023-03-26-direct-connect/direct-connect-general-arch.JPG" target="_blank"><img src="/assets/post-images/2023-03-26-direct-connect/direct-connect-general-arch.JPG" alt="AWS Direct Connect" /></a></p>
+
+<p>As shown in the diagram, you can physically connect your data center to a router located in the direct connect partner. 
+From there, the partner will cross connect your router to AWS router connected to AWS backbone. 
+After the physical connections are done, you need to create logical connections via VIFs (Virtual interface) in order to access
+AWS public services (such as S3) and your private VPCs or a transit gateway.</p>
+
+<h4 id="selection-a-connection">Selection a connection</h4>
+<p>You can select 2 types of connections according to your needs and limitations:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Connection Type</th>
+      <th>Physical network equipment</th>
+      <th>Available bandwidths</th>
+      <th>Hourly Pricing</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Hosted connection</td>
+      <td>Usually belongs to the service provider and managed by it</td>
+      <td>Ranging from 50Mbps to 10Gbps</td>
+      <td>Higher than a dedicated connection</td>
+    </tr>
+    <tr>
+      <td>Dedicated connection</td>
+      <td>Usually your own</td>
+      <td>1, 10 and 100Gbps</td>
+      <td>Lower than hosted connection</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="creating-vifs-and-directing-traffic-to-the-correct">Creating VIFs and directing traffic to the correct</h4>
+<p>You can have 3 types of VIFs: public, private and transit VIFs.<br />
+Public VIF for AWS public services such as S3, private VIF for your VPC and transit VIF for a transit gateway.<br />
+Next, in order to correctly direct traffic, you should associate each VIF with a VLAN tag, so the traffic can be routed to the
+correct routers on AWS.</p>
+
+<p>A VLAN tag is a 4 byte tag added to the ethernet frame in networks configured to use VLANs.</p>
+
+<p>You should use the same VLAN tags on your end, as illustrated below:</p>
+
+<p><a href="/assets/post-images/2023-03-26-direct-connect/direct-connect-with-vlans.JPG" target="_blank"><img src="/assets/post-images/2023-03-26-direct-connect/direct-connect-with-vlans.JPG" alt="AWS Direct Connect" /></a></p>
+
+<p>This is a high level diagram of how things work. 
+You can find a neat <a href="https://docs.aws.amazon.com/directconnect/latest/UserGuide/getting_started.html#ConnectionRequest" target="_blank">step-by-step guide in AWS documentation</a>.</p>
+
+<h4 id="not-only-for-security">Not only for security</h4>
+<p>Security is not the only benefit of using direct connect. 
+You can also get increased bandwidth throughput and a more consistent network performance than what can be achieved with a public internet connection.</p>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="#DataEngineering" /><category term="#BE" /><category term="#Performance" /><category term="#Cloud" /><category term="#Architecture" /><category term="#Devops" /><summary type="html"><![CDATA[While there are a lot of tools to secure your data while being transferred over the internet, the most secured method of them all is not to do it at all. Obviously this approach limits us in many ways, including (but not limited to) leveraging the power of public clouds.]]></summary></entry><entry><title type="html">Speeding up spark SQL with adaptive query execution</title><link href="/jekyll/update/2023/02/07/spark-adaptive-query-execution.html" rel="alternate" type="text/html" title="Speeding up spark SQL with adaptive query execution" /><published>2023-02-07T11:31:29+02:00</published><updated>2023-02-07T11:31:29+02:00</updated><id>/jekyll/update/2023/02/07/spark-adaptive-query-execution</id><content type="html" xml:base="/jekyll/update/2023/02/07/spark-adaptive-query-execution.html"><![CDATA[<p>Spark version 2.x introduced CBO (cost-based-optimization) framework.<br />
+CBO collects and leverages different data statistics (e.g, row count, number of distinct values, etc.) in order to improve
+the quality of query execution plans.</p>
+
+<p>However, building a query plan based on static data which isn’t updated in runtime, comes with some drawbacks.<br />
+Some examples will be outdated statistics or inaccurate cardinality estimates.<br />
+This can lead to suboptimal query plans.<br />
+AQE (adaptive query execution) framework attempts to solve these issues by re-optimizing the query plans based on runtime statistics
+collected during the execution.</p>
+
+<p>So, what are the main features that AQE framework brings to the table?</p>
+
+<h3 id="dynamically-switching-join-strategies">Dynamically switching join strategies</h3>
+<p>Prior to AQE, one of the optimizations done by spark was switching to broadcast join when an
+estimated size of one of the sides of the join could fit well into the memory based on a threshold configuration (default ~10mb).<br />
+One of the issues with this approach was that spark couldn’t take applied filters into consideration, so if a table couldn’t fit into the threshold before filtering,
+spark wouldn’t attempt to broadcast join it even if it could after applying filters.</p>
+
+<p>With AQE, Spark re-plans the join strategy in runtime based on up-to-date join relation size.</p>
+
+<h3 id="dynamically-coalescing-shuffle-partitions">Dynamically coalescing shuffle partitions</h3>
+<p>Shuffle is one of key factors in a query performance, and one of the key factors for a performant shuffle is an optimal number of partitions.
+What is an optimal number of partitions?
+Well, that’s a hard thing to get.</p>
+<ol>
+  <li>You need to be familiar with the data.</li>
+  <li>Even if you familiar with it, we can always have an unexpected skew in production.</li>
+  <li>Optimal partition number might change from stage to stage, and so on.</li>
+</ol>
+
+<p>Eventually,
+If we’ll have too few partitions for the data at hand, we might encounter spills to disk and uneven distribution of work.
+If we’ll have too many partitions, we’ll end up with a lot of tasks and network overhead.</p>
+
+<p>AQE Attempts to address these issues by re-optimizing the optimal number of partitions after every stage of the job, aiming for similar size between all the partitions, considering the definition supplied by the
+<code class="language-plaintext highlighter-rouge">spark.sql.adaptive.advisoryPartitionSizeInBytes</code> (with some exceptions like <code class="language-plaintext highlighter-rouge">parallelismFirst</code>) parameter.</p>
+
+<p><a href="/assets/post-images/2023-3-21-aqe/coalese.JPG" target="_blank"><img src="/assets/post-images/2023-3-21-aqe/coalese.JPG" alt="Coalesce" /></a></p>
+
+<h3 id="dynamically-optimizing-skew-joins">Dynamically optimizing skew joins</h3>
+<p>Data skew is one of the most frequent reasons for performance issues, especially during join.
+While prior to AQE we had to always manually mitigate skew joins (repartitioning, salting etc.), AQE obsoletes some of this work.<br />
+AQE optimization detects skews based on shuffle file statistics and automatically splits large partition into smaller sub partitions, which will be joined
+with the corresponding (after duplication) partition from the other side respectively.</p>
+
+<p>Before AQE optimization:
+<a href="/assets/post-images/2023-3-21-aqe/skew1.JPG" target="_blank"><img src="/assets/post-images/2023-3-21-aqe/skew1.JPG" alt="Skew" /></a></p>
+
+<p>In this case, we will have 4 tasks, 1 task per partition.
+The longest task (A P1 to B P1) will take 3 minutes while all the others will take approx. 1 minute, resulting in a total execution time of 3 minutes.</p>
+
+<p>After AQE optimization:</p>
+
+<p><a href="/assets/post-images/2023-3-21-aqe/skew2.JPG" target="_blank"><img src="/assets/post-images/2023-3-21-aqe/skew2.JPG" alt="Skew" /></a></p>
+
+<p>AQE Optimization will split ABP1 into 2 different partitions, duplicate BP1 and join between them,
+increasing the number of tasks to 5, but reducing allowing a better parallelism, thus reducing the overall execution time by half.</p>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="#DataEngineering" /><category term="#BE" /><category term="#Performance" /><summary type="html"><![CDATA[Spark version 2.x introduced CBO (cost-based-optimization) framework. CBO collects and leverages different data statistics (e.g, row count, number of distinct values, etc.) in order to improve the quality of query execution plans.]]></summary></entry><entry><title type="html">Examining performance related information of your spark application via spark UI</title><link href="/jekyll/update/2022/11/14/performance-related-info-spark-ui.html" rel="alternate" type="text/html" title="Examining performance related information of your spark application via spark UI" /><published>2022-11-14T11:31:29+02:00</published><updated>2022-11-14T11:31:29+02:00</updated><id>/jekyll/update/2022/11/14/performance-related-info-spark-ui</id><content type="html" xml:base="/jekyll/update/2022/11/14/performance-related-info-spark-ui.html"><![CDATA[<p>Debugging and improving spark performance bottlenecks isn’t a straightforward task most of the time.
+Performance issues can arise from easy to detect bottlenecks such as wasteful UDFs or issues in the executors,
+or a more illusive problems such as estimated metrics of input size in SQL plan being very inaccurate.</p>
+
+<p>Luckily, we have spark UI to aid us, but one must know where to look and how to look at the generic data
+provided by spark UI to find potential issues in his spark application.</p>
+
+<p>In this post I’ll try to point to the parts of spark UI which might display information specifically relevant
+for various performance issue we might encounter in a spark application.</p>
+
+<p>I always prefer to use examples, so for this post I’ve written a simple application which performs tasks we’ll usually
+encounter in spark applications, and <em>deliberately</em> causes some common performances issues.</p>
+
+<p>This app will be:</p>
+
+<ul>
+  <li>Reading Data</li>
+  <li>Doing Wide Transformation</li>
+  <li>Doing Narrow Transformation</li>
+  <li>Causing shuffle read and writes</li>
+  <li>Causing data spill</li>
+  <li>Causing unevenly distributed workload</li>
+  <li>Saving Data</li>
+</ul>
+
+<p>I’ve written it in pyspark, but the idea would’ve remained the same even if it was written in scala or java.</p>
+
+<p>We have 2 parquet files,<br />
+<em>cities</em> - Containing skewed and duplicate data about world cities and countries:</p>
+
+<figure class="highlight"><pre><code class="language-xml" data-lang="xml">+--------------------+------+
+|             country| count|
++--------------------+------+
+|              Russia|210355|
+|            Malaysia| 25806|
+|              France|   633|
+|       United States|531703|
+|               China|   799|
+|             Nigeria| 45254|
+|               Spain|   569|</code></pre></figure>
+
+<p><em>citizens</em> - Containing citizens count per city.</p>
+
+<figure class="highlight"><pre><code class="language-xml" data-lang="xml">|         name|citizens|      country|
+......................................
+|   New York | 8467513 | United States|
+|     Moscow | 1700000  | Russia       |
+|     Madrid | 600000 | Spain       |
+......................................</code></pre></figure>
+
+<p>Both of the files saved in parquet format and partitioned by the country field.</p>
+
+<p>And we have the following self-explanatory app:</p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="c1"># Read files into a dataframe
+</span><span class="kn">from</span> <span class="nn">pyspark.sql.functions</span> <span class="kn">import</span> <span class="n">upper</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">floor</span><span class="p">,</span> <span class="n">spark_partition_id</span>
+<span class="n">cities</span> <span class="o">=</span> <span class="n">spark</span><span class="p">.</span><span class="n">read</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="s">"parquet"</span><span class="p">).</span><span class="n">load</span><span class="p">(</span><span class="s">"/folder/cities"</span><span class="p">)</span>
+<span class="n">citizens</span> <span class="o">=</span> <span class="n">spark</span><span class="p">.</span><span class="n">read</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="s">"parquet"</span><span class="p">).</span><span class="n">load</span><span class="p">(</span><span class="s">"/folder/citizens"</span><span class="p">)</span>
+
+<span class="c1"># Join cities info with citizens info
+</span><span class="n">cities_full_info</span> <span class="o">=</span> <span class="n">cities</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="n">citizens</span><span class="p">,</span> <span class="p">[</span><span class="s">"name"</span><span class="p">,</span> <span class="s">"country"</span><span class="p">])</span>
+
+<span class="c1"># Repartition into too few partitions
+</span><span class="n">cities_full_info</span> <span class="o">=</span> <span class="n">cities_full_info</span><span class="p">.</span><span class="n">repartition</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># Add citizens growth estimation for next year
+</span><span class="n">cities_full_info</span> <span class="o">=</span> <span class="n">cities_full_info</span><span class="p">.</span><span class="n">withColumn</span><span class="p">(</span><span class="s">'citizens_next_year'</span><span class="p">,</span> <span class="n">floor</span><span class="p">(</span><span class="n">col</span><span class="p">(</span><span class="s">"citizens"</span><span class="p">)</span><span class="o">*</span><span class="mf">1.1</span><span class="p">))</span>
+
+<span class="c1"># Write the joined data back to parquet
+</span><span class="n">cities_full_info</span><span class="p">.</span><span class="n">write</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="s">"parquet"</span><span class="p">).</span><span class="n">mode</span><span class="p">(</span><span class="s">"overwrite"</span><span class="p">).</span><span class="n">save</span><span class="p">(</span><span class="s">"cities_full_info"</span><span class="p">)</span></code></pre></figure>
+
+<p>Let’s assume our real production app is not as simple as the example, and no one provided us with a list of issues it will cause.
+The only thing we know is that it runs slow, and we need to debug it.
+What are the steps, and at which specific data in spark UI should we look to detect potential performance bottlenecks?</p>
+
+<h3 id="application-event-timeline">Application event timeline</h3>
+<p>First, make sure all the executors you expect to participate are added to the application.
+If not, it might indicate an infrastructure issue, meaning you’re running on less resources than expected.</p>
+
+<p><a href="/assets/post-images/2022-11-15-spark-ui/event-timeline.JPG" target="_blank"><img src="/assets/post-images/2022-11-15-spark-ui/event-timeline.JPG" alt="Event Timeline" /></a></p>
+
+<h3 id="jobs">Jobs</h3>
+<p>Next, it might be a good idea to get a high level understanding of costly jobs in your app.
+You can scroll down to completed (or running) jobs and checkout the <code class="language-plaintext highlighter-rouge">duration</code> column to understand which jobs taking longer than expected.</p>
+
+<p><a href="/assets/post-images/2022-11-15-spark-ui/completed-jobs.JPG" target="_blank"><img src="/assets/post-images/2022-11-15-spark-ui/completed-jobs.JPG" alt="Jobs" /></a></p>
+
+<h3 id="job-details">Job details</h3>
+<p>In the job details page, we get some useful information.</p>
+
+<h4 id="associated-sql-query">Associated SQL query</h4>
+<p>We will examine SQL tab later, but if you were using Datasets or DataFrames (which you probably are), you can examine the physical and
+logical plans of the SQL query by clicking on the associated query ID.</p>
+
+<p><a href="/assets/post-images/2022-11-15-spark-ui/assosiated-query.JPG" target="_blank"><img src="/assets/post-images/2022-11-15-spark-ui/assosiated-query.JPG" alt="AssociatedSQL" /></a></p>
+
+<p>We will get into the details of this later.</p>
+
+<h4 id="stages">Stages</h4>
+<p>Each job has 1 or more stages, and in the stage summary you can see which one of the stages might be a bottleneck.
+In our example we have only 1 stage, so we will explore it:</p>
+
+<p><a href="/assets/post-images/2022-11-15-spark-ui/stages.JPG" target="_blank"><img src="/assets/post-images/2022-11-15-spark-ui/stages.JPG" alt="Stages" /></a></p>
+
+<h3 id="stage-details">Stage details</h3>
+<p>In stage details we can see aggregated and per-executor metrics of the stage.</p>
+
+<h4 id="event-timeline">Event timeline</h4>
+<p>An important thing we might want to examine is that the workload is distributed evenly among the workers.
+Which in our case we can see is not the case in this particular stage:</p>
+
+<p><a href="/assets/post-images/2022-11-15-spark-ui/bad-worker-distribution.JPG" target="_blank"><img src="/assets/post-images/2022-11-15-spark-ui/bad-worker-distribution.JPG" alt="Bad Worker distribution" /></a></p>
+
+<p>We can compare it to a “healthy” work distribution in the read phase of our app, which looks like this:</p>
+
+<p><a href="/assets/post-images/2022-11-15-spark-ui/worker-distribution.JPG" target="_blank"><img src="/assets/post-images/2022-11-15-spark-ui/worker-distribution.JPG" alt="Healthy Worker distribution" /></a></p>
+
+<h4 id="summary-metrics">Summary metrics</h4>
+<p>In the summary metrics you can see summarized stats of all the tasks, but two indicators are specifically important.
+<code class="language-plaintext highlighter-rouge">Data spills</code> and <code class="language-plaintext highlighter-rouge">Shuffle read or write</code>.
+These are extremely costly operations, and we need to understand whether we can improve or get rid of it all together.</p>
+
+<p><a href="/assets/post-images/2022-11-15-spark-ui/summary-metrics.jpg" target="_blank"><img src="/assets/post-images/2022-11-15-spark-ui/summary-metrics.jpg" alt="Summary Metrics" /></a></p>
+
+<h4 id="tasks-breakdown">Tasks breakdown</h4>
+<p>In the task breakdown, we may examine metrics per task and per executor to get a clearer picture.
+But we also have additional information which might be useful for understanding potential slowness - that is the <code class="language-plaintext highlighter-rouge">data locality level</code>,
+data locality indicates data access latency.
+Possible values will be:</p>
+
+<ul>
+  <li>PROCESS_LOCAL - data co-located with the code in the same JVM</li>
+  <li>NODE_LOCAL - data located on the same node</li>
+  <li>NO_PREF - data with no preference for locality</li>
+  <li>RACK_LOCAL - data on the same rack but on a different server</li>
+  <li>ANY - Data located on other racks</li>
+</ul>
+
+<p><a href="/assets/post-images/2022-11-15-spark-ui/data-per-task-per-executor.JPG" target="_blank"><img src="/assets/post-images/2022-11-15-spark-ui/data-per-task-per-executor.JPG" alt="Metrics per task, per executor" /></a></p>
+
+<h3 id="the-main-course---understanding-sql-tab">The main course - Understanding SQL tab</h3>
+<p>In my opinion this is the most important part to understand since it gives us a clear picture of the application flow,
+how much data was moved, how it was moved, which functionality was executed and how long any of them took.
+Before examining the logical and physical plan of our application, make sure to toggle on the
+<code class="language-plaintext highlighter-rouge">Show the Stage ID and Task ID that corresponds to the max metric</code> checkbox, this will help us to correlate parts of the plan
+to bottlenecks we saw in the jobs and stages details.</p>
+
+<h4 id="scanning-parquet">Scanning Parquet</h4>
+
+<p><a href="/assets/post-images/2022-11-15-spark-ui/sql-1.JPG" target="_blank"><img src="/assets/post-images/2022-11-15-spark-ui/sql-1.JPG" alt="Scan Parquet" /></a></p>
+
+<p>First, we can see the <code class="language-plaintext highlighter-rouge">Scan parquet</code> stage which show information about our file structure in HDFS and how long it took the application to
+obtain it (Listing leaf and files job).
+We can see the number of partitions and files read, both stating 244 - which makes sense since our data was partitioned by country
+with a single parquet file per partition:</p>
+
+<p><a href="/assets/post-images/2022-11-15-spark-ui/hue.JPG" target="_blank"><img src="/assets/post-images/2022-11-15-spark-ui/hue.JPG" alt="Hue" /></a></p>
+
+<p>We can see how long it took to complete the scan (1.2s, 5.6s) and number of output rows.
+If we hover over this stage we can see additional info such as the directory, schema, and filters that were pushed:</p>
+
+<p><a href="/assets/post-images/2022-11-15-spark-ui/sql-1-1.JPG" target="_blank"><img src="/assets/post-images/2022-11-15-spark-ui/sql-1-1.JPG" alt="Directory and schema" /></a></p>
+
+<h4 id="wholestagecodegen---fuse-of-multiple-operators">WholeStageCodeGen - fuse of multiple operators</h4>
+<p><a href="/assets/post-images/2022-11-15-spark-ui/sql-2.JPG" target="_blank"><img src="/assets/post-images/2022-11-15-spark-ui/sql-2.JPG" alt="WholeStageCodeGen" /></a></p>
+
+<p>WholeStageCodegen fuses multiple operators together into a single Java function that is aimed at improving execution performance.
+It collapses a query into a single optimized function that eliminates virtual function calls and leverages CPU registers for intermediate data.
+In our case, we can see that fuse of 3 different functions into a single WholeStageCodegen:</p>
+
+<ol>
+  <li><code class="language-plaintext highlighter-rouge">ColumnarToRow</code> - which generates spark data frame from parquet</li>
+  <li><code class="language-plaintext highlighter-rouge">Filter</code> - which was pushed on the <code class="language-plaintext highlighter-rouge">name</code> column by spark due to the join that will come next</li>
+  <li><code class="language-plaintext highlighter-rouge">BroadcatHashJoin</code> - which joins <code class="language-plaintext highlighter-rouge">citizens</code> and <code class="language-plaintext highlighter-rouge">cities</code> data together (via broadcast due to the relatively small data size)</li>
+</ol>
+
+<p>In both <code class="language-plaintext highlighter-rouge">Filter</code> and <code class="language-plaintext highlighter-rouge">BroadcastHashJoin</code> we can conveniently see the number of output rows after a specific operator applied.</p>
+
+<p>Next, we will see the <code class="language-plaintext highlighter-rouge">Project</code> operator, which simply represents what columns will be selected.
+In our case, we will see the product of the join between the 2 dataframes:</p>
+
+<p><a href="/assets/post-images/2022-11-15-spark-ui/product-of-join.JPG" target="_blank"><img src="/assets/post-images/2022-11-15-spark-ui/product-of-join.JPG" alt="Project" /></a></p>
+
+<h4 id="exchange">Exchange</h4>
+<p>Next, we will see an <code class="language-plaintext highlighter-rouge">exchange</code> in the plan which was caused by our <code class="language-plaintext highlighter-rouge">repartition</code> command.
+<a href="/assets/post-images/2022-11-15-spark-ui/exchange.JPG" target="_blank"><img src="/assets/post-images/2022-11-15-spark-ui/exchange.JPG" alt="Exchange" /></a></p>
+
+<p>If we hover over the box, we can see the partition method that was used (round-robin).
+We can also see the total data size, number of partitions, records and various other metrics.</p>
+
+<p>An important thing to notice here (and in the previous step of <code class="language-plaintext highlighter-rouge">BroadcastHashJoin</code>) is the number of output rows of the join.
+If the number of the output rows is disproportional or doesn’t make sense from your understanding of the data, it might indicate that
+there’s something wrong with your data, such as unexpected duplicates in the join column, or your assumptions about the data are incorrect.</p>
+
+<h4 id="narrow-transformation">Narrow transformation</h4>
+<p><a href="/assets/post-images/2022-11-15-spark-ui/next_year_and_write.JPG" target="_blank"><img src="/assets/post-images/2022-11-15-spark-ui/next_year_and_write.JPG" alt="Exchange" /></a></p>
+
+<p>Here you can see a <code class="language-plaintext highlighter-rouge">WholeStageCodegen</code> generated for our citizen multiplication command.</p>
+
+<p>Please note that the duration we see in the WholeStageCodegen (1.3m, see image below) is combining the execution of the repartition command <em>and</em> the column value manipulation.
+If we were to remove the repartition command, the column value manipulation would’ve moved to the top <code class="language-plaintext highlighter-rouge">WholeStageCodegen</code> function alongside the filter and the broadcast join.</p>
+
+<p><a href="/assets/post-images/2022-11-15-spark-ui/narrow-duration.JPG" target="_blank"><img src="/assets/post-images/2022-11-15-spark-ui/narrow-duration.JPG" alt="Exchange" /></a></p>
+
+<h4 id="saving-the-output">Saving the output</h4>
+<p><a href="/assets/post-images/2022-11-15-spark-ui/writing.JPG" target="_blank"><img src="/assets/post-images/2022-11-15-spark-ui/writing.JPG" alt="Exchange" /></a></p>
+
+<p>In the end, we see <code class="language-plaintext highlighter-rouge">InsertIntoHadoopFsRelationCommand</code>, which representing the writing of the output back to parquet.</p>
+
+<p>Among a lot of interesting metrics, there are few which are performance significant:</p>
+<ol>
+  <li>Number of output rows &amp; data size - this is kind of self-explanatory.</li>
+  <li>Number of written files - this is important to notice, since constantly creating a lot of small files might impact the performance of whatever reads your data. A good file size will be 512MiB or 1GiB.</li>
+</ol>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="#DataEngineering" /><category term="#BE" /><category term="#Performance" /><summary type="html"><![CDATA[Debugging and improving spark performance bottlenecks isn’t a straightforward task most of the time. Performance issues can arise from easy to detect bottlenecks such as wasteful UDFs or issues in the executors, or a more illusive problems such as estimated metrics of input size in SQL plan being very inaccurate.]]></summary></entry><entry><title type="html">Improve MTTR’s with observability platforms</title><link href="/jekyll/update/2022/10/23/improve-mttr-with-observability-platform.html" rel="alternate" type="text/html" title="Improve MTTR’s with observability platforms" /><published>2022-10-23T19:31:29+03:00</published><updated>2022-10-23T19:31:29+03:00</updated><id>/jekyll/update/2022/10/23/improve-mttr-with-observability-platform</id><content type="html" xml:base="/jekyll/update/2022/10/23/improve-mttr-with-observability-platform.html"><![CDATA[<p>Ability to quickly resolve production issues is one of the key factors in customer satisfaction.<br />
+Not the mention it saves us resources and debugging time.<br />
+Cloud native and distributed systems are especially hard to debug due to high amount of moving parts.<br />
+An error in a flow can originate in a one of N containers of a specific service, in a flow composed of N different services, 
+and the erroneous container might as well be dead already due to different reasons (HPA, a crash, etc’).<br />
+Debugging is hard, reproducing is sometimes harder.</p>
+
+<h3 id="observability-platforms-to-reduce-the-pain">Observability platforms to reduce the pain</h3>
+<p>Tools such as Rookout, Lightrun or Helios can greatly reduce debugging complexity and MTTR’s (Mean time to response/repair/resolve/recover).</p>
+
+<p>For example,
+You can set ad-hoc virtual non-breaking breakpoints in a live production environment.
+You’ll be able to get information (such as variables, context, evaluate expressions and basically almost everything you’ll get from a debugger) from any service, down to specific line of code, if it was triggered during a flow.
+Thus making debugging much easier.</p>
+
+<p>You can also get live visual representation of how components in your flow interconnects with each other, down to API payloads, kafka messages and more.
+You can even reproduce entire flows with a click of a button.</p>
+
+<p>Basically, you take the power and flexibility of local debugging and issue investigation and apply it on a production (or test/staging) environment.</p>
+
+<h3 id="pricing">Pricing</h3>
+<p>The pricing of most of these tools a relatively affordable for most companies.
+Obviously the exact price depending on the tool itself and the package you select, but in general it starts at around 700$/mo at the time of writing this post.</p>
+
+<h3 id="demos--choosing-the-right-tool-for-you">Demos &amp; Choosing the right tool for you</h3>
+<p>You can book an official demo in the websites, but if you’d like a quick overview here are some useful youtube videos:</p>
+<ul>
+  <li><a href="https://www.youtube.com/watch?v=5hR17z4Qm3g" target="_blank">Lightrun</a></li>
+  <li><a href="https://www.youtube.com/watch?v=Tnsd_65jQLY" target="_blank">Rookout</a></li>
+  <li><a href="https://www.youtube.com/watch?v=OI5oYxTCiV0&amp;t=957s" target="_blank">Helios</a></li>
+</ul>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="#Architecture" /><category term="#Cloud" /><category term="#BE" /><category term="#Devops" /><summary type="html"><![CDATA[Ability to quickly resolve production issues is one of the key factors in customer satisfaction. Not the mention it saves us resources and debugging time. Cloud native and distributed systems are especially hard to debug due to high amount of moving parts. An error in a flow can originate in a one of N containers of a specific service, in a flow composed of N different services, and the erroneous container might as well be dead already due to different reasons (HPA, a crash, etc’). Debugging is hard, reproducing is sometimes harder.]]></summary></entry><entry><title type="html">Extending Flyweight pattern ideas to improve system-wide performance and reduce costs</title><link href="/jekyll/update/2022/07/10/leveraging-flyweight-pattern-to-system-arch.html" rel="alternate" type="text/html" title="Extending Flyweight pattern ideas to improve system-wide performance and reduce costs" /><published>2022-07-10T19:31:29+03:00</published><updated>2022-07-10T19:31:29+03:00</updated><id>/jekyll/update/2022/07/10/leveraging-flyweight-pattern-to-system-arch</id><content type="html" xml:base="/jekyll/update/2022/07/10/leveraging-flyweight-pattern-to-system-arch.html"><![CDATA[<p>There are plenty of sources online explaining the Flyweight design pattern in depth.<br />
+The most common description of the pattern is that it designed to reduce memory footprint of a program without losing any capability.
+But the ideas behind it can be extended to a broader, system-wide scale.</p>
+
+<p>I won’t get into the depth of the design pattern itself (if you’re not familiar with it, you can check out a <a href="https://en.wikipedia.org/wiki/Flyweight_pattern" target="_blank">good explanation in wikipedia</a>),
+but I will sum it up to a very simplistic explanation:</p>
+
+<p>The Flyweight pattern suggests minimizing the memory footprint of a large amount of objects, by storing commonly shared data in external data structures,
+and share these data structures with the objects themselves.</p>
+
+<p>Terminology wise, we’ll have:</p>
+
+<ul>
+  <li>Intrinsic state, which refers to the commonly shared data.</li>
+  <li>Extrinsic state, which refers to context related data, we can call it <i>dynamic</i> data.</li>
+</ul>
+
+<p>A simple example for it can be bullets in a shooter game,
+an extrinsic state will refer to the x,y of the bullet location, while the intrinsic state will refer to the color, size and other constant properties of the bullet.
+We will have a lot of minimalistic bullet objects, which will refer to a single graphical representation object.</p>
+
+<h4 id="taking-the-general-idea-to-a-system-wide-level">Taking the general idea to a system-wide level</h4>
+<p>Let’s say you’re working on a cyber-security system which monitors and ingests network traffic from 3rd party sensors, analyzes the traffic and reports suspicious activity.
+It’s simplified architecture will look something like this:</p>
+
+<p><a href="/assets/post-images/2022-08-10-flyweight/simplified-event-ingestion.JPG" target="_blank"><img src="/assets/post-images/2022-08-10-flyweight/simplified-event-ingestion.JPG" alt="Simplified Ingesting flow" /></a></p>
+
+<p>Let’s assume that one of the events the sensor records, is DNS lookups done by endpoints and servers in the network.
+The sensor enriches it with owner info - such as ASN, and produce it to Kafka, from which ETL reads the event and saves it to storage.
+The event structured something like this:</p>
+
+<figure class="highlight"><pre><code class="language-json" data-lang="json"><span class="p">{</span><span class="w">
+  </span><span class="nl">"event_initiator_ip"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1.1.1.1"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"dns_lookup"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"domain_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"www.google.com"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"record_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"a"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"ttl"</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"address"</span><span class="p">:</span><span class="w"> </span><span class="s2">"142.251.40.164"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"owner_asn_info"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"ASNumber"</span><span class="p">:</span><span class="w"> </span><span class="s2">"15169"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"ASName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"GOOGLE"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"RegDate"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2000-03-30"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Updated"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2012-02-24"</span><span class="p">,</span><span class="w"> 
+    </span><span class="nl">"Ref"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://rdap.arin.net/registry/autnum/15169"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"OrgName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Google LLC"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"OrgId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"GOGL"</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nl">"owner_whois_info"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"NetRange"</span><span class="p">:</span><span class="w">       </span><span class="s2">"142.250.0.0 - 142.251.255.255"</span><span class="w">
+    </span><span class="nl">"CIDR"</span><span class="p">:</span><span class="w">           </span><span class="s2">"142.250.0.0/15"</span><span class="w">
+    </span><span class="nl">"NetName"</span><span class="p">:</span><span class="w">        </span><span class="s2">"GOOGLE"</span><span class="w">
+    </span><span class="nl">"NetHandle"</span><span class="p">:</span><span class="w">      </span><span class="s2">"NET-142-250-0-0-1"</span><span class="w">
+    </span><span class="nl">"Parent"</span><span class="p">:</span><span class="w">         </span><span class="s2">"NET142 (NET-142-0-0-0-0)"</span><span class="w">
+    </span><span class="nl">"NetType"</span><span class="p">:</span><span class="w">        </span><span class="s2">"Direct Allocation"</span><span class="w">
+    </span><span class="nl">"OriginAS"</span><span class="p">:</span><span class="w">       </span><span class="s2">"AS15169"</span><span class="w">
+    </span><span class="nl">"Organization"</span><span class="p">:</span><span class="w">   </span><span class="s2">"Google LLC (GOGL)"</span><span class="w">
+    </span><span class="nl">"RegDate"</span><span class="p">:</span><span class="w">        </span><span class="s2">"2012-05-24"</span><span class="w">
+    </span><span class="nl">"Updated"</span><span class="p">:</span><span class="w">        </span><span class="s2">"2012-05-24"</span><span class="w">
+    </span><span class="nl">"Ref"</span><span class="p">:</span><span class="w">            </span><span class="s2">"https://rdap.arin.net/registry/ip/142.250.0.0"</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span></code></pre></figure>
+
+<p>For simplicity of the example, lets assume we’re not compressing, nor using better suited formats to store the data,
+and we’re just saving it as is in JSON format. This will cost us roughly 1kb per event.
+In a network with 10K/S lookups to google, it means a rough estimate of 864gb of daily data only for DNS lookups.</p>
+
+<ul>
+  <li>It means 864gb worth of daily addition to storage</li>
+  <li>It means that if we’ll attempt to write a daily scheduled analytic, it’ll have to handle 864gb of data</li>
+</ul>
+
+<p>You probably already see where I’m going with this.</p>
+
+<p>If we take a close look at the event data, we’ll see that the owner info is not context related, and probably won’t be frequently modified
+between each lookup event for the same domain. We can consider it as an intrinsic state.</p>
+
+<p>If we change our ETL to work with a cache of ownership info, writing it to a separate intrinsic data storage only when needed,
+we can reduce the amount of data we need to store and process by roughly 84%.</p>
+
+<p>Our updated architecture will look something like this:</p>
+
+<p><a href="/assets/post-images/2022-08-10-flyweight/intrinsic-extrinsic-storage-arch.JPG" target="_blank"><img src="/assets/post-images/2022-08-10-flyweight/intrinsic-extrinsic-storage-arch.JPG" alt="Updated Architecture" /></a></p>
+
+<p>The majority of the data (extrinsic data) will be reduced to this:</p>
+
+<figure class="highlight"><pre><code class="language-json" data-lang="json"><span class="p">{</span><span class="w">
+  </span><span class="nl">"event_initiator_ip"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1.1.1.1"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"dns_lookup"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"domain_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"www.google.com"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"record_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"a"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"ttl"</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"address"</span><span class="p">:</span><span class="w"> </span><span class="s2">"142.251.40.164"</span><span class="w">
+</span><span class="p">}</span></code></pre></figure>
+
+<h4 id="be-careful-with-the-tradeoffs">Be careful with the tradeoffs</h4>
+<p>As you probably understand, separating the data to intrinsic and extrinsic states is not a cost free action.
+You need to consider your data and it’s usages before separating it.</p>
+
+<p>In our example, the ETL will have to do more work before saving the data:</p>
+<ol>
+  <li>Managing a cache, in memory or external</li>
+  <li>Checking for existence of owner data and comparing the update dates</li>
+  <li>Doing an extra store action in case of a new intrinsic info</li>
+</ol>
+
+<p>A lot will be decided by the implementation.</p>
+
+<p>For example,
+in our use case, we can decide that only common domxzxains (google, stackoverflow etc’) and their owner info will be go through intrinsic pipeline, and use in memory cache,
+which will mean two things:</p>
+
+<ol>
+  <li>Working with cache will be extremely performant</li>
+  <li>Storing most common domains will reduce the majority of the data, while taking relatively small amount of memory</li>
+</ol>
+
+<p>Another thing to consider is the usage of the data, the analytics in our case - <br />
+can we preload the intrinsic data in the analytics? If not, will JOINing (with spark, for example) of small amount of intrinsic data
+will be faster than working with 84% more data which is already in the same dataframes?</p>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="#Architecture" /><category term="#DataEngineering" /><category term="#BE" /><category term="#Performance" /><category term="#Cloud" /><summary type="html"><![CDATA[There are plenty of sources online explaining the Flyweight design pattern in depth. The most common description of the pattern is that it designed to reduce memory footprint of a program without losing any capability. But the ideas behind it can be extended to a broader, system-wide scale.]]></summary></entry><entry><title type="html">Creating and sharing private npm packages without setting up a repository manager, using git urls</title><link href="/jekyll/update/2022/07/10/using-git-as-npm-registry.html" rel="alternate" type="text/html" title="Creating and sharing private npm packages without setting up a repository manager, using git urls" /><published>2022-07-10T19:31:29+03:00</published><updated>2022-07-10T19:31:29+03:00</updated><id>/jekyll/update/2022/07/10/using-git-as-npm-registry</id><content type="html" xml:base="/jekyll/update/2022/07/10/using-git-as-npm-registry.html"><![CDATA[<p>When working on JS/TS components (or any other), most chances are, that on relatively regular basis, you’re required to reuse some code you or your team wrote in multiple projects.</p>
+
+<p>A project can be multiple components of the same product, or completely different products.<br />
+A common approach to conveniently share your code is wrapping it as a package and import it wherever required. 
+But, due to various considerations (security, copyrights, etc’), you may want to refrain from uploading your code to NPM registry.</p>
+
+<p>In this case, you might set up a private repository manager such as Nexus or Verdaccio.<br />
+But if your only goal is to share packages between your team, setting up and maintaining a server might be a bit of an overkill.</p>
+
+<p>Luckily, we can import code as NPM package directly from a private (or public) git repository.</p>
+
+<p>For example,</p>
+
+<figure class="highlight"><pre><code class="language-json" data-lang="json"><span class="p">{</span><span class="w">
+  </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"your-project"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0.0.0"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"scripts"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="err">...</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nl">"dependencies"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="err">...</span><span class="w">
+    </span><span class="nl">"your-package"</span><span class="p">:</span><span class="w"> </span><span class="s2">"git+https://your-private-git-repo-url/your-package.git#semver:^x.x"</span><span class="p">,</span><span class="w">
+    </span><span class="err">...</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nl">"devDependencies"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="err">...</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span></code></pre></figure>
+
+<p>In the example above, your shared code will be available as a regular npm package named <i>your-package</i> .</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="k">import</span> <span class="p">{</span><span class="nx">YourClass</span><span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">your-package</span><span class="dl">'</span><span class="p">;</span></code></pre></figure>
+
+<h4 id="package-versioning">Package Versioning</h4>
+<p>We can control which version of our shared package we install in multiple ways:</p>
+<ol>
+  <li><i>#semver:^x.x</i> - npm will look for any tags or refs matching that range in the remote repository</li>
+  <li><i>#branch-name</i> - npm will take a direct branch name</li>
+  <li><i>#commit</i> - npm will take a specific commit</li>
+</ol>
+
+<h4 id="caveats-for-npm-packages-consumed-directly-from-git">Caveats for npm packages consumed directly from git</h4>
+<p>An NPM package following best practices will usually have magic scripts such as:</p>
+<ol>
+  <li>prepare - usually will run a build script</li>
+  <li>prepublishOnly - will usually run tests and linters</li>
+  <li>preversion - will usually run a linter</li>
+  <li>version - can automatically create commits on version bumps</li>
+  <li>postversion - can automatically push to git</li>
+</ol>
+
+<p>We can’t have this in a package consumed directly from git, since there is no publish process.</p>
+
+<p>Another disadvantage will be the size of the package. 
+In a regular package we publish the compiled code, but don’t commit it to a source control.
+Meaning we have less code in git and consumers of our package will not receive the source code.</p>
+
+<p>In a git based npm packaged we must commit the compiled code together with the source code, otherwise our main project
+will not be able to use the package.</p>
+
+<h4 id="tree-shaking-to-mitigate-the-caveats">Tree shaking to mitigate the caveats</h4>
+<p>For inconvenience in the lack of magic commands there’s no straightforward solution (at least not one I’m aware of).<br />
+But for the size issue, we have tree shaking.
+If you’re not familiar with the term, tree-shaking is a step in build process that removes unused code, thus reducing the size of the final application.
+If you’re not using extremely outdated frameworks and build tools, you’ll usually get it with tools which come bundled with the framework.</p>
+
+<p>This means that even if you install a git based npm package, the unnecessary source code will not be part of your compiled production application.</p>
+
+<h4 id="wrapping-your-code-as-installable-npm-package">Wrapping your code as installable npm package</h4>
+<p>Initialize NPM package:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">npm init <span class="nt">-y</span></code></pre></figure>
+
+<p>Add typescript as a development dependency:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">npm <span class="nb">install</span> <span class="nt">--save-dev</span> typescript</code></pre></figure>
+
+<p>Create tsconfig.json:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="o">{</span>
+  <span class="s2">"compilerOptions"</span>: <span class="o">{</span>
+    <span class="s2">"target"</span>: <span class="s2">"es5"</span>,
+    <span class="s2">"module"</span>: <span class="s2">"commonjs"</span>,
+    <span class="s2">"declaration"</span>: <span class="nb">true</span>,
+    <span class="s2">"outDir"</span>: <span class="s2">"./lib"</span>,
+    <span class="s2">"strict"</span>: <span class="nb">true</span>
+  <span class="o">}</span>,
+  <span class="s2">"include"</span>: <span class="o">[</span><span class="s2">"src"</span><span class="o">]</span>,
+  <span class="s2">"exclude"</span>: <span class="o">[</span><span class="s2">"node_modules"</span>, <span class="s2">"**/__tests__/*"</span><span class="o">]</span>
+<span class="o">}</span></code></pre></figure>
+
+<p>I’m not going to go into tsconfig.json options since it’s out of context.<br />
+You can find a <a href="https://www.typescriptlang.org/tsconfig" target="_blank">comprehensive documentation</a> in the official website.</p>
+
+<h4 id="expanding-the-default-packagejson">Expanding the default package.json</h4>
+<p>The final basic version of the package.json should look like this:</p>
+
+<figure class="highlight"><pre><code class="language-json" data-lang="json"><span class="p">{</span><span class="w">
+  </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"your-package"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1.0.0"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"You package description"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"main"</span><span class="p">:</span><span class="w"> </span><span class="s2">"lib/index.js"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"types"</span><span class="p">:</span><span class="w"> </span><span class="s2">"lib/index.d.ts"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"scripts"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"build"</span><span class="p">:</span><span class="w"> </span><span class="s2">"tsc"</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nl">"dependencies"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="err">...dependencies</span><span class="w"> </span><span class="err">of</span><span class="w"> </span><span class="err">your</span><span class="w"> </span><span class="err">package</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nl">"devDependencies"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="err">...</span><span class="w">
+    </span><span class="nl">"typescript"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^4.0.5"</span><span class="w">
+    </span><span class="err">...</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nl">"repository"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"git"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"url"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://your-private-git-repo-url/your-package.git"</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"commonjs"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"author"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Your-name"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"license"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ISC"</span><span class="w">
+</span><span class="p">}</span></code></pre></figure>
+
+<p>The main keys here are <i>main</i> and <i>types</i> .</p>
+
+<ul>
+  <li><i>main<i></i> - indicates to npm from where to import the modules</i></li>
+  <li><i>types</i> - indicates for typescript and IDEs from where they can get type definitions for better developer experience</li>
+</ul>
+
+<h3 id="hello-world">Hello World</h3>
+<p>Once we got our basics ready, we can create a simple hello world package.</p>
+
+<p>Let’s create a file: <i>src/hello-world.ts<i></i></i></p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="k">export</span> <span class="kd">class</span> <span class="nx">HelloWorld</span> <span class="p">{</span>
+    <span class="kr">public</span> <span class="nx">greet</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="dl">'</span><span class="s1">Hello World</span><span class="dl">'</span><span class="p">;</span>
+<span class="p">}</span></code></pre></figure>
+
+<p>Now we need to make it exportable, create a file <i>src/index.ts</i></p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="k">export</span> <span class="p">{</span><span class="nx">HelloWorld</span><span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">./hello-world</span><span class="dl">'</span><span class="p">;</span></code></pre></figure>
+
+<p>Next, lets build it:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">npm run build</code></pre></figure>
+
+<p>After this, you’ll see new files added to the <i>/lib</i> folder of your project.</p>
+
+<h4 id="pushing-to-git">Pushing to git</h4>
+<p>For simplicity let’s use a simple branch name and not semvers, name your branch: <i>my-first-release</i>, and push the code.</p>
+
+<h4 id="using-the-package-from-the-main-project">Using the package from the main project</h4>
+<p>Let’s install the package:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">npm <span class="nb">install </span>git+https://your-private-git-repo-url/your-package.git#my-first-release <span class="nt">--save</span></code></pre></figure>
+
+<p>Now we can use it from the main project:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="k">import</span> <span class="p">{</span><span class="nx">HelloWorld</span><span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">your-package</span><span class="dl">'</span><span class="p">;</span></code></pre></figure>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="#Architecture" /><category term="#FE" /><category term="#BE" /><category term="#Devops" /><category term="#JS/TS" /><summary type="html"><![CDATA[When working on JS/TS components (or any other), most chances are, that on relatively regular basis, you’re required to reuse some code you or your team wrote in multiple projects.]]></summary></entry><entry><title type="html">Cloud based standbys for on Premises workloads without changing your public IP</title><link href="/jekyll/update/2022/07/09/cloud-based-hot-standby-for-onprem-applications.html" rel="alternate" type="text/html" title="Cloud based standbys for on Premises workloads without changing your public IP" /><published>2022-07-09T19:31:29+03:00</published><updated>2022-07-09T19:31:29+03:00</updated><id>/jekyll/update/2022/07/09/cloud-based-hot-standby-for-onprem-applications</id><content type="html" xml:base="/jekyll/update/2022/07/09/cloud-based-hot-standby-for-onprem-applications.html"><![CDATA[<p>Some workloads rely heavily on having a specific public IP addresses.
+For example:</p>
+
+<ul>
+  <li>Workloads with emailing features, where the IP reputation is extremely important to get high delivery rates.</li>
+  <li>Workloads in which access to other systems (partners, 3rd party etc’) based on IP whitelisting.</li>
+  <li>Workloads providing access for field consumers which rely on direct IP address and not on a DNS Server, delivery trucks sending GPS data for example.</li>
+</ul>
+
+<p>Let’s assume your team/group is developing an on premise workload which implements both of the examples above.
+Now you’ve been tasked with designing a standby, or even migrating the entire workload to the cloud.</p>
+
+<p>One of the requirements is to maintain your existing IP address to keep all of your existing integrations intact.</p>
+
+<p>Luckily, in recent years, all the main cloud providers (AWS, Azure, Google Cloud) introduced BYOIP (Bring your own IP) feature.</p>
+
+<p>With this feature, you can basically reuse and remain the owner of your IP range, but allow the cloud provider to advertise it.
+It means you can prepare a standby for your workload, may it be cold, warm or hot, and if the need arise, instantiate the standby
+workload and attach your existing IP range to it, making the process completely transparent to all existing parties consuming/producing data
+from/to your workload.</p>
+
+<h3 id="prerequisites">Prerequisites</h3>
+<p>The process of bringing your own IP and the prerequisites are pretty similar
+among all the providers.</p>
+
+<h4 id="ip-range-registered-with-a-rir">IP range registered with a RIR</h4>
+<p>The main requirement is that the address you are importing must be registered with one of the following RIRs (Regional Internet Registry):</p>
+
+<ul>
+  <li>AFRINIC (Africa)</li>
+  <li>APNIC (Portions of Asia and Oceania)</li>
+  <li>ARIN (North America and some Caribbean Islands)</li>
+  <li>LACNIC (Latin America)</li>
+  <li>RIPE NCC (Europe, Central Asia, Middle East)</li>
+</ul>
+
+<h4 id="minimum-ipv4-address-range">Minimum IPv4 address range</h4>
+<p>The address range must be no smaller than a /24 so it will be accepted by Internet Service Providers.</p>
+
+<h4 id="other-provider-specific-requirements">Other provider specific requirements</h4>
+<p>On top of the generic requirements, each provider enforces additional specific requirements, such as limit on the amount of ranges you can bring,
+validating reputation history of the address and more.</p>
+
+<p>For your convenience here are direct URLs to each provider step-by-step guide to bring your own IP.</p>
+
+<ul>
+  <li><a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-byoip.html" target="_blank">AWS BYOIP</a></li>
+  <li><a href="https://cloud.google.com/vpc/docs/using-bring-your-own-ip" target="_blank">Google Cloud BYOIP</a></li>
+  <li><a href="https://docs.microsoft.com/en-us/azure/virtual-network/ip-services/create-custom-ip-address-prefix-portal" target="_blank">Azure BYOIP</a></li>
+</ul>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="#Architecture" /><category term="#Cloud" /><category term="#BE" /><summary type="html"><![CDATA[Some workloads rely heavily on having a specific public IP addresses. For example:]]></summary></entry><entry><title type="html">Make your Kubernetes workloads more robust with startup, readiness and liveness probes</title><link href="/jekyll/update/2022/07/08/robustness-via-k8s-liveness-probes.html" rel="alternate" type="text/html" title="Make your Kubernetes workloads more robust with startup, readiness and liveness probes" /><published>2022-07-08T19:31:29+03:00</published><updated>2022-07-08T19:31:29+03:00</updated><id>/jekyll/update/2022/07/08/robustness-via-k8s-liveness-probes</id><content type="html" xml:base="/jekyll/update/2022/07/08/robustness-via-k8s-liveness-probes.html"><![CDATA[<p>It’s no easy task to make distributed workloads robust and resilient.
+Kubernetes coming into our lives made this job a lot easier.
+But, like many things in the engineering world, good can become better.</p>
+
+<p>Let’s take this a very simplified architecture of an online store backed up by an
+ML based recommendation system.</p>
+
+<p><a href="/assets/post-images/2022-07-07-liveness-probe/liveness-probe-arch1.JPG" target="_blank"><img src="/assets/post-images/2022-07-07-liveness-probe/liveness-probe-arch1.JPG" alt="Simplified Online Store" /></a></p>
+
+<p>As shown in the diagram, user interactions such as viewing a product sent to a UI BE.<br />
+UI BE writes the event to kafka.
+A big data &amp; analytic platform collects the data from kafka, doing some magic and produces list of recommended 
+products for the user, based on his past interests.</p>
+
+<h4 id="what-can-go-wrong">What can go wrong?</h4>
+<p>As you probably know, by default, K8S control loop will consider a container as functioning as long as the main process is up and running.<br />
+But, up and running not necessarily means that a container is ready to receive requests.
+As you can see, UI BE depends on MySQL DB. For the sake of the example, let’s say that on instantiation,
+each UI BE pod needs to bring some data from MySQL to memory to serve requests.</p>
+
+<h4 id="problem-1---replica-changes-in-time-of-manual-scaling-or-even-worse-hpa-horizontal-pod-autoscaling">Problem #1 - replica changes in time of manual scaling, or even worse, HPA (horizontal pod autoscaling)</h4>
+<p>You got to a point where you need to change the replicas number of your pods.
+This can be a simple case where your store gained popularity, and you need to add more replicas to cope with the increasing demand,
+or it can be a more complex case, where you’ve running in a cluster with configured HPA (Horizontal Pod Autoscaling).</p>
+
+<p>If we’ll get back to our example, once your server and application are running, from K8S perspective, the pod is ready to receive requests.
+Every time the UI will send a recordable action by the user (e.g, product view) - the BE service will proxy the request to the pod
+in a round-robin (by default) manner. If the request will be proxied to a replica where the main process is running, but the connection to DB 
+wasn’t established or the data required to serve the request still was not loaded to memory, the request will fail, and the data will be lost
+or a retry mechanism will need to be implemented.</p>
+
+<p>While this might be an edge case if you do manual scaling,
+if HPA is configured in your cluster, which means that replicas will be changed quite frequently - your workload will be extremely unstable.</p>
+
+<h4 id="problem-2---applicative-errors-that-dont-crash-the-main-process">Problem #2 - applicative errors that don’t crash the main process</h4>
+<p>Let’s say one of your containers encountered a critical applicative error which makes the application instance unusable, while the main
+process is still active.
+Same as before, all events proxied by the UI BE service to the pod with the unusable application, will be lost or will have to be retried.</p>
+
+<h4 id="enter-kubernetes-probes">Enter kubernetes probes</h4>
+<p>Basically, we need an additional indication that our pods are ready to receive requests, besides the main process state.
+For that, Kubernetes provides us with different kind of probes:</p>
+
+<ul>
+  <li>Startup</li>
+  <li>Liveness</li>
+  <li>Readiness</li>
+</ul>
+
+<p>To make it easy to understand, let’s create a comparison table:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>When to use</th>
+      <th>Action on failure</th>
+      <th>When it runs</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Startup Probe</td>
+      <td>When you have a slow loading container, and you wish it won’t receive traffic until your custom logic indicates it’s ready to serve requests.</td>
+      <td>Service won’t send traffic to the pod</td>
+      <td>Only on startup</td>
+    </tr>
+    <tr>
+      <td>Liveness Probe</td>
+      <td>When you want periodic liveness checks that your container is up and running and can serve incoming requests</td>
+      <td>K8S will kill the pod and attempt to spawn a new one</td>
+      <td>Throughout the entire life of the pod</td>
+    </tr>
+    <tr>
+      <td>Readiness Probe</td>
+      <td>Very similar to liveness probe, but the action taken on failure is different</td>
+      <td>Service won’t send traffic to the pod</td>
+      <td>Throughout the entire life of the pod</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="setting-probe-configuration">Setting probe configuration</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>initialDelaySeconds</td>
+      <td>How long to wait (in seconds) after the container has started before liveness or readiness probes are initiated</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>periodSeconds</td>
+      <td>Probe interval (in seconds)</td>
+      <td>10  (min 1)</td>
+    </tr>
+    <tr>
+      <td>timeoutSeconds</td>
+      <td>Timeout configuration for the probe  (in seconds)</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>successThreshold</td>
+      <td>Minimum consecutive successes for the probe to be considered successful after having failed</td>
+      <td>Must be 1 for liveness and startup probes</td>
+    </tr>
+    <tr>
+      <td>failureThreshold</td>
+      <td>How many times a probe should run before failure is declared and an action on failure will be executed (as described in the table above)</td>
+      <td>3</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="types-of-probe-actions">Types of probe actions</h4>
+<p>There are 3 types of probe actions:</p>
+
+<ul>
+  <li>HTTP</li>
+  <li>TCP</li>
+  <li>Command</li>
+</ul>
+
+<h4 id="http-action">HTTP action</h4>
+
+<p>Kubelet will send an HTTP GET request to an endpoint, and will define any status code from the 200-300 ranges as a success.</p>
+
+<p>HTTP Can be configured with additional parameters:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>host</td>
+      <td>Hostname to connect to</td>
+      <td>Pod IP</td>
+    </tr>
+    <tr>
+      <td>scheme</td>
+      <td>HTTP or HTTPS</td>
+      <td>HTTP</td>
+    </tr>
+    <tr>
+      <td>path</td>
+      <td>Path on the server</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>httpHeaders</td>
+      <td>Custom headers (e.g, Authorization header)</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>port</td>
+      <td>Access port</td>
+      <td>-</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="tcp-action">TCP action</h4>
+<p>Just checks a successful TCP connection. If a connection is established the probe considered successful.</p>
+
+<h4 id="command-action">Command action</h4>
+<p>Runs a shell command inside the container. On 0 exist code, action will be considered successful.</p>
+
+<h4 id="complete-example">Complete example</h4>
+<p>An example for 3 different type of probes, each of them with a different action method.</p>
+
+<figure class="highlight"><pre><code class="language-yaml" data-lang="yaml"><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span> 
+<span class="na">kind</span><span class="pi">:</span> <span class="s">Pod</span> 
+<span class="na">metadata</span><span class="pi">:</span> 
+  <span class="na">name</span><span class="pi">:</span> <span class="s">probes-demo</span>
+<span class="na">spec</span><span class="pi">:</span> 
+  <span class="na">containers</span><span class="pi">:</span> 
+  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">probes-demo</span> 
+    <span class="na">image</span><span class="pi">:</span> <span class="s">your-image</span> 
+    <span class="na">ports</span><span class="pi">:</span> 
+        <span class="pi">-</span> <span class="na">containerPort</span><span class="pi">:</span> <span class="s">80</span> 
+    <span class="na">livenessProbe</span><span class="pi">:</span> 
+      <span class="na">httpGet</span><span class="pi">:</span> 
+        <span class="na">path</span><span class="pi">:</span> <span class="s">/health</span>
+        <span class="na">port</span><span class="pi">:</span> <span class="s">80</span> 
+      <span class="na">initialDelaySeconds</span><span class="pi">:</span> <span class="m">2</span>
+      <span class="na">periodSeconds</span><span class="pi">:</span> <span class="m">2</span>
+      <span class="na">timeoutSeconds</span><span class="pi">:</span> <span class="m">1</span>
+      <span class="na">successThreshold</span><span class="pi">:</span> <span class="m">1</span>
+      <span class="na">failureThreshold</span><span class="pi">:</span> <span class="m">3</span>
+    <span class="na">readinessProbe</span><span class="pi">:</span>
+     <span class="na">exec</span><span class="pi">:</span>
+       <span class="na">command</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s">/my-health-cmd</span>
+     <span class="na">initialDelaySeconds</span><span class="pi">:</span> <span class="m">5</span>
+     <span class="na">periodSeconds</span><span class="pi">:</span> <span class="m">5</span>
+    <span class="na">startupProbe</span><span class="pi">:</span>
+      <span class="na">tcpSocket</span><span class="pi">:</span>
+        <span class="na">port</span><span class="pi">:</span> <span class="m">8080</span>
+      <span class="na">initialDelaySeconds</span><span class="pi">:</span> <span class="m">15</span>
+      <span class="na">periodSeconds</span><span class="pi">:</span> <span class="s">20</span></code></pre></figure>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="#Architecture" /><category term="#Devops" /><category term="#BE" /><summary type="html"><![CDATA[It’s no easy task to make distributed workloads robust and resilient. Kubernetes coming into our lives made this job a lot easier. But, like many things in the engineering world, good can become better.]]></summary></entry><entry><title type="html">Anti-Corruption layer is not your way around legacy or badly designed implementation</title><link href="/jekyll/update/2022/07/07/anti-corruption-layer.html" rel="alternate" type="text/html" title="Anti-Corruption layer is not your way around legacy or badly designed implementation" /><published>2022-07-07T19:30:29+03:00</published><updated>2022-07-07T19:30:29+03:00</updated><id>/jekyll/update/2022/07/07/anti-corruption-layer</id><content type="html" xml:base="/jekyll/update/2022/07/07/anti-corruption-layer.html"><![CDATA[<p>So you and your team have been tasked with adding a set of new capabilities to an existing domain, a service or a sub system.<br />
+You research the existing implementation, APIs, databases and technological stack and come to a conclusion that it will be extremely
+difficult to extend existing code and capabilities to support those new features.</p>
+
+<p>One of the more experienced team members suggests a valid approach - <br />
+“The stack is outdated,” he says, “a badly designed monolith, and the only guy that could understand what’s going on quit 2 years ago,
+lets create anti-corruption layer, so we won’t corrupt our new code with this legacy mess.”</p>
+
+<p>The idea is good, the approach is valid, but it has nothing to do with anti corruption layer.<br />
+The suggested approach can be implemented with adapters or facades patterns, which are among the most important patterns in existence.
+Anti corruption layers can be composed out of many facades and adapters, but it’s not ACL’s job to cover up for interfaces you
+can’t or prefer not to deal with.</p>
+
+<h4 id="acls-should-prevent-concepts-intrusions-and-mismatches-between-different-bounded-contexts">ACLs should prevent concepts intrusions and mismatches between different bounded contexts</h4>
+<p>A bounded context is a term in domain driven design which represent a sub system.<br />
+Based on this understanding, lets examine a simplified example of a cyber investigation platform.</p>
+
+<p><a href="/assets/post-images/2022-08-07-acl/simplified-cyber-platform.JPG" target="_blank"><img src="/assets/post-images/2022-08-07-acl/simplified-cyber-platform.JPG" alt="Simplified Cyber Platform" /></a></p>
+
+<p>As you can see in the example, each context operates on need to know basis.</p>
+<ul>
+  <li>
+    <p>Analytics context needs to know about cyber events repository but should not be aware of the collection process,
+which in return decouples the analytic context from understanding and caring what happens in collection context.<br />
+This applies not only to technological perspective (such as backward compatibility, for example), but also from managerial
+point of view. The only thing that should be shared between teams responsible for data collection and analytics is
+the concepts of events.</p>
+  </li>
+  <li>
+    <p>Same example applies on investigation context, teams working in on this sub system should be only familiar with
+investigation artifacts and not how they are collected, or which models applied to produce them.</p>
+  </li>
+</ul>
+
+<h4 id="try-to-say-it-out-loud">Try to say it out loud</h4>
+<p>If you feel like this concept is too high level, over-engineered or not necessarily practical.
+Try to say it out loud, pretend you’re one of the engineers responsible for the investigation context and conducting
+a meeting with your teammates. Referring to “investigation artifacts” will feel perfectly natural, it’s a known and natural
+concept in investigation context. Now try to discuss DS models or which message queues will be used to gather the events, and you’ll
+see how it seems extremely out of context.</p>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="#Architecture" /><summary type="html"><![CDATA[So you and your team have been tasked with adding a set of new capabilities to an existing domain, a service or a sub system. You research the existing implementation, APIs, databases and technological stack and come to a conclusion that it will be extremely difficult to extend existing code and capabilities to support those new features.]]></summary></entry></feed>

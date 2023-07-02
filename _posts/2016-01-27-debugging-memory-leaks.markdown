@@ -4,7 +4,7 @@ title:  "Debugging memory leaks: When the famous 3 snapshot technique can cost y
 date:  2016-01-17 18:33:28 +0200
 categories: jekyll update
 author: Jacob Shapira
-tags: ["#FE", "#JS/TS"]
+tags: ["FE", "#JS/TS"]
 ---
 
 Pretty much every second article about debugging memory leaks demonstrates the great 3 snapshot technique introduced by the GMail team and which was used to

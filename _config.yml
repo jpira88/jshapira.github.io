@@ -21,8 +21,8 @@
 title: Jacob Shapira
 email: jacobamerz at gmail
 description: >- # this means to ignore newlines until "baseurl:"
-baseurl: "https://jpira88.github.io/jacobshapira.github.io" # the subpath of your site, e.g. /blog
-url: "https://jpira88.github.io/jacobshapira.github.io" # the base hostname & protocol for your site, e.g. http://example.com
+baseurl: "/jacobshapira.github.io" # the subpath of your site, e.g. /blog
+url: "https://jpira88.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 github_username:
 
 # Build settings

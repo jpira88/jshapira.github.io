@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>Creating and sharing private npm packages without setting up a repository manager, using git urls | Jacob Shapira</title>
+<meta name="generator" content="Jekyll v4.2.1" />
+<meta property="og:title" content="Creating and sharing private npm packages without setting up a repository manager, using git urls" />
+<meta name="author" content="Jacob Shapira" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="When working on JS/TS components (or any other), most chances are, that on relatively regular basis, you’re required to reuse some code you or your team wrote in multiple projects." />
+<meta property="og:description" content="When working on JS/TS components (or any other), most chances are, that on relatively regular basis, you’re required to reuse some code you or your team wrote in multiple projects." />
+<link rel="canonical" href="https://jpira88.github.io/jacobshapira.github.io/jekyll/update/2022/07/10/using-git-as-npm-registry.html" />
+<meta property="og:url" content="https://jpira88.github.io/jacobshapira.github.io/jekyll/update/2022/07/10/using-git-as-npm-registry.html" />
+<meta property="og:site_name" content="Jacob Shapira" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-07-10T19:31:29+03:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Creating and sharing private npm packages without setting up a repository manager, using git urls" />
+<script type="application/ld+json">
+{"@type":"BlogPosting","url":"https://jpira88.github.io/jacobshapira.github.io/jekyll/update/2022/07/10/using-git-as-npm-registry.html","headline":"Creating and sharing private npm packages without setting up a repository manager, using git urls","dateModified":"2022-07-10T19:31:29+03:00","datePublished":"2022-07-10T19:31:29+03:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://jpira88.github.io/jacobshapira.github.io/jekyll/update/2022/07/10/using-git-as-npm-registry.html"},"author":{"@type":"Person","name":"Jacob Shapira"},"description":"When working on JS/TS components (or any other), most chances are, that on relatively regular basis, you’re required to reuse some code you or your team wrote in multiple projects.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/styles.css">
+  <link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://jpira88.github.io/jacobshapira.github.io/feed.xml" title="Jacob Shapira" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Jacob Shapira</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a><a class="page-link" href="/tag/%23FE/">#FE</a><a class="page-link" href="/tag/%23JS/TS/">#JS/TS</a><a class="page-link" href="/tag/%23BE/">#BE</a><a class="page-link" href="/tag/%23PHP/">#PHP</a><a class="page-link" href="/tag/%23Performance/">#Performance</a><a class="page-link" href="/tag/%23DataEngineering/">#DataEngineering</a><a class="page-link" href="/tag/%23Java/">#Java</a><a class="page-link" href="/tag/%23Python/">#Python</a><a class="page-link" href="/tag/%23Architecture/">#Architecture</a><a class="page-link" href="/tag/%23Devops/">#Devops</a><a class="page-link" href="/tag/%23Cloud/">#Cloud</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Creating and sharing private npm packages without setting up a repository manager, using git urls</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2022-07-10T19:31:29+03:00" itemprop="datePublished">Jul 10, 2022
+      </time>• <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">Jacob Shapira</span></span></p>
+  </header>
+
+  
+  
+  
+  
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>When working on JS/TS components (or any other), most chances are, that on relatively regular basis, you’re required to reuse some code you or your team wrote in multiple projects.</p>
+
+<p>A project can be multiple components of the same product, or completely different products.<br />
+A common approach to conveniently share your code is wrapping it as a package and import it wherever required. 
+But, due to various considerations (security, copyrights, etc’), you may want to refrain from uploading your code to NPM registry.</p>
+
+<p>In this case, you might set up a private repository manager such as Nexus or Verdaccio.<br />
+But if your only goal is to share packages between your team, setting up and maintaining a server might be a bit of an overkill.</p>
+
+<p>Luckily, we can import code as NPM package directly from a private (or public) git repository.</p>
+
+<p>For example,</p>
+
+<figure class="highlight"><pre><code class="language-json" data-lang="json"><span class="p">{</span><span class="w">
+  </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"your-project"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0.0.0"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"scripts"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="err">...</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nl">"dependencies"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="err">...</span><span class="w">
+    </span><span class="nl">"your-package"</span><span class="p">:</span><span class="w"> </span><span class="s2">"git+https://your-private-git-repo-url/your-package.git#semver:^x.x"</span><span class="p">,</span><span class="w">
+    </span><span class="err">...</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nl">"devDependencies"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="err">...</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span></code></pre></figure>
+
+<p>In the example above, your shared code will be available as a regular npm package named <i>your-package</i> .</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="k">import</span> <span class="p">{</span><span class="nx">YourClass</span><span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">your-package</span><span class="dl">'</span><span class="p">;</span></code></pre></figure>
+
+<h4 id="package-versioning">Package Versioning</h4>
+<p>We can control which version of our shared package we install in multiple ways:</p>
+<ol>
+  <li><i>#semver:^x.x</i> - npm will look for any tags or refs matching that range in the remote repository</li>
+  <li><i>#branch-name</i> - npm will take a direct branch name</li>
+  <li><i>#commit</i> - npm will take a specific commit</li>
+</ol>
+
+<h4 id="caveats-for-npm-packages-consumed-directly-from-git">Caveats for npm packages consumed directly from git</h4>
+<p>An NPM package following best practices will usually have magic scripts such as:</p>
+<ol>
+  <li>prepare - usually will run a build script</li>
+  <li>prepublishOnly - will usually run tests and linters</li>
+  <li>preversion - will usually run a linter</li>
+  <li>version - can automatically create commits on version bumps</li>
+  <li>postversion - can automatically push to git</li>
+</ol>
+
+<p>We can’t have this in a package consumed directly from git, since there is no publish process.</p>
+
+<p>Another disadvantage will be the size of the package. 
+In a regular package we publish the compiled code, but don’t commit it to a source control.
+Meaning we have less code in git and consumers of our package will not receive the source code.</p>
+
+<p>In a git based npm packaged we must commit the compiled code together with the source code, otherwise our main project
+will not be able to use the package.</p>
+
+<h4 id="tree-shaking-to-mitigate-the-caveats">Tree shaking to mitigate the caveats</h4>
+<p>For inconvenience in the lack of magic commands there’s no straightforward solution (at least not one I’m aware of).<br />
+But for the size issue, we have tree shaking.
+If you’re not familiar with the term, tree-shaking is a step in build process that removes unused code, thus reducing the size of the final application.
+If you’re not using extremely outdated frameworks and build tools, you’ll usually get it with tools which come bundled with the framework.</p>
+
+<p>This means that even if you install a git based npm package, the unnecessary source code will not be part of your compiled production application.</p>
+
+<h4 id="wrapping-your-code-as-installable-npm-package">Wrapping your code as installable npm package</h4>
+<p>Initialize NPM package:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">npm init <span class="nt">-y</span></code></pre></figure>
+
+<p>Add typescript as a development dependency:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">npm <span class="nb">install</span> <span class="nt">--save-dev</span> typescript</code></pre></figure>
+
+<p>Create tsconfig.json:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="o">{</span>
+  <span class="s2">"compilerOptions"</span>: <span class="o">{</span>
+    <span class="s2">"target"</span>: <span class="s2">"es5"</span>,
+    <span class="s2">"module"</span>: <span class="s2">"commonjs"</span>,
+    <span class="s2">"declaration"</span>: <span class="nb">true</span>,
+    <span class="s2">"outDir"</span>: <span class="s2">"./lib"</span>,
+    <span class="s2">"strict"</span>: <span class="nb">true</span>
+  <span class="o">}</span>,
+  <span class="s2">"include"</span>: <span class="o">[</span><span class="s2">"src"</span><span class="o">]</span>,
+  <span class="s2">"exclude"</span>: <span class="o">[</span><span class="s2">"node_modules"</span>, <span class="s2">"**/__tests__/*"</span><span class="o">]</span>
+<span class="o">}</span></code></pre></figure>
+
+<p>I’m not going to go into tsconfig.json options since it’s out of context.<br />
+You can find a <a href="https://www.typescriptlang.org/tsconfig" target="_blank">comprehensive documentation</a> in the official website.</p>
+
+<h4 id="expanding-the-default-packagejson">Expanding the default package.json</h4>
+<p>The final basic version of the package.json should look like this:</p>
+
+<figure class="highlight"><pre><code class="language-json" data-lang="json"><span class="p">{</span><span class="w">
+  </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"your-package"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1.0.0"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"You package description"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"main"</span><span class="p">:</span><span class="w"> </span><span class="s2">"lib/index.js"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"types"</span><span class="p">:</span><span class="w"> </span><span class="s2">"lib/index.d.ts"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"scripts"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"build"</span><span class="p">:</span><span class="w"> </span><span class="s2">"tsc"</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nl">"dependencies"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="err">...dependencies</span><span class="w"> </span><span class="err">of</span><span class="w"> </span><span class="err">your</span><span class="w"> </span><span class="err">package</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nl">"devDependencies"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="err">...</span><span class="w">
+    </span><span class="nl">"typescript"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^4.0.5"</span><span class="w">
+    </span><span class="err">...</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nl">"repository"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"git"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"url"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://your-private-git-repo-url/your-package.git"</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"commonjs"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"author"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Your-name"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"license"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ISC"</span><span class="w">
+</span><span class="p">}</span></code></pre></figure>
+
+<p>The main keys here are <i>main</i> and <i>types</i> .</p>
+
+<ul>
+  <li><i>main<i></i> - indicates to npm from where to import the modules</i></li>
+  <li><i>types</i> - indicates for typescript and IDEs from where they can get type definitions for better developer experience</li>
+</ul>
+
+<h3 id="hello-world">Hello World</h3>
+<p>Once we got our basics ready, we can create a simple hello world package.</p>
+
+<p>Let’s create a file: <i>src/hello-world.ts<i></i></i></p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="k">export</span> <span class="kd">class</span> <span class="nx">HelloWorld</span> <span class="p">{</span>
+    <span class="kr">public</span> <span class="nx">greet</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="dl">'</span><span class="s1">Hello World</span><span class="dl">'</span><span class="p">;</span>
+<span class="p">}</span></code></pre></figure>
+
+<p>Now we need to make it exportable, create a file <i>src/index.ts</i></p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="k">export</span> <span class="p">{</span><span class="nx">HelloWorld</span><span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">./hello-world</span><span class="dl">'</span><span class="p">;</span></code></pre></figure>
+
+<p>Next, lets build it:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">npm run build</code></pre></figure>
+
+<p>After this, you’ll see new files added to the <i>/lib</i> folder of your project.</p>
+
+<h4 id="pushing-to-git">Pushing to git</h4>
+<p>For simplicity let’s use a simple branch name and not semvers, name your branch: <i>my-first-release</i>, and push the code.</p>
+
+<h4 id="using-the-package-from-the-main-project">Using the package from the main project</h4>
+<p>Let’s install the package:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">npm <span class="nb">install </span>git+https://your-private-git-repo-url/your-package.git#my-first-release <span class="nt">--save</span></code></pre></figure>
+
+<p>Now we can use it from the main project:</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="k">import</span> <span class="p">{</span><span class="nx">HelloWorld</span><span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">your-package</span><span class="dl">'</span><span class="p">;</span></code></pre></figure>
+
+  </div><a class="u-url" href="/jekyll/update/2022/07/10/using-git-as-npm-registry.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Jacob Shapira</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Jacob Shapira</li><li><a class="u-email" href="mailto:jacobamerz at gmail">jacobamerz at gmail</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

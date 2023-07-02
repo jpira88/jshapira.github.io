@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>Using decorators to replace and tweak 3rd party services for your specific needs | Jacob Shapira</title>
+<meta name="generator" content="Jekyll v4.2.1" />
+<meta property="og:title" content="Using decorators to replace and tweak 3rd party services for your specific needs" />
+<meta name="author" content="Jacob Shapira" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="What are decorators? Decorators allows us to enrich, or replace certain part of module we are not allowed (or shouldn’t) touch it’s source code. For example: 3rd party libraries, modules that we are not maintaining and the list can go on." />
+<meta property="og:description" content="What are decorators? Decorators allows us to enrich, or replace certain part of module we are not allowed (or shouldn’t) touch it’s source code. For example: 3rd party libraries, modules that we are not maintaining and the list can go on." />
+<link rel="canonical" href="https://jpira88.github.io/jacobshapira.github.io/jekyll/update/2015/11/18/decorators.html" />
+<meta property="og:url" content="https://jpira88.github.io/jacobshapira.github.io/jekyll/update/2015/11/18/decorators.html" />
+<meta property="og:site_name" content="Jacob Shapira" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2015-11-18T18:33:28+02:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Using decorators to replace and tweak 3rd party services for your specific needs" />
+<script type="application/ld+json">
+{"@type":"BlogPosting","url":"https://jpira88.github.io/jacobshapira.github.io/jekyll/update/2015/11/18/decorators.html","headline":"Using decorators to replace and tweak 3rd party services for your specific needs","dateModified":"2015-11-18T18:33:28+02:00","datePublished":"2015-11-18T18:33:28+02:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://jpira88.github.io/jacobshapira.github.io/jekyll/update/2015/11/18/decorators.html"},"author":{"@type":"Person","name":"Jacob Shapira"},"description":"What are decorators? Decorators allows us to enrich, or replace certain part of module we are not allowed (or shouldn’t) touch it’s source code. For example: 3rd party libraries, modules that we are not maintaining and the list can go on.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/styles.css">
+  <link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://jpira88.github.io/jacobshapira.github.io/feed.xml" title="Jacob Shapira" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Jacob Shapira</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a><a class="page-link" href="/tag/%23FE/">#FE</a><a class="page-link" href="/tag/%23JS/TS/">#JS/TS</a><a class="page-link" href="/tag/%23BE/">#BE</a><a class="page-link" href="/tag/%23PHP/">#PHP</a><a class="page-link" href="/tag/%23Performance/">#Performance</a><a class="page-link" href="/tag/%23DataEngineering/">#DataEngineering</a><a class="page-link" href="/tag/%23Java/">#Java</a><a class="page-link" href="/tag/%23Python/">#Python</a><a class="page-link" href="/tag/%23Architecture/">#Architecture</a><a class="page-link" href="/tag/%23Devops/">#Devops</a><a class="page-link" href="/tag/%23Cloud/">#Cloud</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Using decorators to replace and tweak 3rd party services for your specific needs</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2015-11-18T18:33:28+02:00" itemprop="datePublished">Nov 18, 2015
+      </time>• <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">Jacob Shapira</span></span></p>
+  </header>
+
+  
+  
+  
+  
+  <div id="dateValidity" class="outdated-warning">
+    <strong>Important Warning:</strong><br/>
+    This post was written a long time ago and its contents and code might be outdated or not aligned to current industry standards.<br/>
+    Please proceed with caution :-)
+  </div>
+  
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <h3 id="what-are-decorators">What are decorators?</h3>
+<p>Decorators allows us to enrich, or replace certain part of module we are not allowed (or shouldn’t) touch it’s source code. For example: 3rd party libraries, modules that we are not maintaining and the list can go on.</p>
+
+<h3 id="real-life-scenario">Real-life scenario</h3>
+<p>Let’s say we have file upload functionality in our application, and for that, we are using a great module we found ngmodules.org. For the sake of the example, let’s work with ng-file-upload.
+So, we are extremely satisfied with this module, but then one bright day the requirements of the file upload changed. From now on, we need to upload those files to a remote machine, using special access credentials.</p>
+
+<p>So what will we do? Should we replace the ng-file module? We can’t, we’re using it’s other nice features like drag and drop, image resize, shims for older IE’s and what not.
+Then should we rewrite the upload method of the module? We don’t want to go down that rabbit hole. We should avoid modifying vendor libraries as much as possible.</p>
+
+<h3 id="decorate-it">Decorate It</h3>
+<p>Then our best option is to decorate the service, by adding/replacing methods during our module’s config phase.</p>
+
+<p>Here is a simple upload example provided by the creator of ng-file-upload on its <a href="https://github.com/danialfarid/ng-file-upload" target="_blank">GitHub page</a>.</p>
+
+<p><br />
+<strong>View</strong></p>
+
+<figure class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;body</span> <span class="na">ng-app=</span><span class="s">"fileUpload"</span> <span class="na">ng-controller=</span><span class="s">"MyCtrl"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;form</span> <span class="na">name=</span><span class="s">"myForm"</span><span class="nt">&gt;</span>
+ 
+    <span class="nt">&lt;fieldset&gt;</span>
+ 
+      <span class="nt">&lt;legend&gt;</span>Upload on form submit<span class="nt">&lt;/legend&gt;</span>
+ 
+      Username:
+      <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"text"</span> <span class="na">name=</span><span class="s">"userName"</span> <span class="na">ng-model=</span><span class="s">"username"</span> <span class="na">size=</span><span class="s">"31"</span> <span class="na">required</span><span class="nt">&gt;</span>
+
+      <span class="nt">&lt;i</span> <span class="na">ng-show=</span><span class="s">"myForm.userName.$error.required"</span><span class="nt">&gt;</span>*required<span class="nt">&lt;/i&gt;</span>
+
+      Photo:
+      <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"file"</span> <span class="na">ngf-select</span> <span class="na">ng-model=</span><span class="s">"picFile"</span> <span class="na">name=</span><span class="s">"file"</span>    
+             <span class="na">accept=</span><span class="s">"image/*"</span> <span class="na">ngf-max-size=</span><span class="s">"2MB"</span> <span class="na">required</span><span class="nt">&gt;</span>
+ 
+      <span class="nt">&lt;i</span> <span class="na">ng-show=</span><span class="s">"myForm.file.$error.required"</span><span class="nt">&gt;</span>*required<span class="nt">&lt;/i&gt;&lt;br&gt;</span>
+ 
+      <span class="nt">&lt;i</span> <span class="na">ng-show=</span><span class="s">"myForm.file.$error.maxSize"</span><span class="nt">&gt;</span>File too large 
+          {picFile.size / 1000000|number:1}MB: max 2M<span class="nt">&lt;/i&gt;</span>
+ 
+      <span class="nt">&lt;img</span> <span class="na">ng-show=</span><span class="s">"myForm.file.$valid"</span> <span class="na">ngf-thumbnail=</span><span class="s">"picFile"</span> <span class="na">class=</span><span class="s">"thumb"</span><span class="nt">&gt;</span> <span class="nt">&lt;button</span> <span class="na">ng-click=</span><span class="s">"picFile = null"</span> <span class="na">ng-show=</span><span class="s">"picFile"</span><span class="nt">&gt;</span>Remove<span class="nt">&lt;/button&gt;</span>
+
+ 
+      <span class="nt">&lt;button</span> <span class="na">ng-disabled=</span><span class="s">"!myForm.$valid"</span> 
+              <span class="na">ng-click=</span><span class="s">"uploadPic(picFile)"</span><span class="nt">&gt;</span>Submit<span class="nt">&lt;/button&gt;</span>
+ 
+      <span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">"progress"</span> <span class="na">ng-show=</span><span class="s">"picFile.progress &gt;= 0"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;div</span> <span class="na">style=</span><span class="s">"width:%"</span> 
+            <span class="na">ng-bind=</span><span class="s">"picFile.progress + '%'"</span><span class="nt">&gt;&lt;/div&gt;</span>
+      <span class="nt">&lt;/span&gt;</span>
+ 
+      <span class="nt">&lt;span</span> <span class="na">ng-show=</span><span class="s">"picFile.result"</span><span class="nt">&gt;</span>Upload Successful<span class="nt">&lt;/span&gt;</span>
+      <span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">"err"</span> <span class="na">ng-show=</span><span class="s">"errorMsg"</span><span class="nt">&gt;&lt;/span&gt;</span>
+ 
+    <span class="nt">&lt;/fieldset&gt;</span>
+
+  <span class="nt">&lt;/form&gt;</span>
+<span class="nt">&lt;/body&gt;</span></code></pre></figure>
+
+<p><br />
+<strong>Controller</strong></p>
+
+<figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">//inject angular file upload directives and services.</span>
+<span class="kd">var</span> <span class="nx">app</span> <span class="o">=</span> <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="dl">'</span><span class="s1">fileUpload</span><span class="dl">'</span><span class="p">,</span> <span class="p">[</span><span class="dl">'</span><span class="s1">ngFileUpload</span><span class="dl">'</span><span class="p">]);</span>
+ 
+<span class="nx">app</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="dl">'</span><span class="s1">MyCtrl</span><span class="dl">'</span><span class="p">,</span> <span class="p">[</span><span class="dl">'</span><span class="s1">$scope</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">Upload</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">$timeout</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">Upload</span><span class="p">,</span> <span class="nx">$timeout</span><span class="p">)</span> <span class="p">{</span>
+ 
+    <span class="nx">$scope</span><span class="p">.</span><span class="nx">uploadPic</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">file</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">file</span><span class="p">.</span><span class="nx">upload</span> <span class="o">=</span> <span class="nx">Upload</span><span class="p">.</span><span class="nx">upload</span><span class="p">({</span>
+      <span class="na">url</span><span class="p">:</span> <span class="dl">'</span><span class="s1">https://angular-file-upload-cors-srv.appspot.com/upload</span><span class="dl">'</span><span class="p">,</span>
+      <span class="na">data</span><span class="p">:</span> <span class="p">{</span><span class="na">file</span><span class="p">:</span> <span class="nx">file</span><span class="p">,</span> <span class="na">username</span><span class="p">:</span> <span class="nx">$scope</span><span class="p">.</span><span class="nx">username</span><span class="p">},</span>
+    <span class="p">});</span>
+ 
+    <span class="nx">file</span><span class="p">.</span><span class="nx">upload</span><span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">$timeout</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+        <span class="nx">file</span><span class="p">.</span><span class="nx">result</span> <span class="o">=</span> <span class="nx">response</span><span class="p">.</span><span class="nx">data</span><span class="p">;</span>
+      <span class="p">});</span>
+    <span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">$scope</span><span class="p">.</span><span class="nx">errorMsg</span> <span class="o">=</span> <span class="nx">response</span><span class="p">.</span><span class="nx">status</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">: </span><span class="dl">'</span> <span class="o">+</span> <span class="nx">response</span><span class="p">.</span><span class="nx">data</span><span class="p">;</span>
+    <span class="p">}),</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">evt</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// Math.min is to fix IE which reports 200% sometimes</span>
+      <span class="nx">file</span><span class="p">.</span><span class="nx">progress</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">min</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="nb">parseInt</span><span class="p">(</span><span class="mf">100.0</span> <span class="o">*</span> <span class="nx">evt</span><span class="p">.</span><span class="nx">loaded</span> <span class="o">/</span> <span class="nx">evt</span><span class="p">.</span><span class="nx">total</span><span class="p">));</span>
+    <span class="p">});</span>
+    <span class="p">}</span>
+<span class="p">}]);</span></code></pre></figure>
+
+<p><br /></p>
+<h3 id="replacing-the-upload-method-without-touching-vendors-code">Replacing the upload method without touching vendors code</h3>
+<p>For the sake of the example, let’s say we’ve used his example as is. We also used the drag and drop, image resize and shim functionality.
+But now we need to replace only the upload method without touching any code of the library. 
+<br /></p>
+
+<h4 id="step-1--replacing-the-upload-method-of-the-service-in-our-modules-config-phase">Step 1 – Replacing the upload method of the service in our module’s config phase</h4>
+
+<figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">app</span><span class="p">.</span><span class="nx">config</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">$provide</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">$provide</span><span class="p">.</span><span class="nx">decorator</span><span class="p">(</span><span class="dl">'</span><span class="s1">Upload</span><span class="dl">'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$delegate</span><span class="p">,</span> <span class="nx">$q</span><span class="p">)</span> <span class="p">{</span>
+ 
+        <span class="nx">$delegate</span><span class="p">.</span><span class="nx">upload</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+ 
+            <span class="kd">var</span> <span class="nx">deferred</span> <span class="o">=</span> <span class="nx">$q</span><span class="p">.</span><span class="nx">defer</span><span class="p">();</span>
+ 
+            <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">We have replaced the original upload method</span><span class="dl">'</span><span class="p">);</span>
+ 
+            <span class="nx">deferred</span><span class="p">.</span><span class="nx">resolve</span><span class="p">();</span>
+ 
+            <span class="c1">// no error handling for the sake of simplicity</span>
+ 
+            <span class="k">return</span> <span class="nx">deferred</span><span class="p">.</span><span class="nx">promise</span><span class="p">;</span>
+        <span class="p">}</span>
+ 
+        <span class="k">return</span> <span class="nx">$delegate</span><span class="p">;</span>
+    <span class="p">});</span>
+<span class="p">});</span></code></pre></figure>
+
+<p><br /></p>
+<h4 id="step-2--replace-the-upload-usage-in-our-controller-to-play-nicely-with-our-new-upload-method">Step 2 – Replace the .upload usage in our controller to play nicely with our new upload method</h4>
+
+<figure class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">file</span><span class="p">.</span><span class="nx">upload</span> <span class="o">=</span> <span class="nx">Upload</span><span class="p">.</span><span class="nx">upload</span><span class="p">({</span>
+  <span class="na">url</span><span class="p">:</span> <span class="dl">'</span><span class="s1">https://angular-file-upload-cors-srv.appspot.com/upload</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">data</span><span class="p">:</span> <span class="p">{</span><span class="na">file</span><span class="p">:</span> <span class="nx">file</span><span class="p">,</span> <span class="na">username</span><span class="p">:</span> <span class="nx">$scope</span><span class="p">.</span><span class="nx">username</span><span class="p">},</span>
+<span class="p">}).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">$scope</span><span class="p">.</span><span class="nx">picFile</span><span class="p">.</span><span class="nx">result</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+<span class="p">});</span></code></pre></figure>
+
+<p>As you can see, in the config phase of our module, we used $provide to decorate our Upload service.
+We have used $delegate (which is the original service instance) and replaced its upload method to a method that suits our needs.
+Then we adjusted our controller to play nicely with our new .upload method, and that’s it.</p>
+
+<p>In some cases, when we can make the replaced method to return the same data to success/errors, we don’t even have to touch our controllers.
+So from a possibly costly change in the application, we can get away with decorating one single method.</p>
+
+  </div><a class="u-url" href="/jekyll/update/2015/11/18/decorators.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Jacob Shapira</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Jacob Shapira</li><li><a class="u-email" href="mailto:jacobamerz at gmail">jacobamerz at gmail</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

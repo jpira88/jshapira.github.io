@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>Debugging memory leaks: When the famous 3 snapshot technique can cost you days of development | Jacob Shapira</title>
+<meta name="generator" content="Jekyll v4.2.1" />
+<meta property="og:title" content="Debugging memory leaks: When the famous 3 snapshot technique can cost you days of development" />
+<meta name="author" content="Jacob Shapira" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Pretty much every second article about debugging memory leaks demonstrates the great 3 snapshot technique introduced by the GMail team and which was used to debug heavy memory leaks in GMail. While there’s no doubt about it being a great idea, it seems that not many mention the possible problem that may occur if you rely on only 3 snapshots without understanding 100% of your framework, vendor libraries and internals of JavaScript. You might say that one must actually understand and know every line of code in a project he is working on, and it surely an admirable statement, but not really practical in the real world for medium+ sized applications. Just for some proportions: one of the world most famous UI libraries, Kendo, is 166,000 line of codes." />
+<meta property="og:description" content="Pretty much every second article about debugging memory leaks demonstrates the great 3 snapshot technique introduced by the GMail team and which was used to debug heavy memory leaks in GMail. While there’s no doubt about it being a great idea, it seems that not many mention the possible problem that may occur if you rely on only 3 snapshots without understanding 100% of your framework, vendor libraries and internals of JavaScript. You might say that one must actually understand and know every line of code in a project he is working on, and it surely an admirable statement, but not really practical in the real world for medium+ sized applications. Just for some proportions: one of the world most famous UI libraries, Kendo, is 166,000 line of codes." />
+<link rel="canonical" href="http://localhost:4000/jacobshapira.github.io/jekyll/update/2016/01/17/debugging-memory-leaks.html" />
+<meta property="og:url" content="http://localhost:4000/jacobshapira.github.io/jekyll/update/2016/01/17/debugging-memory-leaks.html" />
+<meta property="og:site_name" content="Jacob Shapira" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2016-01-17T18:33:28+02:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Debugging memory leaks: When the famous 3 snapshot technique can cost you days of development" />
+<script type="application/ld+json">
+{"@type":"BlogPosting","headline":"Debugging memory leaks: When the famous 3 snapshot technique can cost you days of development","dateModified":"2016-01-17T18:33:28+02:00","datePublished":"2016-01-17T18:33:28+02:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/jacobshapira.github.io/jekyll/update/2016/01/17/debugging-memory-leaks.html"},"url":"http://localhost:4000/jacobshapira.github.io/jekyll/update/2016/01/17/debugging-memory-leaks.html","author":{"@type":"Person","name":"Jacob Shapira"},"description":"Pretty much every second article about debugging memory leaks demonstrates the great 3 snapshot technique introduced by the GMail team and which was used to debug heavy memory leaks in GMail. While there’s no doubt about it being a great idea, it seems that not many mention the possible problem that may occur if you rely on only 3 snapshots without understanding 100% of your framework, vendor libraries and internals of JavaScript. You might say that one must actually understand and know every line of code in a project he is working on, and it surely an admirable statement, but not really practical in the real world for medium+ sized applications. Just for some proportions: one of the world most famous UI libraries, Kendo, is 166,000 line of codes.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/styles.css">
+  <link rel="stylesheet" href="/jacobshapira.github.io/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/jacobshapira.github.io/feed.xml" title="Jacob Shapira" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/jacobshapira.github.io/">Jacob Shapira</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/jacobshapira.github.io/about/">About</a><a class="page-link" href="/jacobshapira.github.io/tag/%23FE/">#FE</a><a class="page-link" href="/jacobshapira.github.io/tag/%23JS/TS/">#JS/TS</a><a class="page-link" href="/jacobshapira.github.io/tag/%23BE/">#BE</a><a class="page-link" href="/jacobshapira.github.io/tag/%23PHP/">#PHP</a><a class="page-link" href="/jacobshapira.github.io/tag/%23Performance/">#Performance</a><a class="page-link" href="/jacobshapira.github.io/tag/%23DataEngineering/">#DataEngineering</a><a class="page-link" href="/jacobshapira.github.io/tag/%23Java/">#Java</a><a class="page-link" href="/jacobshapira.github.io/tag/%23Python/">#Python</a><a class="page-link" href="/jacobshapira.github.io/tag/%23Architecture/">#Architecture</a><a class="page-link" href="/jacobshapira.github.io/tag/%23Devops/">#Devops</a><a class="page-link" href="/jacobshapira.github.io/tag/%23Cloud/">#Cloud</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Debugging memory leaks: When the famous 3 snapshot technique can cost you days of development</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2016-01-17T18:33:28+02:00" itemprop="datePublished">Jan 17, 2016
+      </time>• <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">Jacob Shapira</span></span></p>
+  </header>
+
+  
+  
+  
+  
+  <div id="dateValidity" class="outdated-warning">
+    <strong>Important Warning:</strong><br/>
+    This post was written a long time ago and its contents and code might be outdated or not aligned to current industry standards.<br/>
+    Please proceed with caution :-)
+  </div>
+  
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>Pretty much every second article about debugging memory leaks demonstrates the great 3 snapshot technique introduced by the GMail team and which was used to
+debug heavy memory leaks in GMail. While there’s no doubt about it being a great idea,
+it seems that not many mention the possible problem that may occur if you rely on only 3 snapshots without understanding 100% of your framework,
+vendor libraries and internals of JavaScript. You might say that one must actually understand and know every line of code in a project he is working on,
+and it surely an admirable statement, but not really practical in the real world for medium+ sized applications.
+Just for some proportions: one of the world most famous UI libraries, Kendo, is 166,000 line of codes.</p>
+
+<p><br /></p>
+
+<h3 id="whats-the-possible-problem-with-only-3-snapshots">What’s the possible problem with only 3 snapshots?</h3>
+<p>Well, basically, that snapshot 3 may send you barking at the wrong tree for days. The 3 snapshot technique suggest that objects allocated between snapshots #1 and #2 and still exists in snapshot #3 might be leaking, which is not true in many cases, cases like singleton implementations, services, factories (a nice example will be Angular on-demand instantiation), some of native JS interfaces and basically everything that instantiated between #1 and #2 and have all the rights to keep on living in snapshot #3.
+<br /><br /></p>
+<h3 id="example">Example</h3>
+<p>Let’s take a simple code sample where we have 2 buttons, one add items to array and the other removes them. The array lives in a singleton which is instantiated only on demand, but after it was instantiated once, he keeps on living as a global. (I know, globals are the devils work, but bare with me for the sake of the example).</p>
+
+<p><strong>singelton.html</strong></p>
+
+<figure class="highlight"><pre><code class="language-html" data-lang="html"><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="nt">&lt;head&gt;</span>
+    <span class="nt">&lt;title&gt;</span>Memory Test<span class="nt">&lt;/title&gt;</span>
+<span class="nt">&lt;/head&gt;</span>
+<span class="nt">&lt;body&gt;</span>
+    <span class="nt">&lt;button</span> <span class="na">id=</span><span class="s">"addData"</span><span class="nt">&gt;</span>addData<span class="nt">&lt;/button&gt;</span>
+    <span class="nt">&lt;button</span> <span class="na">id=</span><span class="s">"removeData"</span><span class="nt">&gt;</span>removeData<span class="nt">&lt;/button&gt;</span>
+    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"singleton.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span></code></pre></figure>
+
+<p><strong>singleton.js</strong><br />
+I’ve explicitly named the public/private for retainers differentiation ease.</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">myDataLayer</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+ 
+<span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="dl">"</span><span class="s2">addData</span><span class="dl">"</span><span class="p">).</span><span class="nx">addEventListener</span><span class="p">(</span><span class="dl">"</span><span class="s2">click</span><span class="dl">"</span><span class="p">,</span> <span class="nx">addData</span><span class="p">);</span>
+<span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="dl">"</span><span class="s2">removeData</span><span class="dl">"</span><span class="p">).</span><span class="nx">addEventListener</span><span class="p">(</span><span class="dl">"</span><span class="s2">click</span><span class="dl">"</span><span class="p">,</span> <span class="nx">removeData</span><span class="p">);</span>
+ 
+<span class="kd">function</span> <span class="nx">getSingleton</span><span class="p">()</span> <span class="p">{</span>
+ 
+    <span class="k">if</span> <span class="p">(</span><span class="nx">myDataLayer</span><span class="p">)</span> <span class="k">return</span> <span class="nx">myDataLayer</span><span class="p">;</span>
+ 
+    <span class="nx">myDataLayer</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+ 
+            <span class="kd">var</span> <span class="nx">instance</span><span class="p">;</span>
+ 
+            <span class="kd">function</span> <span class="nx">init</span><span class="p">()</span> <span class="p">{</span>
+ 
+                <span class="kd">var</span> <span class="nx">privateDataArray</span> <span class="o">=</span> <span class="p">[],</span> <span class="nx">i</span><span class="p">;</span>
+ 
+                <span class="kd">function</span> <span class="nx">privateAddToData</span><span class="p">(</span><span class="nx">numOfItems</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="k">for</span> <span class="p">(</span><span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;=</span><span class="nx">numOfItems</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+                        <span class="nx">privateDataArray</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">());</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+ 
+                <span class="kd">function</span> <span class="nx">privateEmptyData</span><span class="p">()</span> <span class="p">{</span>
+                    <span class="nx">privateDataArray</span><span class="p">.</span><span class="nx">length</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+                <span class="p">}</span>
+ 
+                <span class="k">return</span> <span class="p">{</span>
+                    <span class="na">publicAddToData</span><span class="p">:</span> <span class="nx">privateAddToData</span><span class="p">,</span>
+                    <span class="na">publicEmptyData</span><span class="p">:</span> <span class="nx">privateEmptyData</span>
+                <span class="p">};</span>
+ 
+            <span class="p">}</span>
+ 
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="na">getInstance</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+                    <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="nx">instance</span> <span class="p">)</span> <span class="p">{</span>
+                        <span class="nx">instance</span> <span class="o">=</span> <span class="nx">init</span><span class="p">();</span>
+                    <span class="p">}</span>
+                    <span class="k">return</span> <span class="nx">instance</span><span class="p">;</span>
+                <span class="p">}</span>
+            <span class="p">};</span>
+ 
+    <span class="p">})();</span>
+ 
+    <span class="k">return</span> <span class="nx">myDataLayer</span><span class="p">;</span>
+<span class="p">}</span>
+ 
+<span class="kd">function</span> <span class="nx">addData</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">getSingleton</span><span class="p">().</span><span class="nx">getInstance</span><span class="p">().</span><span class="nx">publicAddToData</span><span class="p">(</span><span class="mi">100000</span><span class="p">);</span>
+<span class="p">}</span>
+ 
+<span class="kd">function</span> <span class="nx">removeData</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">getSingleton</span><span class="p">().</span><span class="nx">getInstance</span><span class="p">().</span><span class="nx">publicEmptyData</span><span class="p">();</span>
+<span class="p">}</span></code></pre></figure>
+
+<p>Ok so we have this tiny app and we want to make sure we haven’t created any memory leaks, let’s use the 3 snapshot technique (please make sure to test it in incognito and disable all active extensions):</p>
+
+<ol>
+  <li>Open the app and take the snapshot in our “healthy” mode</li>
+  <li>Now click on addData and take another snapshot</li>
+  <li>After this, click on removeData and take another snapshot</li>
+  <li>Next, in snapshot #3, click on Summary and then filter only Objects allocated between Snapshot #1 and Snapshot #2</li>
+</ol>
+
+<p>We will see something like this:</p>
+
+<p><a href="/assets/post-images/21-01-2016-memory-leaks/memory-leaks-1.jpg" target="_blank"><img src="/assets/post-images/21-01-2016-memory-leaks/memory-leaks-1.jpg" alt="Memory Inspection" /></a></p>
+
+<p><br /></p>
+<h4 id="wait-what-we-have-objects-that-arent-browsers-internals-still-allocated-in-snapshot-3-do-we-have-a-leak">Wait, what? We have objects that aren’t browser’s internals still allocated in snapshot #3. Do we have a leak?</h4>
+<p>Well, no. As you can see, those objects and arrays related to the singleton we instantiated and to JavaScript’s UI Event and MouseEvent interfaces. All of them logically supposed to live in the 3rd snapshot. The singleton because it’s a global, and the JS Native objects because we still have an active listener (those objects created when the actual click performed, that’s why it’s displaying as objects allocated between snapshot #1 and #2). So yes, we have objects in the 3rd snapshot, but they are not leaking</p>
+
+<p><br /></p>
+<h4 id="but-thats-easy-i-know-i-need-to-ignore-those-object-ill-just-look-for-something-relevant">But that’s easy, i know i need to ignore those object. I’ll just look for something relevant</h4>
+<p>In this tiny app you may easily find what is relevant and what is not, but if you’re debugging a medium+ application with multiple vendor libraries and complicated business logic, you may waste a lot of time chasing down irrelevant retainers.</p>
+
+<p><br /></p>
+<h4 id="so-what-can-we-do">So, what can we do?</h4>
+<p>Consider this: when you have a memory leak in a set of actions (a flow), repeating this action several times will result in a positive linear graph in the JS heap or DOM count (or both). In simple words, in most cases the graph will keep going up as long you’ll keep doing the same action that is causing the leak (i’ll write about a single leak which won’t result in a linear leak in a few moments). Meaning that objects leaked in snapshot #3, will be kept in all following snapshots, and additional memory will be allocated on top of what was in #3. So if you have a linear leak, you may take 5 snapshots and in snapshot #5 compare snapshots #3 and #4 and discover similar types of objects as you discovered in #1 and #2.</p>
+
+<p><br />
+<strong>For example:</strong><br />
+If in snapshot #3, you are viewing objects allocated between #1 and #2, and you see something like:<br />
+<code class="language-plaintext highlighter-rouge">leakedObject @1</code><br />
+(@ is the location in memory),
+then in snapshot #5, where you’ll be comparing objects that were allocated between #3 and #4, you’ll see something like:<br />
+<code class="language-plaintext highlighter-rouge">leakedObject @2</code><br />
+Meaning, the same object type, leaked twice and created linear leak. If you remove the filter completely and view everything existing in snapshot #5, you will see</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>leakedObject @1
+leakedObject @2
+</code></pre></div></div>
+
+<p><br /></p>
+<h4 id="but-what-good-itll-make-to-take-5-or-even-7-and-not-3">But what good it’ll make to take 5 (or even 7) and not 3?</h4>
+<p>Let’s get back to our tiny app, and repeat the snapshots process, but now we’ll make 7 snapshots and not 3. Repeat those actions (don’t forget incognito to disable all of the extensions):</p>
+
+<ol>
+  <li>Take a snapshot #1 before we begin</li>
+  <li>Click on add data, take snapshot #2</li>
+  <li>Click on remove data, take snapshot #3</li>
+  <li>Click on add data, take snapshot #4</li>
+  <li>Click on remove data, take snapshot #5</li>
+  <li>Click on add data, take snapshot #6</li>
+  <li>Click on remove data, take snapshot #7</li>
+</ol>
+
+<p>You’ll see something like this:</p>
+
+<p><a href="/assets/post-images/21-01-2016-memory-leaks/memory-leaks-2.jpg" target="_blank"><img src="/assets/post-images/21-01-2016-memory-leaks/memory-leaks-2.jpg" alt="Memory Inspection" /></a></p>
+
+<p>Next, if you’ll go to snapshot #3 and compare between #1 and #2, you’ll see something like this:</p>
+
+<p><a href="/assets/post-images/21-01-2016-memory-leaks/memory-leaks-3.jpg" target="_blank"><img src="/assets/post-images/21-01-2016-memory-leaks/memory-leaks-3.jpg" alt="Memory Inspection" /></a></p>
+
+<p>As you can see, we have allocated Objects and an increase of 100kb in memory, which in a case you are not 100% familiar with 100% of the app, would’ve make you think you have a leak.</p>
+
+<p>Now lets go to snapshot #5 and there compare between snapshots #3 and #4:</p>
+
+<p><a href="/assets/post-images/21-01-2016-memory-leaks/memory-leaks-4.jpg" target="_blank"><img src="/assets/post-images/21-01-2016-memory-leaks/memory-leaks-4.jpg" alt="Memory Inspection" /></a></p>
+
+<p>you’ll see 2 things:</p>
+<ol>
+  <li>No more increase in memory between #3 and #5.</li>
+  <li>No more allocated objects that still living in snapshot #5 (objects wrapped in brackets are browsers internals, we ignore them).</li>
+</ol>
+
+<p>But wait, the browser internals makes us worry, we don’t want to stick our head in the sand and we want to make sure nothing is leaked. No problem, lets take a look at snapshot #7 and there compare objects that were allocated between #3 and #4:</p>
+
+<p><a href="/assets/post-images/21-01-2016-memory-leaks/memory-leaks-5.jpg" target="_blank"><img src="/assets/post-images/21-01-2016-memory-leaks/memory-leaks-5.jpg" alt="Memory Inspection" /></a></p>
+
+<p>We see nothing. No memory size increase, no allocated objects, internal or not. That means that whatever happened in #3-#4 was completely removed, meaning we don’t have any leaks.</p>
+
+<p>Do you see the difference? Using 7 snapshots we validated that we don’t have linear memory leak and our application in an healthy mode. But if we would’ve used only 3 snapshots, we could’ve been wasting our time chasing down retainers just to find the that it’s really OK for the singleton and the internal JS interfaces to be kept in memory.</p>
+
+<p><br /></p>
+<h4 id="what-about-one-time-leaks">What about one-time leaks?</h4>
+<p>You are right to think that only the 3 snapshot technique will catch a leak that happens only once between snapshots #1 – #2. Unfortunately i don’t have a better advice than going and checking every single retainer, understanding what it does and than deciding if it’s a leak or by design. My only advice is to be smart about it, if you see that in the first run your memory jumps to unreasonable numbers (unreasonable depends on the application and the devices running it), you’re definitely should take the time to look into it. But if the have an additional 100-200kb, or even 1mb that allocated only once and you’re not sure if they should, most of the current devices (of course with some exceptions) are strong enough to make you think twice if it’s worth your time.</p>
+
+  </div><a class="u-url" href="/jacobshapira.github.io/jekyll/update/2016/01/17/debugging-memory-leaks.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/jacobshapira.github.io/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Jacob Shapira</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Jacob Shapira</li><li><a class="u-email" href="mailto:jacobamerz at gmail">jacobamerz at gmail</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

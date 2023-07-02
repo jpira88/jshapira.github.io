@@ -27,7 +27,7 @@ But, up and running not necessarily means that a container is ready to receive r
 As you can see, UI BE depends on MySQL DB. For the sake of the example, let's say that on instantiation,
 each UI BE pod needs to bring some data from MySQL to memory to serve requests.
 
-#### Problem #1 - Replica changes in time of manual scaling, or even worse, HPA (Horizontal Pod Autoscaling)
+#### Problem #1 - replica changes in time of manual scaling, or even worse, HPA (horizontal pod autoscaling)
 You got to a point where you need to change the replicas number of your pods.
 This can be a simple case where your store gained popularity, and you need to add more replicas to cope with the increasing demand,
 or it can be a more complex case, where you've running in a cluster with configured HPA (Horizontal Pod Autoscaling).  
@@ -42,7 +42,7 @@ While this might be an edge case if you do manual scaling,
 if HPA is configured in your cluster, which means that replicas will be changed quite frequently - your workload will be extremely unstable.
 
 
-#### Problem #2 - Applicative errors that don't crash the main process
+#### Problem #2 - applicative errors that don't crash the main process
 Let's say one of your containers encountered a critical applicative error which makes the application instance unusable, while the main
 process is still active.
 Same as before, all events proxied by the UI BE service to the pod with the unusable application, will be lost or will have to be retried.
@@ -74,7 +74,7 @@ To make it easy to understand, let's create a comparison table:
 | successThreshold    |   Minimum consecutive successes for the probe to be considered successful after having failed    | Must be 1 for liveness and startup probes |
 | failureThreshold  | How many times a probe should run before failure is declared and an action on failure will be executed (as described in the table above)   | 3 |
 
-#### Types of Probe Actions
+#### Types of probe actions
 There are 3 types of probe actions:
 
 * HTTP
@@ -82,7 +82,7 @@ There are 3 types of probe actions:
 * Command
 
 
-#### HTTP Action
+#### HTTP action
 
 Kubelet will send an HTTP GET request to an endpoint, and will define any status code from the 200-300 ranges as a success.
 
@@ -96,13 +96,13 @@ HTTP Can be configured with additional parameters:
 | httpHeaders  |  Custom headers (e.g, Authorization header)  | - |
 | port | Access port | - |
 
-#### TCP Action
+#### TCP action
 Just checks a successful TCP connection. If a connection is established the probe considered successful.
 
-#### Command Action
+#### Command action
 Runs a shell command inside the container. On 0 exist code, action will be considered successful.
 
-#### Complete Example
+#### Complete example
 An example for 3 different type of probes, each of them with a different action method.
 {% highlight yaml %}
 apiVersion: v1 

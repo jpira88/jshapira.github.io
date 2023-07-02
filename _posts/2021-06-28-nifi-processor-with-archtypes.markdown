@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Creating Custom NiFI Processors with Maven Archetypes"
+title:  "Creating custom NiFI processors with Maven Archetypes"
 date:  2021-06-28 18:33:28 +0200
 categories: jekyll update
 author: Jacob Shapira
@@ -24,7 +24,7 @@ Processor projects usually organized in bundle which composed of:
 * A Maven project responsible for packaging the processors into a NAR.
 * A pom for the entire bundle that generates both of the projects above.
 
-### Processor Archetype
+### Processor archetype
 NiFi supplies a Maven Archetype to easily generate the bundle structure and a lot of boilerplate code,
 allowing you to start writing your processor code without having to worry about the boilerplate.
 
@@ -57,17 +57,17 @@ Let's assume your bundle name is <i>customprocessor</i>, then I'll suggest filli
 * <b>artifactId</b> - <i>nifi-customprocessor-bundle</i>
 * <b>package</b> - The Java package for the processor
 
-#### Project Structure
+#### Project structure
 As described above, the output will be 2 projects and a POM file, and look like this:
 
 ![Project Output](/assets/post-images/2021-06-28-nifi-processor/output.JPG)
 
-#### Boilerplate Code
+#### Boilerplate code
 If you'll inspect the processor class that was generated for you in the processor project, you'll notice a lot of boilerplate code provided for you,
 so all you have to do is start implementing your propriety business logic.
 
 ![Project Output](/assets/post-images/2021-06-28-nifi-processor/code-boilerplate.JPG)
 
-### Build and Deploy
+### Build and deploy
 Next, run `mvn clean install` and copy the NAR file to NiFi `/lib` directory.
 After this, restart NiFi and your processors should be available.

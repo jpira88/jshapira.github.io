@@ -113,7 +113,7 @@ Ok so we have this tiny app and we want to make sure we haven’t created any me
 We will see something like this:   
    
 
-[![Memory Inspection](/assets/post-images/21-01-2016-memory-leaks/memory-leaks-1.jpg)](/assets/post-images/21-01-2016-memory-leaks/memory-leaks-1.jpg){:target="_blank"}
+[![Memory Inspection]({{ site.baseurl }}/assets/post-images/21-01-2016-memory-leaks/memory-leaks-1.jpg)]({{ site.baseurl }}/assets/post-images/21-01-2016-memory-leaks/memory-leaks-1.jpg){:target="_blank"}
 
 <br/>
 #### Wait, what? We have objects that aren’t browser’s internals still allocated in snapshot #3. Do we have a leak?
@@ -154,17 +154,17 @@ Let’s get back to our tiny app, and repeat the snapshots process, but now we�
   
 You’ll see something like this:  
 
-[![Memory Inspection](/assets/post-images/21-01-2016-memory-leaks/memory-leaks-2.jpg)](/assets/post-images/21-01-2016-memory-leaks/memory-leaks-2.jpg){:target="_blank"}
+[![Memory Inspection]({{ site.baseurl }}/assets/post-images/21-01-2016-memory-leaks/memory-leaks-2.jpg)]({{ site.baseurl }}/assets/post-images/21-01-2016-memory-leaks/memory-leaks-2.jpg){:target="_blank"}
   
 Next, if you’ll go to snapshot #3 and compare between #1 and #2, you’ll see something like this:  
 
-[![Memory Inspection](/assets/post-images/21-01-2016-memory-leaks/memory-leaks-3.jpg)](/assets/post-images/21-01-2016-memory-leaks/memory-leaks-3.jpg){:target="_blank"}
+[![Memory Inspection]({{ site.baseurl }}/assets/post-images/21-01-2016-memory-leaks/memory-leaks-3.jpg)]({{ site.baseurl }}/assets/post-images/21-01-2016-memory-leaks/memory-leaks-3.jpg){:target="_blank"}
 
 As you can see, we have allocated Objects and an increase of 100kb in memory, which in a case you are not 100% familiar with 100% of the app, would’ve make you think you have a leak. 
   
 Now lets go to snapshot #5 and there compare between snapshots #3 and #4:  
 
-[![Memory Inspection](/assets/post-images/21-01-2016-memory-leaks/memory-leaks-4.jpg)](/assets/post-images/21-01-2016-memory-leaks/memory-leaks-4.jpg){:target="_blank"}
+[![Memory Inspection]({{ site.baseurl }}/assets/post-images/21-01-2016-memory-leaks/memory-leaks-4.jpg)]({{ site.baseurl }}/assets/post-images/21-01-2016-memory-leaks/memory-leaks-4.jpg){:target="_blank"}
 
 you’ll see 2 things:  
 1. No more increase in memory between #3 and #5.  
@@ -172,7 +172,7 @@ you’ll see 2 things:
 
 But wait, the browser internals makes us worry, we don’t want to stick our head in the sand and we want to make sure nothing is leaked. No problem, lets take a look at snapshot #7 and there compare objects that were allocated between #3 and #4:  
 
-[![Memory Inspection](/assets/post-images/21-01-2016-memory-leaks/memory-leaks-5.jpg)](/assets/post-images/21-01-2016-memory-leaks/memory-leaks-5.jpg){:target="_blank"}
+[![Memory Inspection]({{ site.baseurl }}/assets/post-images/21-01-2016-memory-leaks/memory-leaks-5.jpg)]({{ site.baseurl }}/assets/post-images/21-01-2016-memory-leaks/memory-leaks-5.jpg){:target="_blank"}
 
 We see nothing. No memory size increase, no allocated objects, internal or not. That means that whatever happened in #3-#4 was completely removed, meaning we don’t have any leaks.
 

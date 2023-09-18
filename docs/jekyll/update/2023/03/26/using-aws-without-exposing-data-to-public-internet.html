@@ -20,7 +20,7 @@
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Jacob Shapira"},"dateModified":"2023-03-26T12:31:29+03:00","datePublished":"2023-03-26T12:31:29+03:00","description":"While there are a lot of tools to secure your data while being transferred over the internet, the most secured method of them all is not to do it at all. Obviously this approach limits us in many ways, including (but not limited to) leveraging the power of public clouds.","headline":"Leverage AWS Direct Connect to use AWS services without exposing your data to the public internet","mainEntityOfPage":{"@type":"WebPage","@id":"https://jshapira.github.io/jshapira.github.io/jekyll/update/2023/03/26/using-aws-without-exposing-data-to-public-internet.html"},"url":"https://jshapira.github.io/jshapira.github.io/jekyll/update/2023/03/26/using-aws-without-exposing-data-to-public-internet.html"}</script>
 <!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/assets/css/styles.css">
+<link rel="stylesheet" href="/jshapira.github.io/assets/css/styles.css">
   <link rel="stylesheet" href="/jshapira.github.io/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://jshapira.github.io/jshapira.github.io/feed.xml" title="jshapira" /></head>
 <body><header class="site-header" role="banner">
 
@@ -62,7 +62,7 @@ Obviously this approach limits us in many ways, including (but not limited to) l
 
 <p>The general idea of Direct Connect is to create physical connections between AWS Backbone network and your data center via AWS Direct connect location partner.</p>
 
-<p><a href="/assets/post-images/2023-03-26-direct-connect/direct-connect-general-arch.JPG" target="_blank"><img src="/assets/post-images/2023-03-26-direct-connect/direct-connect-general-arch.JPG" alt="AWS Direct Connect" /></a></p>
+<p><a href="/jshapira.github.io/assets/post-images/2023-03-26-direct-connect/direct-connect-general-arch.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2023-03-26-direct-connect/direct-connect-general-arch.JPG" alt="AWS Direct Connect" /></a></p>
 
 <p>As shown in the diagram, you can physically connect your data center to a router located in the direct connect partner. 
 From there, the partner will cross connect your router to AWS router connected to AWS backbone. 
@@ -107,7 +107,7 @@ correct routers on AWS.</p>
 
 <p>You should use the same VLAN tags on your end, as illustrated below:</p>
 
-<p><a href="/assets/post-images/2023-03-26-direct-connect/direct-connect-with-vlans.JPG" target="_blank"><img src="/assets/post-images/2023-03-26-direct-connect/direct-connect-with-vlans.JPG" alt="AWS Direct Connect" /></a></p>
+<p><a href="/jshapira.github.io/assets/post-images/2023-03-26-direct-connect/direct-connect-with-vlans.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2023-03-26-direct-connect/direct-connect-with-vlans.JPG" alt="AWS Direct Connect" /></a></p>
 
 <p>This is a high level diagram of how things work. 
 You can find a neat <a href="https://docs.aws.amazon.com/directconnect/latest/UserGuide/getting_started.html#ConnectionRequest" target="_blank">step-by-step guide in AWS documentation</a>.</p>

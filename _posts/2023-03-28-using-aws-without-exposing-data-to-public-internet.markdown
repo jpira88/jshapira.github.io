@@ -16,7 +16,7 @@ Luckily, AWS (and GCP, but it's out of scope for this post) provides us with a w
 The general idea of Direct Connect is to create physical connections between AWS Backbone network and your data center via AWS Direct connect location partner.
 
 
-[![AWS Direct Connect](/assets/post-images/2023-03-26-direct-connect/direct-connect-general-arch.JPG)](/assets/post-images/2023-03-26-direct-connect/direct-connect-general-arch.JPG){:target="_blank"}
+[![AWS Direct Connect]({{ site.baseurl }}/assets/post-images/2023-03-26-direct-connect/direct-connect-general-arch.JPG)]({{ site.baseurl }}/assets/post-images/2023-03-26-direct-connect/direct-connect-general-arch.JPG){:target="_blank"}
 
 As shown in the diagram, you can physically connect your data center to a router located in the direct connect partner. 
 From there, the partner will cross connect your router to AWS router connected to AWS backbone. 
@@ -43,7 +43,7 @@ A VLAN tag is a 4 byte tag added to the ethernet frame in networks configured to
 
 You should use the same VLAN tags on your end, as illustrated below:
 
-[![AWS Direct Connect](/assets/post-images/2023-03-26-direct-connect/direct-connect-with-vlans.JPG)](/assets/post-images/2023-03-26-direct-connect/direct-connect-with-vlans.JPG){:target="_blank"}
+[![AWS Direct Connect]({{ site.baseurl }}/assets/post-images/2023-03-26-direct-connect/direct-connect-with-vlans.JPG)]({{ site.baseurl }}/assets/post-images/2023-03-26-direct-connect/direct-connect-with-vlans.JPG){:target="_blank"}
 
 
 This is a high level diagram of how things work. 

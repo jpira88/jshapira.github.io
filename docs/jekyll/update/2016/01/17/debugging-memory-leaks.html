@@ -20,7 +20,7 @@
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Jacob Shapira"},"dateModified":"2016-01-17T18:33:28+02:00","datePublished":"2016-01-17T18:33:28+02:00","description":"Pretty much every second article about debugging memory leaks demonstrates the great 3 snapshot technique introduced by the GMail team and which was used to debug heavy memory leaks in GMail. While there’s no doubt about it being a great idea, it seems that not many mention the possible problem that may occur if you rely on only 3 snapshots without understanding 100% of your framework, vendor libraries and internals of JavaScript. You might say that one must actually understand and know every line of code in a project he is working on, and it surely an admirable statement, but not really practical in the real world for medium+ sized applications. Just for some proportions: one of the world most famous UI libraries, Kendo, is 166,000 line of codes.","headline":"Debugging memory leaks: When the famous 3 snapshot technique can cost you days of development","mainEntityOfPage":{"@type":"WebPage","@id":"https://jshapira.github.io/jshapira.github.io/jekyll/update/2016/01/17/debugging-memory-leaks.html"},"url":"https://jshapira.github.io/jshapira.github.io/jekyll/update/2016/01/17/debugging-memory-leaks.html"}</script>
 <!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/assets/css/styles.css">
+<link rel="stylesheet" href="/jshapira.github.io/assets/css/styles.css">
   <link rel="stylesheet" href="/jshapira.github.io/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://jshapira.github.io/jshapira.github.io/feed.xml" title="jshapira" /></head>
 <body><header class="site-header" role="banner">
 
@@ -158,7 +158,7 @@ I’ve explicitly named the public/private for retainers differentiation ease.</
 
 <p>We will see something like this:</p>
 
-<p><a href="/assets/post-images/21-01-2016-memory-leaks/memory-leaks-1.jpg" target="_blank"><img src="/assets/post-images/21-01-2016-memory-leaks/memory-leaks-1.jpg" alt="Memory Inspection" /></a></p>
+<p><a href="/jshapira.github.io/assets/post-images/21-01-2016-memory-leaks/memory-leaks-1.jpg" target="_blank"><img src="/jshapira.github.io/assets/post-images/21-01-2016-memory-leaks/memory-leaks-1.jpg" alt="Memory Inspection" /></a></p>
 
 <p><br /></p>
 <h4 id="wait-what-we-have-objects-that-arent-browsers-internals-still-allocated-in-snapshot-3-do-we-have-a-leak">Wait, what? We have objects that aren’t browser’s internals still allocated in snapshot #3. Do we have a leak?</h4>
@@ -200,17 +200,17 @@ leakedObject @2
 
 <p>You’ll see something like this:</p>
 
-<p><a href="/assets/post-images/21-01-2016-memory-leaks/memory-leaks-2.jpg" target="_blank"><img src="/assets/post-images/21-01-2016-memory-leaks/memory-leaks-2.jpg" alt="Memory Inspection" /></a></p>
+<p><a href="/jshapira.github.io/assets/post-images/21-01-2016-memory-leaks/memory-leaks-2.jpg" target="_blank"><img src="/jshapira.github.io/assets/post-images/21-01-2016-memory-leaks/memory-leaks-2.jpg" alt="Memory Inspection" /></a></p>
 
 <p>Next, if you’ll go to snapshot #3 and compare between #1 and #2, you’ll see something like this:</p>
 
-<p><a href="/assets/post-images/21-01-2016-memory-leaks/memory-leaks-3.jpg" target="_blank"><img src="/assets/post-images/21-01-2016-memory-leaks/memory-leaks-3.jpg" alt="Memory Inspection" /></a></p>
+<p><a href="/jshapira.github.io/assets/post-images/21-01-2016-memory-leaks/memory-leaks-3.jpg" target="_blank"><img src="/jshapira.github.io/assets/post-images/21-01-2016-memory-leaks/memory-leaks-3.jpg" alt="Memory Inspection" /></a></p>
 
 <p>As you can see, we have allocated Objects and an increase of 100kb in memory, which in a case you are not 100% familiar with 100% of the app, would’ve make you think you have a leak.</p>
 
 <p>Now lets go to snapshot #5 and there compare between snapshots #3 and #4:</p>
 
-<p><a href="/assets/post-images/21-01-2016-memory-leaks/memory-leaks-4.jpg" target="_blank"><img src="/assets/post-images/21-01-2016-memory-leaks/memory-leaks-4.jpg" alt="Memory Inspection" /></a></p>
+<p><a href="/jshapira.github.io/assets/post-images/21-01-2016-memory-leaks/memory-leaks-4.jpg" target="_blank"><img src="/jshapira.github.io/assets/post-images/21-01-2016-memory-leaks/memory-leaks-4.jpg" alt="Memory Inspection" /></a></p>
 
 <p>you’ll see 2 things:</p>
 <ol>
@@ -220,7 +220,7 @@ leakedObject @2
 
 <p>But wait, the browser internals makes us worry, we don’t want to stick our head in the sand and we want to make sure nothing is leaked. No problem, lets take a look at snapshot #7 and there compare objects that were allocated between #3 and #4:</p>
 
-<p><a href="/assets/post-images/21-01-2016-memory-leaks/memory-leaks-5.jpg" target="_blank"><img src="/assets/post-images/21-01-2016-memory-leaks/memory-leaks-5.jpg" alt="Memory Inspection" /></a></p>
+<p><a href="/jshapira.github.io/assets/post-images/21-01-2016-memory-leaks/memory-leaks-5.jpg" target="_blank"><img src="/jshapira.github.io/assets/post-images/21-01-2016-memory-leaks/memory-leaks-5.jpg" alt="Memory Inspection" /></a></p>
 
 <p>We see nothing. No memory size increase, no allocated objects, internal or not. That means that whatever happened in #3-#4 was completely removed, meaning we don’t have any leaks.</p>
 

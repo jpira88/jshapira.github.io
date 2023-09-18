@@ -46,7 +46,7 @@ If we'll have too many partitions, we'll end up with a lot of tasks and network 
 AQE Attempts to address these issues by re-optimizing the optimal number of partitions after every stage of the job, aiming for similar size between all the partitions, considering the definition supplied by the
 `spark.sql.adaptive.advisoryPartitionSizeInBytes` (with some exceptions like `parallelismFirst`) parameter.
 
-[![Coalesce](/assets/post-images/2023-3-21-aqe/coalese.JPG)](/assets/post-images/2023-3-21-aqe/coalese.JPG){:target="_blank"}
+[![Coalesce]({{ site.baseurl }}/assets/post-images/2023-3-21-aqe/coalese.JPG)]({{ site.baseurl }}/assets/post-images/2023-3-21-aqe/coalese.JPG){:target="_blank"}
 
 
 ### Dynamically optimizing skew joins
@@ -58,14 +58,14 @@ with the corresponding (after duplication) partition from the other side respect
 
 
 Before AQE optimization:
-[![Skew](/assets/post-images/2023-3-21-aqe/skew1.JPG)](/assets/post-images/2023-3-21-aqe/skew1.JPG){:target="_blank"}
+[![Skew]({{ site.baseurl }}/assets/post-images/2023-3-21-aqe/skew1.JPG)]({{ site.baseurl }}/assets/post-images/2023-3-21-aqe/skew1.JPG){:target="_blank"}
 
 In this case, we will have 4 tasks, 1 task per partition.
 The longest task (A P1 to B P1) will take 3 minutes while all the others will take approx. 1 minute, resulting in a total execution time of 3 minutes.
 
 After AQE optimization:
 
-[![Skew](/assets/post-images/2023-3-21-aqe/skew2.JPG)](/assets/post-images/2023-3-21-aqe/skew2.JPG){:target="_blank"}
+[![Skew]({{ site.baseurl }}/assets/post-images/2023-3-21-aqe/skew2.JPG)]({{ site.baseurl }}/assets/post-images/2023-3-21-aqe/skew2.JPG){:target="_blank"}
 
 AQE Optimization will split ABP1 into 2 different partitions, duplicate BP1 and join between them,
 increasing the number of tasks to 5, but reducing allowing a better parallelism, thus reducing the overall execution time by half.

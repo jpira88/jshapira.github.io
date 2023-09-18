@@ -20,7 +20,7 @@
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Jacob Shapira"},"dateModified":"2022-07-10T19:31:29+03:00","datePublished":"2022-07-10T19:31:29+03:00","description":"There are plenty of sources online explaining the Flyweight design pattern in depth. The most common description of the pattern is that it designed to reduce memory footprint of a program without losing any capability. But the ideas behind it can be extended to a broader, system-wide scale.","headline":"Extending Flyweight pattern ideas to improve system-wide performance and reduce costs","mainEntityOfPage":{"@type":"WebPage","@id":"https://jshapira.github.io/jshapira.github.io/jekyll/update/2022/07/10/leveraging-flyweight-pattern-to-system-arch.html"},"url":"https://jshapira.github.io/jshapira.github.io/jekyll/update/2022/07/10/leveraging-flyweight-pattern-to-system-arch.html"}</script>
 <!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/assets/css/styles.css">
+<link rel="stylesheet" href="/jshapira.github.io/assets/css/styles.css">
   <link rel="stylesheet" href="/jshapira.github.io/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://jshapira.github.io/jshapira.github.io/feed.xml" title="jshapira" /></head>
 <body><header class="site-header" role="banner">
 
@@ -79,7 +79,7 @@ We will have a lot of minimalistic bullet objects, which will refer to a single 
 <p>Let’s say you’re working on a cyber-security system which monitors and ingests network traffic from 3rd party sensors, analyzes the traffic and reports suspicious activity.
 It’s simplified architecture will look something like this:</p>
 
-<p><a href="/assets/post-images/2022-08-10-flyweight/simplified-event-ingestion.JPG" target="_blank"><img src="/assets/post-images/2022-08-10-flyweight/simplified-event-ingestion.JPG" alt="Simplified Ingesting flow" /></a></p>
+<p><a href="/jshapira.github.io/assets/post-images/2022-08-10-flyweight/simplified-event-ingestion.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2022-08-10-flyweight/simplified-event-ingestion.JPG" alt="Simplified Ingesting flow" /></a></p>
 
 <p>Let’s assume that one of the events the sensor records, is DNS lookups done by endpoints and servers in the network.
 The sensor enriches it with owner info - such as ASN, and produce it to Kafka, from which ETL reads the event and saves it to storage.
@@ -135,7 +135,7 @@ we can reduce the amount of data we need to store and process by roughly 84%.</p
 
 <p>Our updated architecture will look something like this:</p>
 
-<p><a href="/assets/post-images/2022-08-10-flyweight/intrinsic-extrinsic-storage-arch.JPG" target="_blank"><img src="/assets/post-images/2022-08-10-flyweight/intrinsic-extrinsic-storage-arch.JPG" alt="Updated Architecture" /></a></p>
+<p><a href="/jshapira.github.io/assets/post-images/2022-08-10-flyweight/intrinsic-extrinsic-storage-arch.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2022-08-10-flyweight/intrinsic-extrinsic-storage-arch.JPG" alt="Updated Architecture" /></a></p>
 
 <p>The majority of the data (extrinsic data) will be reduced to this:</p>
 

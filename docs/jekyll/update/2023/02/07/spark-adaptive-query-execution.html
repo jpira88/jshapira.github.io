@@ -20,7 +20,7 @@
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Jacob Shapira"},"dateModified":"2023-02-07T11:31:29+02:00","datePublished":"2023-02-07T11:31:29+02:00","description":"Spark version 2.x introduced CBO (cost-based-optimization) framework. CBO collects and leverages different data statistics (e.g, row count, number of distinct values, etc.) in order to improve the quality of query execution plans.","headline":"Speeding up spark SQL with adaptive query execution","mainEntityOfPage":{"@type":"WebPage","@id":"https://jshapira.github.io/jshapira.github.io/jekyll/update/2023/02/07/spark-adaptive-query-execution.html"},"url":"https://jshapira.github.io/jshapira.github.io/jekyll/update/2023/02/07/spark-adaptive-query-execution.html"}</script>
 <!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/assets/css/styles.css">
+<link rel="stylesheet" href="/jshapira.github.io/assets/css/styles.css">
   <link rel="stylesheet" href="/jshapira.github.io/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://jshapira.github.io/jshapira.github.io/feed.xml" title="jshapira" /></head>
 <body><header class="site-header" role="banner">
 
@@ -91,7 +91,7 @@ If we’ll have too many partitions, we’ll end up with a lot of tasks and netw
 <p>AQE Attempts to address these issues by re-optimizing the optimal number of partitions after every stage of the job, aiming for similar size between all the partitions, considering the definition supplied by the
 <code class="language-plaintext highlighter-rouge">spark.sql.adaptive.advisoryPartitionSizeInBytes</code> (with some exceptions like <code class="language-plaintext highlighter-rouge">parallelismFirst</code>) parameter.</p>
 
-<p><a href="/assets/post-images/2023-3-21-aqe/coalese.JPG" target="_blank"><img src="/assets/post-images/2023-3-21-aqe/coalese.JPG" alt="Coalesce" /></a></p>
+<p><a href="/jshapira.github.io/assets/post-images/2023-3-21-aqe/coalese.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2023-3-21-aqe/coalese.JPG" alt="Coalesce" /></a></p>
 
 <h3 id="dynamically-optimizing-skew-joins">Dynamically optimizing skew joins</h3>
 <p>Data skew is one of the most frequent reasons for performance issues, especially during join.
@@ -100,14 +100,14 @@ AQE optimization detects skews based on shuffle file statistics and automaticall
 with the corresponding (after duplication) partition from the other side respectively.</p>
 
 <p>Before AQE optimization:
-<a href="/assets/post-images/2023-3-21-aqe/skew1.JPG" target="_blank"><img src="/assets/post-images/2023-3-21-aqe/skew1.JPG" alt="Skew" /></a></p>
+<a href="/jshapira.github.io/assets/post-images/2023-3-21-aqe/skew1.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2023-3-21-aqe/skew1.JPG" alt="Skew" /></a></p>
 
 <p>In this case, we will have 4 tasks, 1 task per partition.
 The longest task (A P1 to B P1) will take 3 minutes while all the others will take approx. 1 minute, resulting in a total execution time of 3 minutes.</p>
 
 <p>After AQE optimization:</p>
 
-<p><a href="/assets/post-images/2023-3-21-aqe/skew2.JPG" target="_blank"><img src="/assets/post-images/2023-3-21-aqe/skew2.JPG" alt="Skew" /></a></p>
+<p><a href="/jshapira.github.io/assets/post-images/2023-3-21-aqe/skew2.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2023-3-21-aqe/skew2.JPG" alt="Skew" /></a></p>
 
 <p>AQE Optimization will split ABP1 into 2 different partitions, duplicate BP1 and join between them,
 increasing the number of tasks to 5, but reducing allowing a better parallelism, thus reducing the overall execution time by half.</p>

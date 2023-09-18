@@ -20,7 +20,7 @@
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Jacob Shapira"},"dateModified":"2022-11-14T11:31:29+02:00","datePublished":"2022-11-14T11:31:29+02:00","description":"Debugging and improving spark performance bottlenecks isn’t a straightforward task most of the time. Performance issues can arise from easy to detect bottlenecks such as wasteful UDFs or issues in the executors, or a more illusive problems such as estimated metrics of input size in SQL plan being very inaccurate.","headline":"Examining performance related information of your spark application via spark UI","mainEntityOfPage":{"@type":"WebPage","@id":"https://jshapira.github.io/jshapira.github.io/jekyll/update/2022/11/14/performance-related-info-spark-ui.html"},"url":"https://jshapira.github.io/jshapira.github.io/jekyll/update/2022/11/14/performance-related-info-spark-ui.html"}</script>
 <!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/assets/css/styles.css">
+<link rel="stylesheet" href="/jshapira.github.io/assets/css/styles.css">
   <link rel="stylesheet" href="/jshapira.github.io/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://jshapira.github.io/jshapira.github.io/feed.xml" title="jshapira" /></head>
 <body><header class="site-header" role="banner">
 
@@ -133,13 +133,13 @@ What are the steps, and at which specific data in spark UI should we look to det
 <p>First, make sure all the executors you expect to participate are added to the application.
 If not, it might indicate an infrastructure issue, meaning you’re running on less resources than expected.</p>
 
-<p><a href="/assets/post-images/2022-11-15-spark-ui/event-timeline.JPG" target="_blank"><img src="/assets/post-images/2022-11-15-spark-ui/event-timeline.JPG" alt="Event Timeline" /></a></p>
+<p><a href="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/event-timeline.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/event-timeline.JPG" alt="Event Timeline" /></a></p>
 
 <h3 id="jobs">Jobs</h3>
 <p>Next, it might be a good idea to get a high level understanding of costly jobs in your app.
 You can scroll down to completed (or running) jobs and checkout the <code class="language-plaintext highlighter-rouge">duration</code> column to understand which jobs taking longer than expected.</p>
 
-<p><a href="/assets/post-images/2022-11-15-spark-ui/completed-jobs.JPG" target="_blank"><img src="/assets/post-images/2022-11-15-spark-ui/completed-jobs.JPG" alt="Jobs" /></a></p>
+<p><a href="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/completed-jobs.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/completed-jobs.JPG" alt="Jobs" /></a></p>
 
 <h3 id="job-details">Job details</h3>
 <p>In the job details page, we get some useful information.</p>
@@ -148,7 +148,7 @@ You can scroll down to completed (or running) jobs and checkout the <code class=
 <p>We will examine SQL tab later, but if you were using Datasets or DataFrames (which you probably are), you can examine the physical and
 logical plans of the SQL query by clicking on the associated query ID.</p>
 
-<p><a href="/assets/post-images/2022-11-15-spark-ui/assosiated-query.JPG" target="_blank"><img src="/assets/post-images/2022-11-15-spark-ui/assosiated-query.JPG" alt="AssociatedSQL" /></a></p>
+<p><a href="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/assosiated-query.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/assosiated-query.JPG" alt="AssociatedSQL" /></a></p>
 
 <p>We will get into the details of this later.</p>
 
@@ -156,7 +156,7 @@ logical plans of the SQL query by clicking on the associated query ID.</p>
 <p>Each job has 1 or more stages, and in the stage summary you can see which one of the stages might be a bottleneck.
 In our example we have only 1 stage, so we will explore it:</p>
 
-<p><a href="/assets/post-images/2022-11-15-spark-ui/stages.JPG" target="_blank"><img src="/assets/post-images/2022-11-15-spark-ui/stages.JPG" alt="Stages" /></a></p>
+<p><a href="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/stages.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/stages.JPG" alt="Stages" /></a></p>
 
 <h3 id="stage-details">Stage details</h3>
 <p>In stage details we can see aggregated and per-executor metrics of the stage.</p>
@@ -165,18 +165,18 @@ In our example we have only 1 stage, so we will explore it:</p>
 <p>An important thing we might want to examine is that the workload is distributed evenly among the workers.
 Which in our case we can see is not the case in this particular stage:</p>
 
-<p><a href="/assets/post-images/2022-11-15-spark-ui/bad-worker-distribution.JPG" target="_blank"><img src="/assets/post-images/2022-11-15-spark-ui/bad-worker-distribution.JPG" alt="Bad Worker distribution" /></a></p>
+<p><a href="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/bad-worker-distribution.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/bad-worker-distribution.JPG" alt="Bad Worker distribution" /></a></p>
 
 <p>We can compare it to a “healthy” work distribution in the read phase of our app, which looks like this:</p>
 
-<p><a href="/assets/post-images/2022-11-15-spark-ui/worker-distribution.JPG" target="_blank"><img src="/assets/post-images/2022-11-15-spark-ui/worker-distribution.JPG" alt="Healthy Worker distribution" /></a></p>
+<p><a href="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/worker-distribution.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/worker-distribution.JPG" alt="Healthy Worker distribution" /></a></p>
 
 <h4 id="summary-metrics">Summary metrics</h4>
 <p>In the summary metrics you can see summarized stats of all the tasks, but two indicators are specifically important.
 <code class="language-plaintext highlighter-rouge">Data spills</code> and <code class="language-plaintext highlighter-rouge">Shuffle read or write</code>.
 These are extremely costly operations, and we need to understand whether we can improve or get rid of it all together.</p>
 
-<p><a href="/assets/post-images/2022-11-15-spark-ui/summary-metrics.jpg" target="_blank"><img src="/assets/post-images/2022-11-15-spark-ui/summary-metrics.jpg" alt="Summary Metrics" /></a></p>
+<p><a href="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/summary-metrics.jpg" target="_blank"><img src="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/summary-metrics.jpg" alt="Summary Metrics" /></a></p>
 
 <h4 id="tasks-breakdown">Tasks breakdown</h4>
 <p>In the task breakdown, we may examine metrics per task and per executor to get a clearer picture.
@@ -192,7 +192,7 @@ Possible values will be:</p>
   <li>ANY - Data located on other racks</li>
 </ul>
 
-<p><a href="/assets/post-images/2022-11-15-spark-ui/data-per-task-per-executor.JPG" target="_blank"><img src="/assets/post-images/2022-11-15-spark-ui/data-per-task-per-executor.JPG" alt="Metrics per task, per executor" /></a></p>
+<p><a href="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/data-per-task-per-executor.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/data-per-task-per-executor.JPG" alt="Metrics per task, per executor" /></a></p>
 
 <h3 id="the-main-course---understanding-sql-tab">The main course - Understanding SQL tab</h3>
 <p>In my opinion this is the most important part to understand since it gives us a clear picture of the application flow,
@@ -203,22 +203,22 @@ to bottlenecks we saw in the jobs and stages details.</p>
 
 <h4 id="scanning-parquet">Scanning Parquet</h4>
 
-<p><a href="/assets/post-images/2022-11-15-spark-ui/sql-1.JPG" target="_blank"><img src="/assets/post-images/2022-11-15-spark-ui/sql-1.JPG" alt="Scan Parquet" /></a></p>
+<p><a href="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/sql-1.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/sql-1.JPG" alt="Scan Parquet" /></a></p>
 
 <p>First, we can see the <code class="language-plaintext highlighter-rouge">Scan parquet</code> stage which show information about our file structure in HDFS and how long it took the application to
 obtain it (Listing leaf and files job).
 We can see the number of partitions and files read, both stating 244 - which makes sense since our data was partitioned by country
 with a single parquet file per partition:</p>
 
-<p><a href="/assets/post-images/2022-11-15-spark-ui/hue.JPG" target="_blank"><img src="/assets/post-images/2022-11-15-spark-ui/hue.JPG" alt="Hue" /></a></p>
+<p><a href="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/hue.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/hue.JPG" alt="Hue" /></a></p>
 
 <p>We can see how long it took to complete the scan (1.2s, 5.6s) and number of output rows.
 If we hover over this stage we can see additional info such as the directory, schema, and filters that were pushed:</p>
 
-<p><a href="/assets/post-images/2022-11-15-spark-ui/sql-1-1.JPG" target="_blank"><img src="/assets/post-images/2022-11-15-spark-ui/sql-1-1.JPG" alt="Directory and schema" /></a></p>
+<p><a href="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/sql-1-1.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/sql-1-1.JPG" alt="Directory and schema" /></a></p>
 
 <h4 id="wholestagecodegen---fuse-of-multiple-operators">WholeStageCodeGen - fuse of multiple operators</h4>
-<p><a href="/assets/post-images/2022-11-15-spark-ui/sql-2.JPG" target="_blank"><img src="/assets/post-images/2022-11-15-spark-ui/sql-2.JPG" alt="WholeStageCodeGen" /></a></p>
+<p><a href="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/sql-2.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/sql-2.JPG" alt="WholeStageCodeGen" /></a></p>
 
 <p>WholeStageCodegen fuses multiple operators together into a single Java function that is aimed at improving execution performance.
 It collapses a query into a single optimized function that eliminates virtual function calls and leverages CPU registers for intermediate data.
@@ -235,11 +235,11 @@ In our case, we can see that fuse of 3 different functions into a single WholeSt
 <p>Next, we will see the <code class="language-plaintext highlighter-rouge">Project</code> operator, which simply represents what columns will be selected.
 In our case, we will see the product of the join between the 2 dataframes:</p>
 
-<p><a href="/assets/post-images/2022-11-15-spark-ui/product-of-join.JPG" target="_blank"><img src="/assets/post-images/2022-11-15-spark-ui/product-of-join.JPG" alt="Project" /></a></p>
+<p><a href="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/product-of-join.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/product-of-join.JPG" alt="Project" /></a></p>
 
 <h4 id="exchange">Exchange</h4>
 <p>Next, we will see an <code class="language-plaintext highlighter-rouge">exchange</code> in the plan which was caused by our <code class="language-plaintext highlighter-rouge">repartition</code> command.
-<a href="/assets/post-images/2022-11-15-spark-ui/exchange.JPG" target="_blank"><img src="/assets/post-images/2022-11-15-spark-ui/exchange.JPG" alt="Exchange" /></a></p>
+<a href="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/exchange.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/exchange.JPG" alt="Exchange" /></a></p>
 
 <p>If we hover over the box, we can see the partition method that was used (round-robin).
 We can also see the total data size, number of partitions, records and various other metrics.</p>
@@ -249,17 +249,17 @@ If the number of the output rows is disproportional or doesn’t make sense from
 there’s something wrong with your data, such as unexpected duplicates in the join column, or your assumptions about the data are incorrect.</p>
 
 <h4 id="narrow-transformation">Narrow transformation</h4>
-<p><a href="/assets/post-images/2022-11-15-spark-ui/next_year_and_write.JPG" target="_blank"><img src="/assets/post-images/2022-11-15-spark-ui/next_year_and_write.JPG" alt="Exchange" /></a></p>
+<p><a href="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/next_year_and_write.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/next_year_and_write.JPG" alt="Exchange" /></a></p>
 
 <p>Here you can see a <code class="language-plaintext highlighter-rouge">WholeStageCodegen</code> generated for our citizen multiplication command.</p>
 
 <p>Please note that the duration we see in the WholeStageCodegen (1.3m, see image below) is combining the execution of the repartition command <em>and</em> the column value manipulation.
 If we were to remove the repartition command, the column value manipulation would’ve moved to the top <code class="language-plaintext highlighter-rouge">WholeStageCodegen</code> function alongside the filter and the broadcast join.</p>
 
-<p><a href="/assets/post-images/2022-11-15-spark-ui/narrow-duration.JPG" target="_blank"><img src="/assets/post-images/2022-11-15-spark-ui/narrow-duration.JPG" alt="Exchange" /></a></p>
+<p><a href="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/narrow-duration.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/narrow-duration.JPG" alt="Exchange" /></a></p>
 
 <h4 id="saving-the-output">Saving the output</h4>
-<p><a href="/assets/post-images/2022-11-15-spark-ui/writing.JPG" target="_blank"><img src="/assets/post-images/2022-11-15-spark-ui/writing.JPG" alt="Exchange" /></a></p>
+<p><a href="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/writing.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/writing.JPG" alt="Exchange" /></a></p>
 
 <p>In the end, we see <code class="language-plaintext highlighter-rouge">InsertIntoHadoopFsRelationCommand</code>, which representing the writing of the output back to parquet.</p>
 

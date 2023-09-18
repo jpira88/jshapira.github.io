@@ -20,7 +20,7 @@
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Jacob Shapira"},"dateModified":"2016-06-27T19:33:28+03:00","datePublished":"2016-06-27T19:33:28+03:00","description":"Speed is one of the most important (if not the most important) aspects of a quality application. Among others, application speed is effected by the speed of the HTTP requests, which effected by things we can’t always (network connection) and can (responses size, structure etc’) control. HTTP compression provides a neat method to control response size and reduce the amount of time it takes for an HTTP request to complete.","headline":"HTTP compression: reduce up to 90% of HTTP response size with Gzip","mainEntityOfPage":{"@type":"WebPage","@id":"https://jshapira.github.io/jshapira.github.io/jekyll/update/2016/06/27/reduce-with-gzip.html"},"url":"https://jshapira.github.io/jshapira.github.io/jekyll/update/2016/06/27/reduce-with-gzip.html"}</script>
 <!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/assets/css/styles.css">
+<link rel="stylesheet" href="/jshapira.github.io/assets/css/styles.css">
   <link rel="stylesheet" href="/jshapira.github.io/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://jshapira.github.io/jshapira.github.io/feed.xml" title="jshapira" /></head>
 <body><header class="site-header" role="banner">
 
@@ -68,7 +68,7 @@ HTTP compression provides a neat method to control response size and reduce the 
 <p>Gzip is one of most popular compression utilities and can reduce your response size by up to 90% (You can see a compression list here). One of the nicer parts about Gzip is that from server point of view, it’s relatively easy to setup on most of the modern servers, and from client point of view you literally don’t need to do anything. All of the modern browsers support it, 
 you can see it if you open the requests details on your network tab and look at <em>Accept-Encoding</em>:</p>
 
-<p><img src="/assets/post-images/2022-01-06-reduce-with-gzip/2022-01-06-reduce-with-gzip-1.jpg" alt="Browser Supports GZIP" /></p>
+<p><img src="/jshapira.github.io/assets/post-images/2022-01-06-reduce-with-gzip/2022-01-06-reduce-with-gzip-1.jpg" alt="Browser Supports GZIP" /></p>
 
 <p>What basically happens is that the HTTP request notifying the server that it can accept Gzipped content, and the server, if configured, Gzipping the content before returning the response.</p>
 
@@ -123,11 +123,11 @@ gzip_comp_level <span class="o">[</span>1-9]<span class="p">;</span></code></pre
 
 <p>You can make sure your response came back compressed if you open your network tab and look at the response headers:</p>
 
-<p><img src="/assets/post-images/2022-01-06-reduce-with-gzip/2022-01-06-reduce-with-gzip-2.jpg" alt="Browser Supports GZIP" /></p>
+<p><img src="/jshapira.github.io/assets/post-images/2022-01-06-reduce-with-gzip/2022-01-06-reduce-with-gzip-2.jpg" alt="Browser Supports GZIP" /></p>
 
 <p>You can also see the before/after compression size in the main HTTP Requests view:</p>
 
-<p><img src="/assets/post-images/2022-01-06-reduce-with-gzip/2022-01-06-reduce-with-gzip-3.jpg" alt="Browser Supports GZIP" /></p>
+<p><img src="/jshapira.github.io/assets/post-images/2022-01-06-reduce-with-gzip/2022-01-06-reduce-with-gzip-3.jpg" alt="Browser Supports GZIP" /></p>
 
 <p>If you look at the size column, you’ll notice a black and greyed out numbers. The grey number represents the size of the actual size while the grey one represents the compressed size.</p>
 

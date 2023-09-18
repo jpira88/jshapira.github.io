@@ -3,7 +3,7 @@ layout: post
 title:  "Session locking – big bad and sometimes (or mostly) unnoticed until it’s too late con of long polling"
 date:  2016-03-03 18:33:28 +0200
 categories: jekyll update
-author: Jacob Shapira
+author: j.shapira
 tags: ["BE", "PHP"]
 ---
 

@@ -3,7 +3,7 @@ layout: post
 title:  "F-Strings formatting is not only the most modern approach, it's also the most performant"
 date:  2022-06-05 18:33:29 +0200
 categories: jekyll update
-author: Jacob Shapira
+author: j.shapira
 tags: ["Performance", "Python", "BE"]
 ---
 

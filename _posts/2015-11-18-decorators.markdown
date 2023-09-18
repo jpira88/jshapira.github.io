@@ -3,7 +3,7 @@ layout: post
 title:  "Using decorators to replace and tweak 3rd party services for your specific needs"
 date:  2015-11-18 18:33:28 +0200
 categories: jekyll update
-author: Jacob Shapira
+author: j.shapira
 tags: ["FE", "JS/TS"]
 ---
 

@@ -3,7 +3,7 @@ layout: post
 title:  "Reducing I/O latency on EBS restored from snapshots with AWS FSR" 
 date:  2023-03-26 11:31:29 +0200
 categories: jekyll update
-author: Jacob Shapira
+author: j.shapira
 tags: ["DataEngineering", "BE", "Performance", "Cloud", "Architecture"]
 ---
 

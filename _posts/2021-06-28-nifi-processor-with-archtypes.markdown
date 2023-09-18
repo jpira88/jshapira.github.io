@@ -3,7 +3,7 @@ layout: post
 title:  "Creating custom NiFI processors with Maven Archetypes"
 date:  2021-06-28 18:33:28 +0200
 categories: jekyll update
-author: Jacob Shapira
+author: j.shapira
 tags: ["BE", "DataEngineering", "Java"]
 ---
 

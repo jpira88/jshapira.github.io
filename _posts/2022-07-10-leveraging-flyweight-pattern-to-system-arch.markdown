@@ -3,7 +3,7 @@ layout: post
 title:  "Extending Flyweight pattern ideas to improve system-wide performance and reduce costs" 
 date:  2022-07-10 18:31:29 +0200
 categories: jekyll update
-author: Jacob Shapira
+author: j.shapira
 tags: ["Architecture", "DataEngineering", "BE", "Performance", "Cloud"]
 ---
 

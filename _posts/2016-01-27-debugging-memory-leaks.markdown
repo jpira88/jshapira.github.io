@@ -3,7 +3,7 @@ layout: post
 title:  "Debugging memory leaks: When the famous 3 snapshot technique can cost you days of development"
 date:  2016-01-17 18:33:28 +0200
 categories: jekyll update
-author: Jacob Shapira
+author: j.shapira
 tags: ["FE", "JS/TS"]
 ---
 

@@ -3,7 +3,7 @@ layout: post
 title:  "Cloud based standbys for on Premises workloads without changing your public IP" 
 date:  2022-07-09 18:31:29 +0200
 categories: jekyll update
-author: Jacob Shapira
+author: j.shapira
 tags: ["Architecture", "Cloud", "BE"]
 ---
 

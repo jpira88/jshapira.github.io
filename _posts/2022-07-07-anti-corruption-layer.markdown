@@ -3,7 +3,7 @@ layout: post
 title:  "Anti-Corruption layer is not your way around legacy or badly designed implementation"
 date:  2022-07-07 18:30:29 +0200
 categories: jekyll update
-author: Jacob Shapira
+author: j.shapira
 tags: ["Architecture"]
 ---
 

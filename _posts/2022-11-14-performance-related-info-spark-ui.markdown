@@ -3,7 +3,7 @@ layout: post
 title:  "Examining performance related information of your spark application via spark UI" 
 date:  2022-11-14 11:31:29 +0200
 categories: jekyll update
-author: Jacob Shapira
+author: j.shapira
 tags: ["DataEngineering", "BE", "Performance"]
 ---
 

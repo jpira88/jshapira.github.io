@@ -3,7 +3,7 @@ layout: post
 title:  "Leverage AWS Direct Connect to use AWS services without exposing your data to the public internet" 
 date:  2023-03-26 11:31:29 +0200
 categories: jekyll update
-author: Jacob Shapira
+author: j.shapira
 tags: ["DataEngineering", "BE", "Performance", "Cloud", "Architecture", "Devops"]
 ---
 

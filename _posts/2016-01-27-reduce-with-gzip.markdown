@@ -3,7 +3,7 @@ layout: post
 title:  "HTTP compression: reduce up to 90% of HTTP response size with Gzip"
 date:  2016-06-27 18:33:28 +0200
 categories: jekyll update
-author: Jacob Shapira
+author: j.shapira
 tags: ["BE", "Performance"]
 ---
 

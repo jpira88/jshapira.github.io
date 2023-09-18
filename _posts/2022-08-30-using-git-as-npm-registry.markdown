@@ -3,7 +3,7 @@ layout: post
 title:  "Creating and sharing private npm packages without setting up a repository manager, using git urls" 
 date:  2022-07-10 18:31:29 +0200
 categories: jekyll update
-author: Jacob Shapira
+author: j.shapira
 tags: ["Architecture", "FE", "BE", "Devops", "JS/TS"]
 ---
 

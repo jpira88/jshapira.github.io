@@ -3,7 +3,7 @@ layout: post
 title:  "Speeding up spark SQL with adaptive query execution" 
 date:  2023-02-07 11:31:29 +0200
 categories: jekyll update
-author: Jacob Shapira
+author: j.shapira
 tags: ["DataEngineering", "BE", "Performance"]
 ---
 

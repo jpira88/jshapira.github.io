@@ -4,7 +4,7 @@ title:  "Session locking – big bad and sometimes (or mostly) unnoticed until i
 date:  2016-03-03 18:33:28 +0200
 categories: jekyll update
 author: Jacob Shapira
-tags: ["#BE", "#PHP"]
+tags: ["BE", "PHP"]
 ---
 
 In this post I’m not going to discuss long polling VS short polling VS sockets, I’m also not going to say anything against (or in favor) of long polling. I assume that anyone reading this already done their research and considerations and aware of most (or all) of the pros and the cons of each method. I just wanted to share something that is not mentioned in most of the discussions i heard about the polling methods: PHP’s sessions locks.

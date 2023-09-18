@@ -4,7 +4,7 @@ title:  "HTTP compression: reduce up to 90% of HTTP response size with Gzip"
 date:  2016-06-27 18:33:28 +0200
 categories: jekyll update
 author: Jacob Shapira
-tags: ["#BE", "#Performance"]
+tags: ["BE", "Performance"]
 ---
 
 Speed is one of the most important (if not the most important) aspects of a quality application.

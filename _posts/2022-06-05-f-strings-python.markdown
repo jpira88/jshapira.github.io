@@ -4,7 +4,7 @@ title:  "F-Strings formatting is not only the most modern approach, it's also th
 date:  2022-06-05 18:33:29 +0200
 categories: jekyll update
 author: Jacob Shapira
-tags: ["#Performance", "#Python", "#BE"]
+tags: ["Performance", "Python", "BE"]
 ---
 
 There are many ways to format strings in python, concatenation, modulus, ordered, named, and f-strings.   

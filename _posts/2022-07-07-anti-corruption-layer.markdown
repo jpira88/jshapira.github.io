@@ -4,7 +4,7 @@ title:  "Anti-Corruption layer is not your way around legacy or badly designed i
 date:  2022-07-07 18:30:29 +0200
 categories: jekyll update
 author: Jacob Shapira
-tags: ["#Architecture"]
+tags: ["Architecture"]
 ---
 
 So you and your team have been tasked with adding a set of new capabilities to an existing domain, a service or a sub system.  

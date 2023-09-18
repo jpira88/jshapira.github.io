@@ -4,7 +4,7 @@ title:  "Creating and sharing private npm packages without setting up a reposito
 date:  2022-07-10 18:31:29 +0200
 categories: jekyll update
 author: Jacob Shapira
-tags: ["#Architecture", "FE", "#BE", "#Devops", "#JS/TS"]
+tags: ["Architecture", "FE", "BE", "Devops", "JS/TS"]
 ---
 
 When working on JS/TS components (or any other), most chances are, that on relatively regular basis, you're required to reuse some code you or your team wrote in multiple projects. 

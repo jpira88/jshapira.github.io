@@ -4,7 +4,7 @@ title:  "Speeding up spark SQL with adaptive query execution"
 date:  2023-02-07 11:31:29 +0200
 categories: jekyll update
 author: Jacob Shapira
-tags: ["DataEngineering", "#BE", "#Performance"]
+tags: ["DataEngineering", "BE", "Performance"]
 ---
 
 Spark version 2.x introduced CBO (cost-based-optimization) framework.  

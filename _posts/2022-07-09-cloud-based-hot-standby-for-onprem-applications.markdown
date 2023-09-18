@@ -4,7 +4,7 @@ title:  "Cloud based standbys for on Premises workloads without changing your pu
 date:  2022-07-09 18:31:29 +0200
 categories: jekyll update
 author: Jacob Shapira
-tags: ["#Architecture", "#Cloud", "#BE"]
+tags: ["Architecture", "Cloud", "BE"]
 ---
 
 Some workloads rely heavily on having a specific public IP addresses.

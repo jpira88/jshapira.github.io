@@ -15,7 +15,7 @@ HTTP compression provides a neat method to control response size and reduce the 
 Gzip is one of most popular compression utilities and can reduce your response size by up to 90% (You can see a compression list here). One of the nicer parts about Gzip is that from server point of view, it’s relatively easy to setup on most of the modern servers, and from client point of view you literally don’t need to do anything. All of the modern browsers support it, 
 you can see it if you open the requests details on your network tab and look at *Accept-Encoding*:
 
-![Browser Supports GZIP]({{ site.baseurl }}/assets/post-images/2022-01-06-reduce-with-gzip/2022-01-06-reduce-with-gzip-1.jpg)
+![Browser Supports GZIP](/assets/post-images/2022-01-06-reduce-with-gzip/2022-01-06-reduce-with-gzip-1.jpg)
 
 What basically happens is that the HTTP request notifying the server that it can accept Gzipped content, and the server, if configured, Gzipping the content before returning the response.
 
@@ -76,10 +76,10 @@ I’ve never really configured gzip for IIS, but a quick google yield this [high
 
 You can make sure your response came back compressed if you open your network tab and look at the response headers:
 
-![Browser Supports GZIP]({{ site.baseurl }}/assets/post-images/2022-01-06-reduce-with-gzip/2022-01-06-reduce-with-gzip-2.jpg)
+![Browser Supports GZIP](/assets/post-images/2022-01-06-reduce-with-gzip/2022-01-06-reduce-with-gzip-2.jpg)
 
 You can also see the before/after compression size in the main HTTP Requests view:
 
-![Browser Supports GZIP]({{ site.baseurl }}/assets/post-images/2022-01-06-reduce-with-gzip/2022-01-06-reduce-with-gzip-3.jpg)
+![Browser Supports GZIP](/assets/post-images/2022-01-06-reduce-with-gzip/2022-01-06-reduce-with-gzip-3.jpg)
 
 If you look at the size column, you’ll notice a black and greyed out numbers. The grey number represents the size of the actual size while the grey one represents the compressed size. 

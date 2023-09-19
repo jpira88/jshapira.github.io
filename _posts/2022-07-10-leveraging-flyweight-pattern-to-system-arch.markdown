@@ -31,7 +31,7 @@ We will have a lot of minimalistic bullet objects, which will refer to a single 
 Let's say you're working on a cyber-security system which monitors and ingests network traffic from 3rd party sensors, analyzes the traffic and reports suspicious activity.
 It's simplified architecture will look something like this:
 
-[![Simplified Ingesting flow]({{ site.baseurl }}/assets/post-images/2022-08-10-flyweight/simplified-event-ingestion.JPG)]({{ site.baseurl }}/assets/post-images/2022-08-10-flyweight/simplified-event-ingestion.JPG){:target="_blank"}
+[![Simplified Ingesting flow](/assets/post-images/2022-08-10-flyweight/simplified-event-ingestion.JPG)](/assets/post-images/2022-08-10-flyweight/simplified-event-ingestion.JPG){:target="_blank"}
 
 Let's assume that one of the events the sensor records, is DNS lookups done by endpoints and servers in the network.
 The sensor enriches it with owner info - such as ASN, and produce it to Kafka, from which ETL reads the event and saves it to storage.
@@ -87,7 +87,7 @@ we can reduce the amount of data we need to store and process by roughly 84%.
 
 Our updated architecture will look something like this:
 
-[![Updated Architecture]({{ site.baseurl }}/assets/post-images/2022-08-10-flyweight/intrinsic-extrinsic-storage-arch.JPG)]({{ site.baseurl }}/assets/post-images/2022-08-10-flyweight/intrinsic-extrinsic-storage-arch.JPG){:target="_blank"}
+[![Updated Architecture](/assets/post-images/2022-08-10-flyweight/intrinsic-extrinsic-storage-arch.JPG)](/assets/post-images/2022-08-10-flyweight/intrinsic-extrinsic-storage-arch.JPG){:target="_blank"}
 
 The majority of the data (extrinsic data) will be reduced to this:
 

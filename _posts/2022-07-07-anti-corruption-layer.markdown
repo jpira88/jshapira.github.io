@@ -24,7 +24,7 @@ can't or prefer not to deal with.
 A bounded context is a term in domain driven design which represent a sub system.  
 Based on this understanding, lets examine a simplified example of a cyber investigation platform.
 
-[![Simplified Cyber Platform]({{ site.baseurl }}/assets/post-images/2022-08-07-acl/simplified-cyber-platform.JPG)]({{ site.baseurl }}/assets/post-images/2022-08-07-acl/simplified-cyber-platform.JPG){:target="_blank"}
+[![Simplified Cyber Platform](/assets/post-images/2022-08-07-acl/simplified-cyber-platform.JPG)](/assets/post-images/2022-08-07-acl/simplified-cyber-platform.JPG){:target="_blank"}
 
 As you can see in the example, each context operates on need to know basis.
 * Analytics context needs to know about cyber events repository but should not be aware of the collection process,

@@ -89,13 +89,13 @@ What are the steps, and at which specific data in spark UI should we look to det
 First, make sure all the executors you expect to participate are added to the application.
 If not, it might indicate an infrastructure issue, meaning you're running on less resources than expected.
 
-[![Event Timeline]({{ site.baseurl }}/assets/post-images/2022-11-15-spark-ui/event-timeline.JPG)]({{ site.baseurl }}/assets/post-images/2022-11-15-spark-ui/event-timeline.JPG){:target="_blank"}
+[![Event Timeline](/assets/post-images/2022-11-15-spark-ui/event-timeline.JPG)](/assets/post-images/2022-11-15-spark-ui/event-timeline.JPG){:target="_blank"}
 
 ### Jobs
 Next, it might be a good idea to get a high level understanding of costly jobs in your app.
 You can scroll down to completed (or running) jobs and checkout the `duration` column to understand which jobs taking longer than expected.
 
-[![Jobs]({{ site.baseurl }}/assets/post-images/2022-11-15-spark-ui/completed-jobs.JPG)]({{ site.baseurl }}/assets/post-images/2022-11-15-spark-ui/completed-jobs.JPG){:target="_blank"}
+[![Jobs](/assets/post-images/2022-11-15-spark-ui/completed-jobs.JPG)](/assets/post-images/2022-11-15-spark-ui/completed-jobs.JPG){:target="_blank"}
 
 ### Job details
 In the job details page, we get some useful information.
@@ -104,7 +104,7 @@ In the job details page, we get some useful information.
 We will examine SQL tab later, but if you were using Datasets or DataFrames (which you probably are), you can examine the physical and
 logical plans of the SQL query by clicking on the associated query ID.
 
-[![AssociatedSQL]({{ site.baseurl }}/assets/post-images/2022-11-15-spark-ui/assosiated-query.JPG)]({{ site.baseurl }}/assets/post-images/2022-11-15-spark-ui/assosiated-query.JPG){:target="_blank"}
+[![AssociatedSQL](/assets/post-images/2022-11-15-spark-ui/assosiated-query.JPG)](/assets/post-images/2022-11-15-spark-ui/assosiated-query.JPG){:target="_blank"}
 
 We will get into the details of this later.
 
@@ -112,7 +112,7 @@ We will get into the details of this later.
 Each job has 1 or more stages, and in the stage summary you can see which one of the stages might be a bottleneck.
 In our example we have only 1 stage, so we will explore it:
 
-[![Stages]({{ site.baseurl }}/assets/post-images/2022-11-15-spark-ui/stages.JPG)]({{ site.baseurl }}/assets/post-images/2022-11-15-spark-ui/stages.JPG){:target="_blank"}
+[![Stages](/assets/post-images/2022-11-15-spark-ui/stages.JPG)](/assets/post-images/2022-11-15-spark-ui/stages.JPG){:target="_blank"}
 
 
 ### Stage details
@@ -123,18 +123,18 @@ In stage details we can see aggregated and per-executor metrics of the stage.
 An important thing we might want to examine is that the workload is distributed evenly among the workers.
 Which in our case we can see is not the case in this particular stage:
 
-[![Bad Worker distribution]({{ site.baseurl }}/assets/post-images/2022-11-15-spark-ui/bad-worker-distribution.JPG)]({{ site.baseurl }}/assets/post-images/2022-11-15-spark-ui/bad-worker-distribution.JPG){:target="_blank"}
+[![Bad Worker distribution](/assets/post-images/2022-11-15-spark-ui/bad-worker-distribution.JPG)](/assets/post-images/2022-11-15-spark-ui/bad-worker-distribution.JPG){:target="_blank"}
 
 We can compare it to a "healthy" work distribution in the read phase of our app, which looks like this:  
 
-[![Healthy Worker distribution]({{ site.baseurl }}/assets/post-images/2022-11-15-spark-ui/worker-distribution.JPG)]({{ site.baseurl }}/assets/post-images/2022-11-15-spark-ui/worker-distribution.JPG){:target="_blank"}
+[![Healthy Worker distribution](/assets/post-images/2022-11-15-spark-ui/worker-distribution.JPG)](/assets/post-images/2022-11-15-spark-ui/worker-distribution.JPG){:target="_blank"}
 
 #### Summary metrics
 In the summary metrics you can see summarized stats of all the tasks, but two indicators are specifically important.
 `Data spills` and `Shuffle read or write`.
 These are extremely costly operations, and we need to understand whether we can improve or get rid of it all together.
  
-[![Summary Metrics]({{ site.baseurl }}/assets/post-images/2022-11-15-spark-ui/summary-metrics.jpg)]({{ site.baseurl }}/assets/post-images/2022-11-15-spark-ui/summary-metrics.jpg){:target="_blank"}
+[![Summary Metrics](/assets/post-images/2022-11-15-spark-ui/summary-metrics.jpg)](/assets/post-images/2022-11-15-spark-ui/summary-metrics.jpg){:target="_blank"}
 
 
 #### Tasks breakdown
@@ -150,7 +150,7 @@ Possible values will be:
 - ANY - Data located on other racks
 
 
-[![Metrics per task, per executor]({{ site.baseurl }}/assets/post-images/2022-11-15-spark-ui/data-per-task-per-executor.JPG)]({{ site.baseurl }}/assets/post-images/2022-11-15-spark-ui/data-per-task-per-executor.JPG){:target="_blank"}
+[![Metrics per task, per executor](/assets/post-images/2022-11-15-spark-ui/data-per-task-per-executor.JPG)](/assets/post-images/2022-11-15-spark-ui/data-per-task-per-executor.JPG){:target="_blank"}
 
 
 ### The main course - Understanding SQL tab
@@ -162,7 +162,7 @@ to bottlenecks we saw in the jobs and stages details.
 
 #### Scanning Parquet
 
-[![Scan Parquet]({{ site.baseurl }}/assets/post-images/2022-11-15-spark-ui/sql-1.JPG)]({{ site.baseurl }}/assets/post-images/2022-11-15-spark-ui/sql-1.JPG){:target="_blank"}
+[![Scan Parquet](/assets/post-images/2022-11-15-spark-ui/sql-1.JPG)](/assets/post-images/2022-11-15-spark-ui/sql-1.JPG){:target="_blank"}
 
 
 First, we can see the `Scan parquet` stage which show information about our file structure in HDFS and how long it took the application to
@@ -170,15 +170,15 @@ obtain it (Listing leaf and files job).
 We can see the number of partitions and files read, both stating 244 - which makes sense since our data was partitioned by country
 with a single parquet file per partition:
 
-[![Hue]({{ site.baseurl }}/assets/post-images/2022-11-15-spark-ui/hue.JPG)]({{ site.baseurl }}/assets/post-images/2022-11-15-spark-ui/hue.JPG){:target="_blank"}
+[![Hue](/assets/post-images/2022-11-15-spark-ui/hue.JPG)](/assets/post-images/2022-11-15-spark-ui/hue.JPG){:target="_blank"}
 
 We can see how long it took to complete the scan (1.2s, 5.6s) and number of output rows.
 If we hover over this stage we can see additional info such as the directory, schema, and filters that were pushed:
 
-[![Directory and schema]({{ site.baseurl }}/assets/post-images/2022-11-15-spark-ui/sql-1-1.JPG)]({{ site.baseurl }}/assets/post-images/2022-11-15-spark-ui/sql-1-1.JPG){:target="_blank"}
+[![Directory and schema](/assets/post-images/2022-11-15-spark-ui/sql-1-1.JPG)](/assets/post-images/2022-11-15-spark-ui/sql-1-1.JPG){:target="_blank"}
 
 #### WholeStageCodeGen - fuse of multiple operators
-[![WholeStageCodeGen]({{ site.baseurl }}/assets/post-images/2022-11-15-spark-ui/sql-2.JPG)]({{ site.baseurl }}/assets/post-images/2022-11-15-spark-ui/sql-2.JPG){:target="_blank"}
+[![WholeStageCodeGen](/assets/post-images/2022-11-15-spark-ui/sql-2.JPG)](/assets/post-images/2022-11-15-spark-ui/sql-2.JPG){:target="_blank"}
 
 WholeStageCodegen fuses multiple operators together into a single Java function that is aimed at improving execution performance.
 It collapses a query into a single optimized function that eliminates virtual function calls and leverages CPU registers for intermediate data.
@@ -193,11 +193,11 @@ In both `Filter` and `BroadcastHashJoin` we can conveniently see the number of o
 Next, we will see the `Project` operator, which simply represents what columns will be selected.
 In our case, we will see the product of the join between the 2 dataframes: 
 
-[![Project]({{ site.baseurl }}/assets/post-images/2022-11-15-spark-ui/product-of-join.JPG)]({{ site.baseurl }}/assets/post-images/2022-11-15-spark-ui/product-of-join.JPG){:target="_blank"}
+[![Project](/assets/post-images/2022-11-15-spark-ui/product-of-join.JPG)](/assets/post-images/2022-11-15-spark-ui/product-of-join.JPG){:target="_blank"}
 
 #### Exchange
 Next, we will see an `exchange` in the plan which was caused by our `repartition` command.
-[![Exchange]({{ site.baseurl }}/assets/post-images/2022-11-15-spark-ui/exchange.JPG)]({{ site.baseurl }}/assets/post-images/2022-11-15-spark-ui/exchange.JPG){:target="_blank"}
+[![Exchange](/assets/post-images/2022-11-15-spark-ui/exchange.JPG)](/assets/post-images/2022-11-15-spark-ui/exchange.JPG){:target="_blank"}
 
 If we hover over the box, we can see the partition method that was used (round-robin).
 We can also see the total data size, number of partitions, records and various other metrics.
@@ -207,18 +207,18 @@ If the number of the output rows is disproportional or doesn't make sense from y
 there's something wrong with your data, such as unexpected duplicates in the join column, or your assumptions about the data are incorrect.
 
 #### Narrow transformation 
-[![Exchange]({{ site.baseurl }}/assets/post-images/2022-11-15-spark-ui/next_year_and_write.JPG)]({{ site.baseurl }}/assets/post-images/2022-11-15-spark-ui/next_year_and_write.JPG){:target="_blank"}
+[![Exchange](/assets/post-images/2022-11-15-spark-ui/next_year_and_write.JPG)](/assets/post-images/2022-11-15-spark-ui/next_year_and_write.JPG){:target="_blank"}
 
 Here you can see a `WholeStageCodegen` generated for our citizen multiplication command.
 
 Please note that the duration we see in the WholeStageCodegen (1.3m, see image below) is combining the execution of the repartition command *and* the column value manipulation.
 If we were to remove the repartition command, the column value manipulation would've moved to the top `WholeStageCodegen` function alongside the filter and the broadcast join.
 
-[![Exchange]({{ site.baseurl }}/assets/post-images/2022-11-15-spark-ui/narrow-duration.JPG)]({{ site.baseurl }}/assets/post-images/2022-11-15-spark-ui/narrow-duration.JPG){:target="_blank"}
+[![Exchange](/assets/post-images/2022-11-15-spark-ui/narrow-duration.JPG)](/assets/post-images/2022-11-15-spark-ui/narrow-duration.JPG){:target="_blank"}
 
 
 #### Saving the output
-[![Exchange]({{ site.baseurl }}/assets/post-images/2022-11-15-spark-ui/writing.JPG)]({{ site.baseurl }}/assets/post-images/2022-11-15-spark-ui/writing.JPG){:target="_blank"}
+[![Exchange](/assets/post-images/2022-11-15-spark-ui/writing.JPG)](/assets/post-images/2022-11-15-spark-ui/writing.JPG){:target="_blank"}
 
 In the end, we see `InsertIntoHadoopFsRelationCommand`, which representing the writing of the output back to parquet.
 

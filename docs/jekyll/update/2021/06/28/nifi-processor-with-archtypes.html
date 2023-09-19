@@ -102,7 +102,7 @@ allowing you to start writing your processor code without having to worry about 
 <h4 id="step-3-fill-in-properties">Step 3: Fill in properties</h4>
 <p>After running the generation command, you will be prompted to fill in the bundle properties,</p>
 
-<p><img src="//assets/post-images/2021-06-28-nifi-processor/2021-06-28-nifi-processor.JPG" alt="Maven Prompt" /></p>
+<p><img src="/assets/post-images/2021-06-28-nifi-processor/2021-06-28-nifi-processor.JPG" alt="Maven Prompt" /></p>
 
 <p>Let’s assume your bundle name is <i>customprocessor</i>, then I’ll suggest filling the values as follows:</p>
 
@@ -117,13 +117,13 @@ allowing you to start writing your processor code without having to worry about 
 <h4 id="project-structure">Project structure</h4>
 <p>As described above, the output will be 2 projects and a POM file, and look like this:</p>
 
-<p><img src="//assets/post-images/2021-06-28-nifi-processor/output.JPG" alt="Project Output" /></p>
+<p><img src="/assets/post-images/2021-06-28-nifi-processor/output.JPG" alt="Project Output" /></p>
 
 <h4 id="boilerplate-code">Boilerplate code</h4>
 <p>If you’ll inspect the processor class that was generated for you in the processor project, you’ll notice a lot of boilerplate code provided for you,
 so all you have to do is start implementing your propriety business logic.</p>
 
-<p><img src="//assets/post-images/2021-06-28-nifi-processor/code-boilerplate.JPG" alt="Project Output" /></p>
+<p><img src="/assets/post-images/2021-06-28-nifi-processor/code-boilerplate.JPG" alt="Project Output" /></p>
 
 <h3 id="build-and-deploy">Build and deploy</h3>
 <p>Next, run <code class="language-plaintext highlighter-rouge">mvn clean install</code> and copy the NAR file to NiFi <code class="language-plaintext highlighter-rouge">/lib</code> directory.

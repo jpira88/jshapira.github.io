@@ -81,7 +81,7 @@ We will have a lot of minimalistic bullet objects, which will refer to a single 
 <p>Let’s say you’re working on a cyber-security system which monitors and ingests network traffic from 3rd party sensors, analyzes the traffic and reports suspicious activity.
 It’s simplified architecture will look something like this:</p>
 
-<p><a href="//assets/post-images/2022-08-10-flyweight/simplified-event-ingestion.JPG" target="_blank"><img src="//assets/post-images/2022-08-10-flyweight/simplified-event-ingestion.JPG" alt="Simplified Ingesting flow" /></a></p>
+<p><a href="/assets/post-images/2022-08-10-flyweight/simplified-event-ingestion.JPG" target="_blank"><img src="/assets/post-images/2022-08-10-flyweight/simplified-event-ingestion.JPG" alt="Simplified Ingesting flow" /></a></p>
 
 <p>Let’s assume that one of the events the sensor records, is DNS lookups done by endpoints and servers in the network.
 The sensor enriches it with owner info - such as ASN, and produce it to Kafka, from which ETL reads the event and saves it to storage.
@@ -137,7 +137,7 @@ we can reduce the amount of data we need to store and process by roughly 84%.</p
 
 <p>Our updated architecture will look something like this:</p>
 
-<p><a href="//assets/post-images/2022-08-10-flyweight/intrinsic-extrinsic-storage-arch.JPG" target="_blank"><img src="//assets/post-images/2022-08-10-flyweight/intrinsic-extrinsic-storage-arch.JPG" alt="Updated Architecture" /></a></p>
+<p><a href="/assets/post-images/2022-08-10-flyweight/intrinsic-extrinsic-storage-arch.JPG" target="_blank"><img src="/assets/post-images/2022-08-10-flyweight/intrinsic-extrinsic-storage-arch.JPG" alt="Updated Architecture" /></a></p>
 
 <p>The majority of the data (extrinsic data) will be reduced to this:</p>
 

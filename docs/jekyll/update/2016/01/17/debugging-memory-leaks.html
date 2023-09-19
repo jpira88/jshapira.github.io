@@ -160,7 +160,7 @@ I’ve explicitly named the public/private for retainers differentiation ease.</
 
 <p>We will see something like this:</p>
 
-<p><a href="//assets/post-images/21-01-2016-memory-leaks/memory-leaks-1.jpg" target="_blank"><img src="//assets/post-images/21-01-2016-memory-leaks/memory-leaks-1.jpg" alt="Memory Inspection" /></a></p>
+<p><a href="/assets/post-images/21-01-2016-memory-leaks/memory-leaks-1.jpg" target="_blank"><img src="/assets/post-images/21-01-2016-memory-leaks/memory-leaks-1.jpg" alt="Memory Inspection" /></a></p>
 
 <p><br /></p>
 <h4 id="wait-what-we-have-objects-that-arent-browsers-internals-still-allocated-in-snapshot-3-do-we-have-a-leak">Wait, what? We have objects that aren’t browser’s internals still allocated in snapshot #3. Do we have a leak?</h4>
@@ -202,17 +202,17 @@ leakedObject @2
 
 <p>You’ll see something like this:</p>
 
-<p><a href="//assets/post-images/21-01-2016-memory-leaks/memory-leaks-2.jpg" target="_blank"><img src="//assets/post-images/21-01-2016-memory-leaks/memory-leaks-2.jpg" alt="Memory Inspection" /></a></p>
+<p><a href="/assets/post-images/21-01-2016-memory-leaks/memory-leaks-2.jpg" target="_blank"><img src="/assets/post-images/21-01-2016-memory-leaks/memory-leaks-2.jpg" alt="Memory Inspection" /></a></p>
 
 <p>Next, if you’ll go to snapshot #3 and compare between #1 and #2, you’ll see something like this:</p>
 
-<p><a href="//assets/post-images/21-01-2016-memory-leaks/memory-leaks-3.jpg" target="_blank"><img src="//assets/post-images/21-01-2016-memory-leaks/memory-leaks-3.jpg" alt="Memory Inspection" /></a></p>
+<p><a href="/assets/post-images/21-01-2016-memory-leaks/memory-leaks-3.jpg" target="_blank"><img src="/assets/post-images/21-01-2016-memory-leaks/memory-leaks-3.jpg" alt="Memory Inspection" /></a></p>
 
 <p>As you can see, we have allocated Objects and an increase of 100kb in memory, which in a case you are not 100% familiar with 100% of the app, would’ve make you think you have a leak.</p>
 
 <p>Now lets go to snapshot #5 and there compare between snapshots #3 and #4:</p>
 
-<p><a href="//assets/post-images/21-01-2016-memory-leaks/memory-leaks-4.jpg" target="_blank"><img src="//assets/post-images/21-01-2016-memory-leaks/memory-leaks-4.jpg" alt="Memory Inspection" /></a></p>
+<p><a href="/assets/post-images/21-01-2016-memory-leaks/memory-leaks-4.jpg" target="_blank"><img src="/assets/post-images/21-01-2016-memory-leaks/memory-leaks-4.jpg" alt="Memory Inspection" /></a></p>
 
 <p>you’ll see 2 things:</p>
 <ol>
@@ -222,7 +222,7 @@ leakedObject @2
 
 <p>But wait, the browser internals makes us worry, we don’t want to stick our head in the sand and we want to make sure nothing is leaked. No problem, lets take a look at snapshot #7 and there compare objects that were allocated between #3 and #4:</p>
 
-<p><a href="//assets/post-images/21-01-2016-memory-leaks/memory-leaks-5.jpg" target="_blank"><img src="//assets/post-images/21-01-2016-memory-leaks/memory-leaks-5.jpg" alt="Memory Inspection" /></a></p>
+<p><a href="/assets/post-images/21-01-2016-memory-leaks/memory-leaks-5.jpg" target="_blank"><img src="/assets/post-images/21-01-2016-memory-leaks/memory-leaks-5.jpg" alt="Memory Inspection" /></a></p>
 
 <p>We see nothing. No memory size increase, no allocated objects, internal or not. That means that whatever happened in #3-#4 was completely removed, meaning we don’t have any leaks.</p>
 

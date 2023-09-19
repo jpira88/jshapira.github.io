@@ -47,7 +47,7 @@ You can access Maven CLI via a double click on Ctrl.
 #### Step 3: Fill in properties
 After running the generation command, you will be prompted to fill in the bundle properties,
 
-![Maven Prompt]({{ site.baseurl }}/assets/post-images/2021-06-28-nifi-processor/2021-06-28-nifi-processor.JPG)
+![Maven Prompt](/assets/post-images/2021-06-28-nifi-processor/2021-06-28-nifi-processor.JPG)
 
 Let's assume your bundle name is <i>customprocessor</i>, then I'll suggest filling the values as follows:
 
@@ -60,13 +60,13 @@ Let's assume your bundle name is <i>customprocessor</i>, then I'll suggest filli
 #### Project structure
 As described above, the output will be 2 projects and a POM file, and look like this:
 
-![Project Output]({{ site.baseurl }}/assets/post-images/2021-06-28-nifi-processor/output.JPG)
+![Project Output](/assets/post-images/2021-06-28-nifi-processor/output.JPG)
 
 #### Boilerplate code
 If you'll inspect the processor class that was generated for you in the processor project, you'll notice a lot of boilerplate code provided for you,
 so all you have to do is start implementing your propriety business logic.
 
-![Project Output]({{ site.baseurl }}/assets/post-images/2021-06-28-nifi-processor/code-boilerplate.JPG)
+![Project Output](/assets/post-images/2021-06-28-nifi-processor/code-boilerplate.JPG)
 
 ### Build and deploy
 Next, run `mvn clean install` and copy the NAR file to NiFi `/lib` directory.

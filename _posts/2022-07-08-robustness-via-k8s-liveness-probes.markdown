@@ -14,7 +14,7 @@ But, like many things in the engineering world, good can become better.
 Let's take this a very simplified architecture of an online store backed up by an
 ML based recommendation system.
 
-[![Simplified Online Store]({{ site.baseurl }}/assets/post-images/2022-07-07-liveness-probe/liveness-probe-arch1.JPG)]({{ site.baseurl }}/assets/post-images/2022-07-07-liveness-probe/liveness-probe-arch1.JPG){:target="_blank"}
+[![Simplified Online Store](/assets/post-images/2022-07-07-liveness-probe/liveness-probe-arch1.JPG)](/assets/post-images/2022-07-07-liveness-probe/liveness-probe-arch1.JPG){:target="_blank"}
 
 As shown in the diagram, user interactions such as viewing a product sent to a UI BE.  
 UI BE writes the event to kafka.

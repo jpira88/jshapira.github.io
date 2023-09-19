@@ -18,13 +18,13 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
-domain: jshapira.github.io
+domain: 
 title: jshapira | Software architecture, engineering and AI
 #email: jacobamerz at gmail
 twitter: https://twitter.com/shapira_j
 description: >- # this means to ignore newlines until "baseurl:"
-baseurl: "/jshapira.github.io" # the subpath of your site, e.g. /blog
-url: "https://jshapira.github.io" # the base hostname & protocol for your site, e.g. http://example.com
+baseurl: "/" # the subpath of your site, e.g. /blog
+url: "" # the base hostname & protocol for your site, e.g. http://example.com
 github_username:
 
 # Build settings

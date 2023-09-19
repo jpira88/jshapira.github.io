@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://jshapira.github.io/jshapira.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://jshapira.github.io/jshapira.github.io/" rel="alternate" type="text/html" /><updated>2023-09-18T14:44:06+03:00</updated><id>https://jshapira.github.io/jshapira.github.io/feed.xml</id><title type="html">jshapira | Software architecture, engineering and AI</title><subtitle></subtitle><entry><title type="html">Reducing I/O latency on EBS restored from snapshots with AWS FSR</title><link href="https://jshapira.github.io/jshapira.github.io/jekyll/update/2023/03/26/aws-fast-snapshot-restore.html" rel="alternate" type="text/html" title="Reducing I/O latency on EBS restored from snapshots with AWS FSR" /><published>2023-03-26T12:31:29+03:00</published><updated>2023-03-26T12:31:29+03:00</updated><id>https://jshapira.github.io/jshapira.github.io/jekyll/update/2023/03/26/aws-fast-snapshot-restore</id><content type="html" xml:base="https://jshapira.github.io/jshapira.github.io/jekyll/update/2023/03/26/aws-fast-snapshot-restore.html"><![CDATA[<p>When creating an EBS snapshot the data is saved to S3.<br />
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2023-09-19T20:08:50+03:00</updated><id>/feed.xml</id><title type="html">jshapira | Software architecture, engineering and AI</title><subtitle></subtitle><entry><title type="html">Reducing I/O latency on EBS restored from snapshots with AWS FSR</title><link href="/jekyll/update/2023/03/26/aws-fast-snapshot-restore.html" rel="alternate" type="text/html" title="Reducing I/O latency on EBS restored from snapshots with AWS FSR" /><published>2023-03-26T12:31:29+03:00</published><updated>2023-03-26T12:31:29+03:00</updated><id>/jekyll/update/2023/03/26/aws-fast-snapshot-restore</id><content type="html" xml:base="/jekyll/update/2023/03/26/aws-fast-snapshot-restore.html"><![CDATA[<p>When creating an EBS snapshot the data is saved to S3.<br />
 Snapshots are incremental, meaning that only the blocks that have been modified later than the most recent snapshot - are saved.<br />
 For obvious reasons this makes the snapshot faster to save and cheaper to store.</p>
 
@@ -24,7 +24,7 @@ So for example, initiating EBS from an FSR enabled snapshot of 10TB will take 10
 <p>Some limitations:<br />
 You can enable up to 5 FSR enabled snapshots per region and only to snapshots sized 16TiB or less.</p>
 
-<p>A full documentation of FSR can be found <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-fast-snapshot-restore.html" target="_blank">here</a>.</p>]]></content><author><name>j.shapira</name></author><category term="jekyll" /><category term="update" /><category term="DataEngineering" /><category term="BE" /><category term="Performance" /><category term="Cloud" /><category term="Architecture" /><summary type="html"><![CDATA[When creating an EBS snapshot the data is saved to S3. Snapshots are incremental, meaning that only the blocks that have been modified later than the most recent snapshot - are saved. For obvious reasons this makes the snapshot faster to save and cheaper to store.]]></summary></entry><entry><title type="html">Leverage AWS Direct Connect to use AWS services without exposing your data to the public internet</title><link href="https://jshapira.github.io/jshapira.github.io/jekyll/update/2023/03/26/using-aws-without-exposing-data-to-public-internet.html" rel="alternate" type="text/html" title="Leverage AWS Direct Connect to use AWS services without exposing your data to the public internet" /><published>2023-03-26T12:31:29+03:00</published><updated>2023-03-26T12:31:29+03:00</updated><id>https://jshapira.github.io/jshapira.github.io/jekyll/update/2023/03/26/using-aws-without-exposing-data-to-public-internet</id><content type="html" xml:base="https://jshapira.github.io/jshapira.github.io/jekyll/update/2023/03/26/using-aws-without-exposing-data-to-public-internet.html"><![CDATA[<p>While there are a lot of tools to secure your data while being transferred over the internet,
+<p>A full documentation of FSR can be found <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-fast-snapshot-restore.html" target="_blank">here</a>.</p>]]></content><author><name>j.shapira</name></author><category term="jekyll" /><category term="update" /><category term="DataEngineering" /><category term="BE" /><category term="Performance" /><category term="Cloud" /><category term="Architecture" /><summary type="html"><![CDATA[When creating an EBS snapshot the data is saved to S3. Snapshots are incremental, meaning that only the blocks that have been modified later than the most recent snapshot - are saved. For obvious reasons this makes the snapshot faster to save and cheaper to store.]]></summary></entry><entry><title type="html">Leverage AWS Direct Connect to use AWS services without exposing your data to the public internet</title><link href="/jekyll/update/2023/03/26/using-aws-without-exposing-data-to-public-internet.html" rel="alternate" type="text/html" title="Leverage AWS Direct Connect to use AWS services without exposing your data to the public internet" /><published>2023-03-26T12:31:29+03:00</published><updated>2023-03-26T12:31:29+03:00</updated><id>/jekyll/update/2023/03/26/using-aws-without-exposing-data-to-public-internet</id><content type="html" xml:base="/jekyll/update/2023/03/26/using-aws-without-exposing-data-to-public-internet.html"><![CDATA[<p>While there are a lot of tools to secure your data while being transferred over the internet,
 the most secured method of them all is not to do it at all.<br />
 Obviously this approach limits us in many ways, including (but not limited to) leveraging the power of public clouds.</p>
 
@@ -32,7 +32,7 @@ Obviously this approach limits us in many ways, including (but not limited to) l
 
 <p>The general idea of Direct Connect is to create physical connections between AWS Backbone network and your data center via AWS Direct connect location partner.</p>
 
-<p><a href="/jshapira.github.io/assets/post-images/2023-03-26-direct-connect/direct-connect-general-arch.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2023-03-26-direct-connect/direct-connect-general-arch.JPG" alt="AWS Direct Connect" /></a></p>
+<p><a href="//assets/post-images/2023-03-26-direct-connect/direct-connect-general-arch.JPG" target="_blank"><img src="//assets/post-images/2023-03-26-direct-connect/direct-connect-general-arch.JPG" alt="AWS Direct Connect" /></a></p>
 
 <p>As shown in the diagram, you can physically connect your data center to a router located in the direct connect partner. 
 From there, the partner will cross connect your router to AWS router connected to AWS backbone. 
@@ -77,14 +77,14 @@ correct routers on AWS.</p>
 
 <p>You should use the same VLAN tags on your end, as illustrated below:</p>
 
-<p><a href="/jshapira.github.io/assets/post-images/2023-03-26-direct-connect/direct-connect-with-vlans.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2023-03-26-direct-connect/direct-connect-with-vlans.JPG" alt="AWS Direct Connect" /></a></p>
+<p><a href="//assets/post-images/2023-03-26-direct-connect/direct-connect-with-vlans.JPG" target="_blank"><img src="//assets/post-images/2023-03-26-direct-connect/direct-connect-with-vlans.JPG" alt="AWS Direct Connect" /></a></p>
 
 <p>This is a high level diagram of how things work. 
 You can find a neat <a href="https://docs.aws.amazon.com/directconnect/latest/UserGuide/getting_started.html#ConnectionRequest" target="_blank">step-by-step guide in AWS documentation</a>.</p>
 
 <h4 id="not-only-for-security">Not only for security</h4>
 <p>Security is not the only benefit of using direct connect. 
-You can also get increased bandwidth throughput and a more consistent network performance than what can be achieved with a public internet connection.</p>]]></content><author><name>j.shapira</name></author><category term="jekyll" /><category term="update" /><category term="DataEngineering" /><category term="BE" /><category term="Performance" /><category term="Cloud" /><category term="Architecture" /><category term="Devops" /><summary type="html"><![CDATA[While there are a lot of tools to secure your data while being transferred over the internet, the most secured method of them all is not to do it at all. Obviously this approach limits us in many ways, including (but not limited to) leveraging the power of public clouds.]]></summary></entry><entry><title type="html">Speeding up spark SQL with adaptive query execution</title><link href="https://jshapira.github.io/jshapira.github.io/jekyll/update/2023/02/07/spark-adaptive-query-execution.html" rel="alternate" type="text/html" title="Speeding up spark SQL with adaptive query execution" /><published>2023-02-07T11:31:29+02:00</published><updated>2023-02-07T11:31:29+02:00</updated><id>https://jshapira.github.io/jshapira.github.io/jekyll/update/2023/02/07/spark-adaptive-query-execution</id><content type="html" xml:base="https://jshapira.github.io/jshapira.github.io/jekyll/update/2023/02/07/spark-adaptive-query-execution.html"><![CDATA[<p>Spark version 2.x introduced CBO (cost-based-optimization) framework.<br />
+You can also get increased bandwidth throughput and a more consistent network performance than what can be achieved with a public internet connection.</p>]]></content><author><name>j.shapira</name></author><category term="jekyll" /><category term="update" /><category term="DataEngineering" /><category term="BE" /><category term="Performance" /><category term="Cloud" /><category term="Architecture" /><category term="Devops" /><summary type="html"><![CDATA[While there are a lot of tools to secure your data while being transferred over the internet, the most secured method of them all is not to do it at all. Obviously this approach limits us in many ways, including (but not limited to) leveraging the power of public clouds.]]></summary></entry><entry><title type="html">Speeding up spark SQL with adaptive query execution</title><link href="/jekyll/update/2023/02/07/spark-adaptive-query-execution.html" rel="alternate" type="text/html" title="Speeding up spark SQL with adaptive query execution" /><published>2023-02-07T11:31:29+02:00</published><updated>2023-02-07T11:31:29+02:00</updated><id>/jekyll/update/2023/02/07/spark-adaptive-query-execution</id><content type="html" xml:base="/jekyll/update/2023/02/07/spark-adaptive-query-execution.html"><![CDATA[<p>Spark version 2.x introduced CBO (cost-based-optimization) framework.<br />
 CBO collects and leverages different data statistics (e.g, row count, number of distinct values, etc.) in order to improve
 the quality of query execution plans.</p>
 
@@ -121,7 +121,7 @@ If we’ll have too many partitions, we’ll end up with a lot of tasks and netw
 <p>AQE Attempts to address these issues by re-optimizing the optimal number of partitions after every stage of the job, aiming for similar size between all the partitions, considering the definition supplied by the
 <code class="language-plaintext highlighter-rouge">spark.sql.adaptive.advisoryPartitionSizeInBytes</code> (with some exceptions like <code class="language-plaintext highlighter-rouge">parallelismFirst</code>) parameter.</p>
 
-<p><a href="/jshapira.github.io/assets/post-images/2023-3-21-aqe/coalese.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2023-3-21-aqe/coalese.JPG" alt="Coalesce" /></a></p>
+<p><a href="//assets/post-images/2023-3-21-aqe/coalese.JPG" target="_blank"><img src="//assets/post-images/2023-3-21-aqe/coalese.JPG" alt="Coalesce" /></a></p>
 
 <h3 id="dynamically-optimizing-skew-joins">Dynamically optimizing skew joins</h3>
 <p>Data skew is one of the most frequent reasons for performance issues, especially during join.
@@ -130,17 +130,17 @@ AQE optimization detects skews based on shuffle file statistics and automaticall
 with the corresponding (after duplication) partition from the other side respectively.</p>
 
 <p>Before AQE optimization:
-<a href="/jshapira.github.io/assets/post-images/2023-3-21-aqe/skew1.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2023-3-21-aqe/skew1.JPG" alt="Skew" /></a></p>
+<a href="//assets/post-images/2023-3-21-aqe/skew1.JPG" target="_blank"><img src="//assets/post-images/2023-3-21-aqe/skew1.JPG" alt="Skew" /></a></p>
 
 <p>In this case, we will have 4 tasks, 1 task per partition.
 The longest task (A P1 to B P1) will take 3 minutes while all the others will take approx. 1 minute, resulting in a total execution time of 3 minutes.</p>
 
 <p>After AQE optimization:</p>
 
-<p><a href="/jshapira.github.io/assets/post-images/2023-3-21-aqe/skew2.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2023-3-21-aqe/skew2.JPG" alt="Skew" /></a></p>
+<p><a href="//assets/post-images/2023-3-21-aqe/skew2.JPG" target="_blank"><img src="//assets/post-images/2023-3-21-aqe/skew2.JPG" alt="Skew" /></a></p>
 
 <p>AQE Optimization will split ABP1 into 2 different partitions, duplicate BP1 and join between them,
-increasing the number of tasks to 5, but reducing allowing a better parallelism, thus reducing the overall execution time by half.</p>]]></content><author><name>j.shapira</name></author><category term="jekyll" /><category term="update" /><category term="DataEngineering" /><category term="BE" /><category term="Performance" /><summary type="html"><![CDATA[Spark version 2.x introduced CBO (cost-based-optimization) framework. CBO collects and leverages different data statistics (e.g, row count, number of distinct values, etc.) in order to improve the quality of query execution plans.]]></summary></entry><entry><title type="html">Examining performance related information of your spark application via spark UI</title><link href="https://jshapira.github.io/jshapira.github.io/jekyll/update/2022/11/14/performance-related-info-spark-ui.html" rel="alternate" type="text/html" title="Examining performance related information of your spark application via spark UI" /><published>2022-11-14T11:31:29+02:00</published><updated>2022-11-14T11:31:29+02:00</updated><id>https://jshapira.github.io/jshapira.github.io/jekyll/update/2022/11/14/performance-related-info-spark-ui</id><content type="html" xml:base="https://jshapira.github.io/jshapira.github.io/jekyll/update/2022/11/14/performance-related-info-spark-ui.html"><![CDATA[<p>Debugging and improving spark performance bottlenecks isn’t a straightforward task most of the time.
+increasing the number of tasks to 5, but reducing allowing a better parallelism, thus reducing the overall execution time by half.</p>]]></content><author><name>j.shapira</name></author><category term="jekyll" /><category term="update" /><category term="DataEngineering" /><category term="BE" /><category term="Performance" /><summary type="html"><![CDATA[Spark version 2.x introduced CBO (cost-based-optimization) framework. CBO collects and leverages different data statistics (e.g, row count, number of distinct values, etc.) in order to improve the quality of query execution plans.]]></summary></entry><entry><title type="html">Examining performance related information of your spark application via spark UI</title><link href="/jekyll/update/2022/11/14/performance-related-info-spark-ui.html" rel="alternate" type="text/html" title="Examining performance related information of your spark application via spark UI" /><published>2022-11-14T11:31:29+02:00</published><updated>2022-11-14T11:31:29+02:00</updated><id>/jekyll/update/2022/11/14/performance-related-info-spark-ui</id><content type="html" xml:base="/jekyll/update/2022/11/14/performance-related-info-spark-ui.html"><![CDATA[<p>Debugging and improving spark performance bottlenecks isn’t a straightforward task most of the time.
 Performance issues can arise from easy to detect bottlenecks such as wasteful UDFs or issues in the executors,
 or a more illusive problems such as estimated metrics of input size in SQL plan being very inaccurate.</p>
 
@@ -219,13 +219,13 @@ What are the steps, and at which specific data in spark UI should we look to det
 <p>First, make sure all the executors you expect to participate are added to the application.
 If not, it might indicate an infrastructure issue, meaning you’re running on less resources than expected.</p>
 
-<p><a href="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/event-timeline.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/event-timeline.JPG" alt="Event Timeline" /></a></p>
+<p><a href="//assets/post-images/2022-11-15-spark-ui/event-timeline.JPG" target="_blank"><img src="//assets/post-images/2022-11-15-spark-ui/event-timeline.JPG" alt="Event Timeline" /></a></p>
 
 <h3 id="jobs">Jobs</h3>
 <p>Next, it might be a good idea to get a high level understanding of costly jobs in your app.
 You can scroll down to completed (or running) jobs and checkout the <code class="language-plaintext highlighter-rouge">duration</code> column to understand which jobs taking longer than expected.</p>
 
-<p><a href="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/completed-jobs.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/completed-jobs.JPG" alt="Jobs" /></a></p>
+<p><a href="//assets/post-images/2022-11-15-spark-ui/completed-jobs.JPG" target="_blank"><img src="//assets/post-images/2022-11-15-spark-ui/completed-jobs.JPG" alt="Jobs" /></a></p>
 
 <h3 id="job-details">Job details</h3>
 <p>In the job details page, we get some useful information.</p>
@@ -234,7 +234,7 @@ You can scroll down to completed (or running) jobs and checkout the <code class=
 <p>We will examine SQL tab later, but if you were using Datasets or DataFrames (which you probably are), you can examine the physical and
 logical plans of the SQL query by clicking on the associated query ID.</p>
 
-<p><a href="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/assosiated-query.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/assosiated-query.JPG" alt="AssociatedSQL" /></a></p>
+<p><a href="//assets/post-images/2022-11-15-spark-ui/assosiated-query.JPG" target="_blank"><img src="//assets/post-images/2022-11-15-spark-ui/assosiated-query.JPG" alt="AssociatedSQL" /></a></p>
 
 <p>We will get into the details of this later.</p>
 
@@ -242,7 +242,7 @@ logical plans of the SQL query by clicking on the associated query ID.</p>
 <p>Each job has 1 or more stages, and in the stage summary you can see which one of the stages might be a bottleneck.
 In our example we have only 1 stage, so we will explore it:</p>
 
-<p><a href="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/stages.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/stages.JPG" alt="Stages" /></a></p>
+<p><a href="//assets/post-images/2022-11-15-spark-ui/stages.JPG" target="_blank"><img src="//assets/post-images/2022-11-15-spark-ui/stages.JPG" alt="Stages" /></a></p>
 
 <h3 id="stage-details">Stage details</h3>
 <p>In stage details we can see aggregated and per-executor metrics of the stage.</p>
@@ -251,18 +251,18 @@ In our example we have only 1 stage, so we will explore it:</p>
 <p>An important thing we might want to examine is that the workload is distributed evenly among the workers.
 Which in our case we can see is not the case in this particular stage:</p>
 
-<p><a href="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/bad-worker-distribution.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/bad-worker-distribution.JPG" alt="Bad Worker distribution" /></a></p>
+<p><a href="//assets/post-images/2022-11-15-spark-ui/bad-worker-distribution.JPG" target="_blank"><img src="//assets/post-images/2022-11-15-spark-ui/bad-worker-distribution.JPG" alt="Bad Worker distribution" /></a></p>
 
 <p>We can compare it to a “healthy” work distribution in the read phase of our app, which looks like this:</p>
 
-<p><a href="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/worker-distribution.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/worker-distribution.JPG" alt="Healthy Worker distribution" /></a></p>
+<p><a href="//assets/post-images/2022-11-15-spark-ui/worker-distribution.JPG" target="_blank"><img src="//assets/post-images/2022-11-15-spark-ui/worker-distribution.JPG" alt="Healthy Worker distribution" /></a></p>
 
 <h4 id="summary-metrics">Summary metrics</h4>
 <p>In the summary metrics you can see summarized stats of all the tasks, but two indicators are specifically important.
 <code class="language-plaintext highlighter-rouge">Data spills</code> and <code class="language-plaintext highlighter-rouge">Shuffle read or write</code>.
 These are extremely costly operations, and we need to understand whether we can improve or get rid of it all together.</p>
 
-<p><a href="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/summary-metrics.jpg" target="_blank"><img src="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/summary-metrics.jpg" alt="Summary Metrics" /></a></p>
+<p><a href="//assets/post-images/2022-11-15-spark-ui/summary-metrics.jpg" target="_blank"><img src="//assets/post-images/2022-11-15-spark-ui/summary-metrics.jpg" alt="Summary Metrics" /></a></p>
 
 <h4 id="tasks-breakdown">Tasks breakdown</h4>
 <p>In the task breakdown, we may examine metrics per task and per executor to get a clearer picture.
@@ -278,7 +278,7 @@ Possible values will be:</p>
   <li>ANY - Data located on other racks</li>
 </ul>
 
-<p><a href="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/data-per-task-per-executor.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/data-per-task-per-executor.JPG" alt="Metrics per task, per executor" /></a></p>
+<p><a href="//assets/post-images/2022-11-15-spark-ui/data-per-task-per-executor.JPG" target="_blank"><img src="//assets/post-images/2022-11-15-spark-ui/data-per-task-per-executor.JPG" alt="Metrics per task, per executor" /></a></p>
 
 <h3 id="the-main-course---understanding-sql-tab">The main course - Understanding SQL tab</h3>
 <p>In my opinion this is the most important part to understand since it gives us a clear picture of the application flow,
@@ -289,22 +289,22 @@ to bottlenecks we saw in the jobs and stages details.</p>
 
 <h4 id="scanning-parquet">Scanning Parquet</h4>
 
-<p><a href="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/sql-1.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/sql-1.JPG" alt="Scan Parquet" /></a></p>
+<p><a href="//assets/post-images/2022-11-15-spark-ui/sql-1.JPG" target="_blank"><img src="//assets/post-images/2022-11-15-spark-ui/sql-1.JPG" alt="Scan Parquet" /></a></p>
 
 <p>First, we can see the <code class="language-plaintext highlighter-rouge">Scan parquet</code> stage which show information about our file structure in HDFS and how long it took the application to
 obtain it (Listing leaf and files job).
 We can see the number of partitions and files read, both stating 244 - which makes sense since our data was partitioned by country
 with a single parquet file per partition:</p>
 
-<p><a href="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/hue.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/hue.JPG" alt="Hue" /></a></p>
+<p><a href="//assets/post-images/2022-11-15-spark-ui/hue.JPG" target="_blank"><img src="//assets/post-images/2022-11-15-spark-ui/hue.JPG" alt="Hue" /></a></p>
 
 <p>We can see how long it took to complete the scan (1.2s, 5.6s) and number of output rows.
 If we hover over this stage we can see additional info such as the directory, schema, and filters that were pushed:</p>
 
-<p><a href="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/sql-1-1.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/sql-1-1.JPG" alt="Directory and schema" /></a></p>
+<p><a href="//assets/post-images/2022-11-15-spark-ui/sql-1-1.JPG" target="_blank"><img src="//assets/post-images/2022-11-15-spark-ui/sql-1-1.JPG" alt="Directory and schema" /></a></p>
 
 <h4 id="wholestagecodegen---fuse-of-multiple-operators">WholeStageCodeGen - fuse of multiple operators</h4>
-<p><a href="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/sql-2.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/sql-2.JPG" alt="WholeStageCodeGen" /></a></p>
+<p><a href="//assets/post-images/2022-11-15-spark-ui/sql-2.JPG" target="_blank"><img src="//assets/post-images/2022-11-15-spark-ui/sql-2.JPG" alt="WholeStageCodeGen" /></a></p>
 
 <p>WholeStageCodegen fuses multiple operators together into a single Java function that is aimed at improving execution performance.
 It collapses a query into a single optimized function that eliminates virtual function calls and leverages CPU registers for intermediate data.
@@ -321,11 +321,11 @@ In our case, we can see that fuse of 3 different functions into a single WholeSt
 <p>Next, we will see the <code class="language-plaintext highlighter-rouge">Project</code> operator, which simply represents what columns will be selected.
 In our case, we will see the product of the join between the 2 dataframes:</p>
 
-<p><a href="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/product-of-join.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/product-of-join.JPG" alt="Project" /></a></p>
+<p><a href="//assets/post-images/2022-11-15-spark-ui/product-of-join.JPG" target="_blank"><img src="//assets/post-images/2022-11-15-spark-ui/product-of-join.JPG" alt="Project" /></a></p>
 
 <h4 id="exchange">Exchange</h4>
 <p>Next, we will see an <code class="language-plaintext highlighter-rouge">exchange</code> in the plan which was caused by our <code class="language-plaintext highlighter-rouge">repartition</code> command.
-<a href="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/exchange.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/exchange.JPG" alt="Exchange" /></a></p>
+<a href="//assets/post-images/2022-11-15-spark-ui/exchange.JPG" target="_blank"><img src="//assets/post-images/2022-11-15-spark-ui/exchange.JPG" alt="Exchange" /></a></p>
 
 <p>If we hover over the box, we can see the partition method that was used (round-robin).
 We can also see the total data size, number of partitions, records and various other metrics.</p>
@@ -335,17 +335,17 @@ If the number of the output rows is disproportional or doesn’t make sense from
 there’s something wrong with your data, such as unexpected duplicates in the join column, or your assumptions about the data are incorrect.</p>
 
 <h4 id="narrow-transformation">Narrow transformation</h4>
-<p><a href="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/next_year_and_write.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/next_year_and_write.JPG" alt="Exchange" /></a></p>
+<p><a href="//assets/post-images/2022-11-15-spark-ui/next_year_and_write.JPG" target="_blank"><img src="//assets/post-images/2022-11-15-spark-ui/next_year_and_write.JPG" alt="Exchange" /></a></p>
 
 <p>Here you can see a <code class="language-plaintext highlighter-rouge">WholeStageCodegen</code> generated for our citizen multiplication command.</p>
 
 <p>Please note that the duration we see in the WholeStageCodegen (1.3m, see image below) is combining the execution of the repartition command <em>and</em> the column value manipulation.
 If we were to remove the repartition command, the column value manipulation would’ve moved to the top <code class="language-plaintext highlighter-rouge">WholeStageCodegen</code> function alongside the filter and the broadcast join.</p>
 
-<p><a href="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/narrow-duration.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/narrow-duration.JPG" alt="Exchange" /></a></p>
+<p><a href="//assets/post-images/2022-11-15-spark-ui/narrow-duration.JPG" target="_blank"><img src="//assets/post-images/2022-11-15-spark-ui/narrow-duration.JPG" alt="Exchange" /></a></p>
 
 <h4 id="saving-the-output">Saving the output</h4>
-<p><a href="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/writing.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2022-11-15-spark-ui/writing.JPG" alt="Exchange" /></a></p>
+<p><a href="//assets/post-images/2022-11-15-spark-ui/writing.JPG" target="_blank"><img src="//assets/post-images/2022-11-15-spark-ui/writing.JPG" alt="Exchange" /></a></p>
 
 <p>In the end, we see <code class="language-plaintext highlighter-rouge">InsertIntoHadoopFsRelationCommand</code>, which representing the writing of the output back to parquet.</p>
 
@@ -353,7 +353,7 @@ If we were to remove the repartition command, the column value manipulation woul
 <ol>
   <li>Number of output rows &amp; data size - this is kind of self-explanatory.</li>
   <li>Number of written files - this is important to notice, since constantly creating a lot of small files might impact the performance of whatever reads your data. A good file size will be 512MiB or 1GiB.</li>
-</ol>]]></content><author><name>j.shapira</name></author><category term="jekyll" /><category term="update" /><category term="DataEngineering" /><category term="BE" /><category term="Performance" /><summary type="html"><![CDATA[Debugging and improving spark performance bottlenecks isn’t a straightforward task most of the time. Performance issues can arise from easy to detect bottlenecks such as wasteful UDFs or issues in the executors, or a more illusive problems such as estimated metrics of input size in SQL plan being very inaccurate.]]></summary></entry><entry><title type="html">Improve MTTR’s with observability platforms</title><link href="https://jshapira.github.io/jshapira.github.io/jekyll/update/2022/10/23/improve-mttr-with-observability-platform.html" rel="alternate" type="text/html" title="Improve MTTR’s with observability platforms" /><published>2022-10-23T19:31:29+03:00</published><updated>2022-10-23T19:31:29+03:00</updated><id>https://jshapira.github.io/jshapira.github.io/jekyll/update/2022/10/23/improve-mttr-with-observability-platform</id><content type="html" xml:base="https://jshapira.github.io/jshapira.github.io/jekyll/update/2022/10/23/improve-mttr-with-observability-platform.html"><![CDATA[<p>Ability to quickly resolve production issues is one of the key factors in customer satisfaction.<br />
+</ol>]]></content><author><name>j.shapira</name></author><category term="jekyll" /><category term="update" /><category term="DataEngineering" /><category term="BE" /><category term="Performance" /><summary type="html"><![CDATA[Debugging and improving spark performance bottlenecks isn’t a straightforward task most of the time. Performance issues can arise from easy to detect bottlenecks such as wasteful UDFs or issues in the executors, or a more illusive problems such as estimated metrics of input size in SQL plan being very inaccurate.]]></summary></entry><entry><title type="html">Improve MTTR’s with observability platforms</title><link href="/jekyll/update/2022/10/23/improve-mttr-with-observability-platform.html" rel="alternate" type="text/html" title="Improve MTTR’s with observability platforms" /><published>2022-10-23T19:31:29+03:00</published><updated>2022-10-23T19:31:29+03:00</updated><id>/jekyll/update/2022/10/23/improve-mttr-with-observability-platform</id><content type="html" xml:base="/jekyll/update/2022/10/23/improve-mttr-with-observability-platform.html"><![CDATA[<p>Ability to quickly resolve production issues is one of the key factors in customer satisfaction.<br />
 Not the mention it saves us resources and debugging time.<br />
 Cloud native and distributed systems are especially hard to debug due to high amount of moving parts.<br />
 An error in a flow can originate in a one of N containers of a specific service, in a flow composed of N different services, 
@@ -383,7 +383,7 @@ Obviously the exact price depending on the tool itself and the package you selec
   <li><a href="https://www.youtube.com/watch?v=5hR17z4Qm3g" target="_blank">Lightrun</a></li>
   <li><a href="https://www.youtube.com/watch?v=Tnsd_65jQLY" target="_blank">Rookout</a></li>
   <li><a href="https://www.youtube.com/watch?v=OI5oYxTCiV0&amp;t=957s" target="_blank">Helios</a></li>
-</ul>]]></content><author><name>j.shapira</name></author><category term="jekyll" /><category term="update" /><category term="Architecture" /><category term="Cloud" /><category term="BE" /><category term="Devops" /><summary type="html"><![CDATA[Ability to quickly resolve production issues is one of the key factors in customer satisfaction. Not the mention it saves us resources and debugging time. Cloud native and distributed systems are especially hard to debug due to high amount of moving parts. An error in a flow can originate in a one of N containers of a specific service, in a flow composed of N different services, and the erroneous container might as well be dead already due to different reasons (HPA, a crash, etc’). Debugging is hard, reproducing is sometimes harder.]]></summary></entry><entry><title type="html">Extending Flyweight pattern ideas to improve system-wide performance and reduce costs</title><link href="https://jshapira.github.io/jshapira.github.io/jekyll/update/2022/07/10/leveraging-flyweight-pattern-to-system-arch.html" rel="alternate" type="text/html" title="Extending Flyweight pattern ideas to improve system-wide performance and reduce costs" /><published>2022-07-10T19:31:29+03:00</published><updated>2022-07-10T19:31:29+03:00</updated><id>https://jshapira.github.io/jshapira.github.io/jekyll/update/2022/07/10/leveraging-flyweight-pattern-to-system-arch</id><content type="html" xml:base="https://jshapira.github.io/jshapira.github.io/jekyll/update/2022/07/10/leveraging-flyweight-pattern-to-system-arch.html"><![CDATA[<p>There are plenty of sources online explaining the Flyweight design pattern in depth.<br />
+</ul>]]></content><author><name>j.shapira</name></author><category term="jekyll" /><category term="update" /><category term="Architecture" /><category term="Cloud" /><category term="BE" /><category term="Devops" /><summary type="html"><![CDATA[Ability to quickly resolve production issues is one of the key factors in customer satisfaction. Not the mention it saves us resources and debugging time. Cloud native and distributed systems are especially hard to debug due to high amount of moving parts. An error in a flow can originate in a one of N containers of a specific service, in a flow composed of N different services, and the erroneous container might as well be dead already due to different reasons (HPA, a crash, etc’). Debugging is hard, reproducing is sometimes harder.]]></summary></entry><entry><title type="html">Extending Flyweight pattern ideas to improve system-wide performance and reduce costs</title><link href="/jekyll/update/2022/07/10/leveraging-flyweight-pattern-to-system-arch.html" rel="alternate" type="text/html" title="Extending Flyweight pattern ideas to improve system-wide performance and reduce costs" /><published>2022-07-10T19:31:29+03:00</published><updated>2022-07-10T19:31:29+03:00</updated><id>/jekyll/update/2022/07/10/leveraging-flyweight-pattern-to-system-arch</id><content type="html" xml:base="/jekyll/update/2022/07/10/leveraging-flyweight-pattern-to-system-arch.html"><![CDATA[<p>There are plenty of sources online explaining the Flyweight design pattern in depth.<br />
 The most common description of the pattern is that it designed to reduce memory footprint of a program without losing any capability.
 But the ideas behind it can be extended to a broader, system-wide scale.</p>
 
@@ -408,7 +408,7 @@ We will have a lot of minimalistic bullet objects, which will refer to a single 
 <p>Let’s say you’re working on a cyber-security system which monitors and ingests network traffic from 3rd party sensors, analyzes the traffic and reports suspicious activity.
 It’s simplified architecture will look something like this:</p>
 
-<p><a href="/jshapira.github.io/assets/post-images/2022-08-10-flyweight/simplified-event-ingestion.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2022-08-10-flyweight/simplified-event-ingestion.JPG" alt="Simplified Ingesting flow" /></a></p>
+<p><a href="//assets/post-images/2022-08-10-flyweight/simplified-event-ingestion.JPG" target="_blank"><img src="//assets/post-images/2022-08-10-flyweight/simplified-event-ingestion.JPG" alt="Simplified Ingesting flow" /></a></p>
 
 <p>Let’s assume that one of the events the sensor records, is DNS lookups done by endpoints and servers in the network.
 The sensor enriches it with owner info - such as ASN, and produce it to Kafka, from which ETL reads the event and saves it to storage.
@@ -464,7 +464,7 @@ we can reduce the amount of data we need to store and process by roughly 84%.</p
 
 <p>Our updated architecture will look something like this:</p>
 
-<p><a href="/jshapira.github.io/assets/post-images/2022-08-10-flyweight/intrinsic-extrinsic-storage-arch.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2022-08-10-flyweight/intrinsic-extrinsic-storage-arch.JPG" alt="Updated Architecture" /></a></p>
+<p><a href="//assets/post-images/2022-08-10-flyweight/intrinsic-extrinsic-storage-arch.JPG" target="_blank"><img src="//assets/post-images/2022-08-10-flyweight/intrinsic-extrinsic-storage-arch.JPG" alt="Updated Architecture" /></a></p>
 
 <p>The majority of the data (extrinsic data) will be reduced to this:</p>
 
@@ -501,7 +501,7 @@ which will mean two things:</p>
 
 <p>Another thing to consider is the usage of the data, the analytics in our case - <br />
 can we preload the intrinsic data in the analytics? If not, will JOINing (with spark, for example) of small amount of intrinsic data
-will be faster than working with 84% more data which is already in the same dataframes?</p>]]></content><author><name>j.shapira</name></author><category term="jekyll" /><category term="update" /><category term="Architecture" /><category term="DataEngineering" /><category term="BE" /><category term="Performance" /><category term="Cloud" /><summary type="html"><![CDATA[There are plenty of sources online explaining the Flyweight design pattern in depth. The most common description of the pattern is that it designed to reduce memory footprint of a program without losing any capability. But the ideas behind it can be extended to a broader, system-wide scale.]]></summary></entry><entry><title type="html">Creating and sharing private npm packages without setting up a repository manager, using git urls</title><link href="https://jshapira.github.io/jshapira.github.io/jekyll/update/2022/07/10/using-git-as-npm-registry.html" rel="alternate" type="text/html" title="Creating and sharing private npm packages without setting up a repository manager, using git urls" /><published>2022-07-10T19:31:29+03:00</published><updated>2022-07-10T19:31:29+03:00</updated><id>https://jshapira.github.io/jshapira.github.io/jekyll/update/2022/07/10/using-git-as-npm-registry</id><content type="html" xml:base="https://jshapira.github.io/jshapira.github.io/jekyll/update/2022/07/10/using-git-as-npm-registry.html"><![CDATA[<p>When working on JS/TS components (or any other), most chances are, that on relatively regular basis, you’re required to reuse some code you or your team wrote in multiple projects.</p>
+will be faster than working with 84% more data which is already in the same dataframes?</p>]]></content><author><name>j.shapira</name></author><category term="jekyll" /><category term="update" /><category term="Architecture" /><category term="DataEngineering" /><category term="BE" /><category term="Performance" /><category term="Cloud" /><summary type="html"><![CDATA[There are plenty of sources online explaining the Flyweight design pattern in depth. The most common description of the pattern is that it designed to reduce memory footprint of a program without losing any capability. But the ideas behind it can be extended to a broader, system-wide scale.]]></summary></entry><entry><title type="html">Creating and sharing private npm packages without setting up a repository manager, using git urls</title><link href="/jekyll/update/2022/07/10/using-git-as-npm-registry.html" rel="alternate" type="text/html" title="Creating and sharing private npm packages without setting up a repository manager, using git urls" /><published>2022-07-10T19:31:29+03:00</published><updated>2022-07-10T19:31:29+03:00</updated><id>/jekyll/update/2022/07/10/using-git-as-npm-registry</id><content type="html" xml:base="/jekyll/update/2022/07/10/using-git-as-npm-registry.html"><![CDATA[<p>When working on JS/TS components (or any other), most chances are, that on relatively regular basis, you’re required to reuse some code you or your team wrote in multiple projects.</p>
 
 <p>A project can be multiple components of the same product, or completely different products.<br />
 A common approach to conveniently share your code is wrapping it as a package and import it wherever required. 
@@ -660,7 +660,7 @@ You can find a <a href="https://www.typescriptlang.org/tsconfig" target="_blank"
 
 <p>Now we can use it from the main project:</p>
 
-<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="k">import</span> <span class="p">{</span><span class="nx">HelloWorld</span><span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">your-package</span><span class="dl">'</span><span class="p">;</span></code></pre></figure>]]></content><author><name>j.shapira</name></author><category term="jekyll" /><category term="update" /><category term="Architecture" /><category term="FE" /><category term="BE" /><category term="Devops" /><category term="JS/TS" /><summary type="html"><![CDATA[When working on JS/TS components (or any other), most chances are, that on relatively regular basis, you’re required to reuse some code you or your team wrote in multiple projects.]]></summary></entry><entry><title type="html">Cloud based standbys for on Premises workloads without changing your public IP</title><link href="https://jshapira.github.io/jshapira.github.io/jekyll/update/2022/07/09/cloud-based-hot-standby-for-onprem-applications.html" rel="alternate" type="text/html" title="Cloud based standbys for on Premises workloads without changing your public IP" /><published>2022-07-09T19:31:29+03:00</published><updated>2022-07-09T19:31:29+03:00</updated><id>https://jshapira.github.io/jshapira.github.io/jekyll/update/2022/07/09/cloud-based-hot-standby-for-onprem-applications</id><content type="html" xml:base="https://jshapira.github.io/jshapira.github.io/jekyll/update/2022/07/09/cloud-based-hot-standby-for-onprem-applications.html"><![CDATA[<p>Some workloads rely heavily on having a specific public IP addresses.
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="k">import</span> <span class="p">{</span><span class="nx">HelloWorld</span><span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">your-package</span><span class="dl">'</span><span class="p">;</span></code></pre></figure>]]></content><author><name>j.shapira</name></author><category term="jekyll" /><category term="update" /><category term="Architecture" /><category term="FE" /><category term="BE" /><category term="Devops" /><category term="JS/TS" /><summary type="html"><![CDATA[When working on JS/TS components (or any other), most chances are, that on relatively regular basis, you’re required to reuse some code you or your team wrote in multiple projects.]]></summary></entry><entry><title type="html">Cloud based standbys for on Premises workloads without changing your public IP</title><link href="/jekyll/update/2022/07/09/cloud-based-hot-standby-for-onprem-applications.html" rel="alternate" type="text/html" title="Cloud based standbys for on Premises workloads without changing your public IP" /><published>2022-07-09T19:31:29+03:00</published><updated>2022-07-09T19:31:29+03:00</updated><id>/jekyll/update/2022/07/09/cloud-based-hot-standby-for-onprem-applications</id><content type="html" xml:base="/jekyll/update/2022/07/09/cloud-based-hot-standby-for-onprem-applications.html"><![CDATA[<p>Some workloads rely heavily on having a specific public IP addresses.
 For example:</p>
 
 <ul>
@@ -709,14 +709,14 @@ validating reputation history of the address and more.</p>
   <li><a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-byoip.html" target="_blank">AWS BYOIP</a></li>
   <li><a href="https://cloud.google.com/vpc/docs/using-bring-your-own-ip" target="_blank">Google Cloud BYOIP</a></li>
   <li><a href="https://docs.microsoft.com/en-us/azure/virtual-network/ip-services/create-custom-ip-address-prefix-portal" target="_blank">Azure BYOIP</a></li>
-</ul>]]></content><author><name>j.shapira</name></author><category term="jekyll" /><category term="update" /><category term="Architecture" /><category term="Cloud" /><category term="BE" /><summary type="html"><![CDATA[Some workloads rely heavily on having a specific public IP addresses. For example:]]></summary></entry><entry><title type="html">Make your Kubernetes workloads more robust with startup, readiness and liveness probes</title><link href="https://jshapira.github.io/jshapira.github.io/jekyll/update/2022/07/08/robustness-via-k8s-liveness-probes.html" rel="alternate" type="text/html" title="Make your Kubernetes workloads more robust with startup, readiness and liveness probes" /><published>2022-07-08T19:31:29+03:00</published><updated>2022-07-08T19:31:29+03:00</updated><id>https://jshapira.github.io/jshapira.github.io/jekyll/update/2022/07/08/robustness-via-k8s-liveness-probes</id><content type="html" xml:base="https://jshapira.github.io/jshapira.github.io/jekyll/update/2022/07/08/robustness-via-k8s-liveness-probes.html"><![CDATA[<p>It’s no easy task to make distributed workloads robust and resilient.
+</ul>]]></content><author><name>j.shapira</name></author><category term="jekyll" /><category term="update" /><category term="Architecture" /><category term="Cloud" /><category term="BE" /><summary type="html"><![CDATA[Some workloads rely heavily on having a specific public IP addresses. For example:]]></summary></entry><entry><title type="html">Make your Kubernetes workloads more robust with startup, readiness and liveness probes</title><link href="/jekyll/update/2022/07/08/robustness-via-k8s-liveness-probes.html" rel="alternate" type="text/html" title="Make your Kubernetes workloads more robust with startup, readiness and liveness probes" /><published>2022-07-08T19:31:29+03:00</published><updated>2022-07-08T19:31:29+03:00</updated><id>/jekyll/update/2022/07/08/robustness-via-k8s-liveness-probes</id><content type="html" xml:base="/jekyll/update/2022/07/08/robustness-via-k8s-liveness-probes.html"><![CDATA[<p>It’s no easy task to make distributed workloads robust and resilient.
 Kubernetes coming into our lives made this job a lot easier.
 But, like many things in the engineering world, good can become better.</p>
 
 <p>Let’s take this a very simplified architecture of an online store backed up by an
 ML based recommendation system.</p>
 
-<p><a href="/jshapira.github.io/assets/post-images/2022-07-07-liveness-probe/liveness-probe-arch1.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2022-07-07-liveness-probe/liveness-probe-arch1.JPG" alt="Simplified Online Store" /></a></p>
+<p><a href="//assets/post-images/2022-07-07-liveness-probe/liveness-probe-arch1.JPG" target="_blank"><img src="//assets/post-images/2022-07-07-liveness-probe/liveness-probe-arch1.JPG" alt="Simplified Online Store" /></a></p>
 
 <p>As shown in the diagram, user interactions such as viewing a product sent to a UI BE.<br />
 UI BE writes the event to kafka.
@@ -920,7 +920,7 @@ For that, Kubernetes provides us with different kind of probes:</p>
       <span class="na">tcpSocket</span><span class="pi">:</span>
         <span class="na">port</span><span class="pi">:</span> <span class="m">8080</span>
       <span class="na">initialDelaySeconds</span><span class="pi">:</span> <span class="m">15</span>
-      <span class="na">periodSeconds</span><span class="pi">:</span> <span class="s">20</span></code></pre></figure>]]></content><author><name>j.shapira</name></author><category term="jekyll" /><category term="update" /><category term="Architecture" /><category term="Devops" /><category term="BE" /><summary type="html"><![CDATA[It’s no easy task to make distributed workloads robust and resilient. Kubernetes coming into our lives made this job a lot easier. But, like many things in the engineering world, good can become better.]]></summary></entry><entry><title type="html">Anti-Corruption layer is not your way around legacy or badly designed implementation</title><link href="https://jshapira.github.io/jshapira.github.io/jekyll/update/2022/07/07/anti-corruption-layer.html" rel="alternate" type="text/html" title="Anti-Corruption layer is not your way around legacy or badly designed implementation" /><published>2022-07-07T19:30:29+03:00</published><updated>2022-07-07T19:30:29+03:00</updated><id>https://jshapira.github.io/jshapira.github.io/jekyll/update/2022/07/07/anti-corruption-layer</id><content type="html" xml:base="https://jshapira.github.io/jshapira.github.io/jekyll/update/2022/07/07/anti-corruption-layer.html"><![CDATA[<p>So you and your team have been tasked with adding a set of new capabilities to an existing domain, a service or a sub system.<br />
+      <span class="na">periodSeconds</span><span class="pi">:</span> <span class="s">20</span></code></pre></figure>]]></content><author><name>j.shapira</name></author><category term="jekyll" /><category term="update" /><category term="Architecture" /><category term="Devops" /><category term="BE" /><summary type="html"><![CDATA[It’s no easy task to make distributed workloads robust and resilient. Kubernetes coming into our lives made this job a lot easier. But, like many things in the engineering world, good can become better.]]></summary></entry><entry><title type="html">Anti-Corruption layer is not your way around legacy or badly designed implementation</title><link href="/jekyll/update/2022/07/07/anti-corruption-layer.html" rel="alternate" type="text/html" title="Anti-Corruption layer is not your way around legacy or badly designed implementation" /><published>2022-07-07T19:30:29+03:00</published><updated>2022-07-07T19:30:29+03:00</updated><id>/jekyll/update/2022/07/07/anti-corruption-layer</id><content type="html" xml:base="/jekyll/update/2022/07/07/anti-corruption-layer.html"><![CDATA[<p>So you and your team have been tasked with adding a set of new capabilities to an existing domain, a service or a sub system.<br />
 You research the existing implementation, APIs, databases and technological stack and come to a conclusion that it will be extremely
 difficult to extend existing code and capabilities to support those new features.</p>
 
@@ -937,7 +937,7 @@ can’t or prefer not to deal with.</p>
 <p>A bounded context is a term in domain driven design which represent a sub system.<br />
 Based on this understanding, lets examine a simplified example of a cyber investigation platform.</p>
 
-<p><a href="/jshapira.github.io/assets/post-images/2022-08-07-acl/simplified-cyber-platform.JPG" target="_blank"><img src="/jshapira.github.io/assets/post-images/2022-08-07-acl/simplified-cyber-platform.JPG" alt="Simplified Cyber Platform" /></a></p>
+<p><a href="//assets/post-images/2022-08-07-acl/simplified-cyber-platform.JPG" target="_blank"><img src="//assets/post-images/2022-08-07-acl/simplified-cyber-platform.JPG" alt="Simplified Cyber Platform" /></a></p>
 
 <p>As you can see in the example, each context operates on need to know basis.</p>
 <ul>

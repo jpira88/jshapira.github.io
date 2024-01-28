@@ -3,10 +3,14 @@ layout: post
 title:  "Anti-Corruption layer is not your way around legacy or badly designed implementation"
 date:  2022-07-07 18:30:29 +0200
 categories: jekyll update
-author: j.shapira
+author: Jacob Shapira
 tags: ["Architecture"]
 ---
 
+* TOC
+{:toc}
+
+### Intro
 So you and your team have been tasked with adding a set of new capabilities to an existing domain, a service or a sub system.  
 You research the existing implementation, APIs, databases and technological stack and come to a conclusion that it will be extremely
 difficult to extend existing code and capabilities to support those new features.

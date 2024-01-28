@@ -3,10 +3,14 @@ layout: post
 title:  "F-Strings formatting is not only the most modern approach, it's also the most performant"
 date:  2022-06-05 18:33:29 +0200
 categories: jekyll update
-author: j.shapira
+author: Jacob Shapira
 tags: ["Performance", "Python", "BE"]
 ---
 
+* TOC
+{:toc}
+
+### Intro
 There are many ways to format strings in python, concatenation, modulus, ordered, named, and f-strings.   
 Making sure that all python3+ applications in your ecosystem use f-strings is not only
 a matter of standardizing the code base and enforcing best practices among all teammates.  
@@ -19,7 +23,7 @@ but :
 * Think about scaling, eventually it's a numbers game. String formatting is a CPU bound task,
 higher CPU utilization means spending more money, or hogging resources from other services and applications.
 
-#### A little test
+### A little test
 {% highlight python %}
 import time
 
@@ -46,7 +50,7 @@ test(named)
 test(f)
 {% endhighlight %}
 
-#### And the results
+### And the results
 {% highlight shell %}
 3.7484169006347656
 3.6047866344451904

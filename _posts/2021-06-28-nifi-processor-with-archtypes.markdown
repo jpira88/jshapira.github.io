@@ -3,10 +3,14 @@ layout: post
 title:  "Creating custom NiFI processors with Maven Archetypes"
 date:  2021-06-28 18:33:28 +0200
 categories: jekyll update
-author: j.shapira
+author: Jacob Shapira
 tags: ["BE", "DataEngineering", "Java"]
 ---
 
+* TOC
+{:toc}
+
+### Intro
 This post assumes you're familiar with Apache NiFi and its concepts and architecture.
 Currently, Apache NiFi comes with almost 300 built in processors and more than 50 controller services.
 But in case you need to implement a processor with a propriety, or an industry specific logic,

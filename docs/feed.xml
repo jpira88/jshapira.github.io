@@ -1,4 +1,358 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2023-09-19T20:19:47+03:00</updated><id>/feed.xml</id><title type="html">jshapira | Software architecture, engineering and AI</title><subtitle></subtitle><entry><title type="html">Reducing I/O latency on EBS restored from snapshots with AWS FSR</title><link href="/jekyll/update/2023/03/26/aws-fast-snapshot-restore.html" rel="alternate" type="text/html" title="Reducing I/O latency on EBS restored from snapshots with AWS FSR" /><published>2023-03-26T12:31:29+03:00</published><updated>2023-03-26T12:31:29+03:00</updated><id>/jekyll/update/2023/03/26/aws-fast-snapshot-restore</id><content type="html" xml:base="/jekyll/update/2023/03/26/aws-fast-snapshot-restore.html"><![CDATA[<p>When creating an EBS snapshot the data is saved to S3.<br />
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2024-01-28T12:27:04+02:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Jacob Shapira | Software architecture, engineering and AI</title><subtitle></subtitle><entry><title type="html">Effective LLM fine-tuning for dummies</title><link href="http://localhost:4000/jekyll/update/2023/09/18/llm-fine-tuning-hypterparameters-simplified.html" rel="alternate" type="text/html" title="Effective LLM fine-tuning for dummies" /><published>2023-09-18T12:31:29+03:00</published><updated>2023-09-18T12:31:29+03:00</updated><id>http://localhost:4000/jekyll/update/2023/09/18/llm-fine-tuning-hypterparameters-simplified</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2023/09/18/llm-fine-tuning-hypterparameters-simplified.html"><![CDATA[<ul id="markdown-toc">
+  <li><a href="#intro" id="markdown-toc-intro">Intro</a></li>
+  <li><a href="#base-model-fine-tuned-model-and-initial-weight-and-biases" id="markdown-toc-base-model-fine-tuned-model-and-initial-weight-and-biases">Base model, fine-tuned model and initial weight and biases</a></li>
+  <li><a href="#preparing-the-base-model" id="markdown-toc-preparing-the-base-model">Preparing the base model</a></li>
+  <li><a href="#creating-domain-specific-dataset" id="markdown-toc-creating-domain-specific-dataset">Creating domain specific dataset</a></li>
+  <li><a href="#preparing-data-sets" id="markdown-toc-preparing-data-sets">Preparing data sets</a>    <ul>
+      <li><a href="#data-split-with-a-seed---train-test-and-validation-sets" id="markdown-toc-data-split-with-a-seed---train-test-and-validation-sets">Data split with a seed - train, test and validation sets</a></li>
+      <li><a href="#tensors-and-pytorch-models" id="markdown-toc-tensors-and-pytorch-models">Tensors and PyTorch models</a></li>
+      <li><a href="#max-sequence-length" id="markdown-toc-max-sequence-length">Max sequence length</a></li>
+    </ul>
+  </li>
+  <li><a href="#starting-the-actual-fine-tuning" id="markdown-toc-starting-the-actual-fine-tuning">Starting the actual fine tuning</a>    <ul>
+      <li><a href="#fine-tuning-flow" id="markdown-toc-fine-tuning-flow">Fine-tuning flow</a></li>
+      <li><a href="#learning-rate-and-catastrophic-forgetting" id="markdown-toc-learning-rate-and-catastrophic-forgetting">Learning rate and catastrophic forgetting</a></li>
+      <li><a href="#epochs-and-epoch-sizes" id="markdown-toc-epochs-and-epoch-sizes">Epochs and epoch sizes</a></li>
+      <li><a href="#gradient-accumulation-batches-and-micro-batches" id="markdown-toc-gradient-accumulation-batches-and-micro-batches">Gradient accumulation, batches and micro-batches</a></li>
+      <li><a href="#overfitting-underfitting-and-weight-decay" id="markdown-toc-overfitting-underfitting-and-weight-decay">Overfitting, underfitting and weight decay</a></li>
+      <li><a href="#warmup-iterations" id="markdown-toc-warmup-iterations">Warmup iterations</a></li>
+    </ul>
+  </li>
+  <li><a href="#running-inference" id="markdown-toc-running-inference">Running inference</a></li>
+</ul>
+
+<h3 id="intro">Intro</h3>
+<p>At the time of writing this entry, the tech world is caught up in what I like to call a LLM-BOOM.<br />
+Everyone’s implementing LLM based features, new models announced on an hourly basis and the LLM ecosystem, both open source and proprietary is exploding.<br />
+A lot of professionals (such as software engineers and architects) which aren’t specialized in AI and data science domains required to gain
+sufficient knowledge to enable and lead features and projects in these domains.<br />
+Luckily, one of the advantages of this LLM-BOOM is that tools are getting better and easier to use.</p>
+
+<p>One of the most frequent tasks is to create LLMs with domain specific knowledge,
+and the purpose of this post is to explain LLM fine tuning process, terminology and hyperparameters in simple terms for professionals
+which aren’t extremely proficient the data science and AI domains.</p>
+
+<p>Fine-tuning an LLM model was not a very straightforward task a year ago, but now we have variety of tools allowing step-by-step fine tuning of models.
+One of these tools is <a href="https://github.com/Lightning-AI/lit-gpt" target="_blank">Lit-GPT</a>, which is defined as an <code class="language-plaintext highlighter-rouge">Hackable implementation of state-of-the-art open-source large language models released under the Apache 2.0 license</code>.
+Which basically means it’s main design goal is simplicity over SOLID principles.</p>
+
+<p>With that being said, in order to use this tool (or any other for that matter) effectively, you need to properly configure it, and in order to properly configure it,
+you need to understand what each configuration means and have sufficient general knowledge about what you’re doing.</p>
+
+<p>I will use Lit-GPT as an example tool due to creators decision to choose simplicity over other design properties,
+but the concepts and parameters this entry will cover are generic to many fine tuning other tools out there.</p>
+
+<h3 id="base-model-fine-tuned-model-and-initial-weight-and-biases">Base model, fine-tuned model and initial weight and biases</h3>
+<p>In most use cases, when training a model from scratch, weights and biases are initialized with either random or constant values
+and does not truthfully represent the data.</p>
+
+<p>During the training process the weights and biases are adjusted and the <code class="language-plaintext highlighter-rouge">base model</code> gains understanding of natural language, grammar and the data it was trained on.<br />
+When fine tuning, you’ll (usually) use a <code class="language-plaintext highlighter-rouge">base model</code> with pre-existing weights and biases, and train it on your domain-specific datasets to adjust the (but not re-generate) the weights.</p>
+
+<p>The model with the updated weights and biases is the <code class="language-plaintext highlighter-rouge">fine tuned model</code>.<br />
+As you probably understand, fine tuning a model is much simpler, quicker and cheaper than training a model from scratch.<br />
+Of course there is an exception if you attempt to train a base model on a domain specific data, but this is a more complex
+use case and out of scope for this post.</p>
+
+<h3 id="preparing-the-base-model">Preparing the base model</h3>
+<p>Now that we understand the difference between base and fine-tuned models, we need to select the base model
+that we will fine tune.<br />
+Lit-GPT supports 16 open source models (you can see the full list in the Github repo),
+but we’ll run our example based on falcon model.</p>
+
+<p>It’s pretty straightforward to download base model checkpoints and convert it from Hugging Face to Lit-GPT.<br />
+If you’re not familiar with <a href="https://huggingface.co/" target="_blank">HF</a>, it’s a collaboration platform for te
+AI &amp; LLM community, I like to think of it as Github for AI.</p>
+
+<p>You’ll need to run the following:</p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="c1"># Download the falcon7b-instruct base model:
+</span><span class="n">python</span> <span class="n">scripts</span><span class="o">/</span><span class="n">download</span><span class="p">.</span><span class="n">py</span> <span class="o">--</span><span class="n">repo_id</span> <span class="n">tiiuae</span><span class="o">/</span><span class="n">falcon</span><span class="o">-</span><span class="mi">7</span><span class="n">b</span><span class="o">-</span><span class="n">instruct</span>
+
+<span class="c1"># Convert from HF to Lit-GPT format:  
+</span><span class="n">python</span> <span class="n">scripts</span><span class="o">/</span><span class="n">convert_hf_checkpoint</span><span class="p">.</span><span class="n">py</span> <span class="o">--</span><span class="n">checkpoint_dir</span> <span class="n">checkpoints</span><span class="o">/</span><span class="n">tiiuae</span><span class="o">/</span><span class="n">falcon</span><span class="o">-</span><span class="mi">7</span><span class="n">b</span><span class="o">-</span><span class="n">instruct</span>
+
+<span class="c1"># Run test inference  
+</span><span class="n">python</span> <span class="n">generate</span><span class="o">/</span><span class="n">base</span><span class="p">.</span><span class="n">py</span> <span class="o">--</span><span class="n">prompt</span> <span class="s">"Annie, are you ok?"</span> <span class="o">--</span><span class="n">checkpoint_dir</span> <span class="n">checkpoints</span><span class="o">/</span><span class="n">tiiuae</span><span class="o">/</span><span class="n">falcon</span><span class="o">-</span><span class="mi">7</span><span class="n">b</span></code></pre></figure>
+
+<p>Now that we have our base model up and running, we can move forward.</p>
+
+<h3 id="creating-domain-specific-dataset">Creating domain specific dataset</h3>
+<p>When fine tuning general purpose models with domain specific knowledge, most of the time (but not always) you’ll need to create some sort of input-output datasets.<br />
+It can be instructions with inputs and outputs, questions and answers or other formats.<br />
+In our case the fine tuning will be done on an instruction data set (which means the more specific term in our case is instruction tuning, but let’s ignore that for simplicity purposes)
+based on the <a href="https://github.com/tatsu-lab/stanford_alpaca" target="_blank">Alpaca</a> dataset, which looks like this:</p>
+
+<figure class="highlight"><pre><code class="language-json" data-lang="json"><span class="p">[</span><span class="w">
+</span><span class="err">.....</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"instruction"</span><span class="p">:</span><span class="w"> </span><span class="s2">"What are the three primary colors?"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"input"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"output"</span><span class="p">:</span><span class="w"> </span><span class="s2">"The three primary colors are red, blue, and yellow."</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"instruction"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Evaluate this sentence for spelling and grammar mistakes"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"input"</span><span class="p">:</span><span class="w"> </span><span class="s2">"He finnished his meal and left the resturant"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"output"</span><span class="p">:</span><span class="w"> </span><span class="s2">"He finished his meal and left the restaurant."</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+</span><span class="err">.....</span><span class="w">
+</span><span class="p">]</span></code></pre></figure>
+
+<p>To proceed with our use case, you should create a domain specific dataset in a similar format:</p>
+
+<figure class="highlight"><pre><code class="language-json" data-lang="json"><span class="p">[</span><span class="w">
+</span><span class="err">.....</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"instruction"</span><span class="p">:</span><span class="w"> </span><span class="s2">"My instruction..."</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"input"</span><span class="p">:</span><span class="w"> </span><span class="s2">"My input..."</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"output"</span><span class="p">:</span><span class="w"> </span><span class="s2">"My output..."</span><span class="p">,</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+</span><span class="err">.....</span><span class="w">
+</span><span class="p">]</span></code></pre></figure>
+
+<h3 id="preparing-data-sets">Preparing data sets</h3>
+<p>After creating the data set, we can run the preparation process.<br />
+If you examine the <code class="language-plaintext highlighter-rouge">scripts/prepare_alpaca.py</code> file, you’ll be able to see that you can set various parameters.<br />
+While most of them are pretty self-explanatory (destination path, checkpoint dir etc’), some of them deserve further explanation.</p>
+
+<h4 id="data-split-with-a-seed---train-test-and-validation-sets">Data split with a seed - train, test and validation sets</h4>
+<p>One of the things you’ll need to define is the <code class="language-plaintext highlighter-rouge">test_split_size</code> which indicates the size of the data you’ll use to test the performance.
+In this case we have only training and test sets, but it is a common practice to use also validation data sets.<br />
+The optimal train/validation/test split depends on your data, but standard splits can be 80/10/10, 70/15/15 or 60/20/20.</p>
+
+<p><code class="language-plaintext highlighter-rouge">Training data</code> is pretty self-explanatory, this is the data you’ll be using to train your model.</p>
+
+<p><code class="language-plaintext highlighter-rouge">Validation data</code> used to automatically or manually optimize hyperparameters during training phase.
+For example, every N intervals, we can validate the model performance with a loss function.</p>
+
+<p>A <code class="language-plaintext highlighter-rouge">loss function</code> quantifies the difference between the predicated output as stated in the validation samples and the actual output produced by the model.<br />
+If we (manually or automatically) notice that the loss function stops decreasing (or stops increasing), we might want to adjust the hyperparameters.</p>
+
+<p><code class="language-plaintext highlighter-rouge">Test data</code> is the final data on which we will test the model performance.</p>
+
+<p>You’ll also be required to set a <code class="language-plaintext highlighter-rouge">seed</code>.<br />
+A seed usually used in order to reproduce random generation, so for a specific seed, the random sequence will always be the same.<br />
+In our case, it is used to take the same random order of <code class="language-plaintext highlighter-rouge">test_split_size</code> samples from the data set.
+Although the test samples are randomized, it is important to use seed for reproducibility of experiments.
+The actual number of the seed is not important as long as it is consistent per experiment.</p>
+
+<h4 id="tensors-and-pytorch-models">Tensors and PyTorch models</h4>
+<p>As you’ll see once you run the preparation script, you’ll get <code class="language-plaintext highlighter-rouge">train.pt</code> and <code class="language-plaintext highlighter-rouge">test.pt</code> file in your <code class="language-plaintext highlighter-rouge">/data</code> folder.</p>
+<ul>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">.pt</code> files are saved PyTorch models.</p>
+  </li>
+  <li>
+    <p>PyTorch models can store various data, such as weights, tokens, simple python objects and tensors.</p>
+  </li>
+  <li>
+    <p>A <code class="language-plaintext highlighter-rouge">PyTorch Tensor</code> is basically a generic multidimensional array containing numerical values on which we can perform computational actions.</p>
+  </li>
+</ul>
+
+<p>In our case, these files contain pytorch objects with textual and tokenized representation of each instruction in your data set:</p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="p">{</span>
+<span class="s">'instruction'</span><span class="p">:</span> <span class="s">"My instruction..."</span><span class="p">,</span>
+<span class="s">'input'</span><span class="p">:</span> <span class="s">'My input...'</span><span class="p">,</span>
+<span class="s">'output'</span><span class="p">:</span> <span class="s">"My output..."</span><span class="p">,</span>
+<span class="s">'input_ids'</span><span class="p">:</span> <span class="n">tensor</span><span class="p">([</span> <span class="mi">19028</span><span class="p">,</span> <span class="mi">304</span><span class="p">,</span> <span class="mi">267</span> <span class="p">,</span> <span class="p">...</span> <span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="p">.</span><span class="n">int32</span><span class="p">),</span>
+<span class="s">'input_ids_no_response'</span><span class="p">:</span> <span class="n">tensor</span><span class="p">([</span> <span class="mi">19028</span><span class="p">,</span> <span class="mi">304</span><span class="p">,</span> <span class="mi">267</span><span class="p">,</span> <span class="p">...</span> <span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="p">.</span><span class="n">int32</span><span class="p">),</span>
+<span class="s">'labels'</span><span class="p">:</span> <span class="n">tensor</span><span class="p">([</span> <span class="mi">19028</span><span class="p">,</span> <span class="mi">304</span><span class="p">,</span> <span class="mi">267</span> <span class="p">,</span> <span class="p">...</span> <span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="p">.</span><span class="n">int32</span><span class="p">)</span>
+<span class="p">}</span></code></pre></figure>
+
+<p>You can see that <code class="language-plaintext highlighter-rouge">input_ids</code> are stored as a tensor, which means we can perform computational actions on it, for example, get the MIN and MAX values of the tensor:</p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">x</span> <span class="o">=</span> <span class="n">tensor</span><span class="p">([</span> <span class="mi">19028</span><span class="p">,</span> <span class="mi">304</span><span class="p">,</span> <span class="mi">267</span><span class="p">])</span>
+<span class="n">torch</span><span class="p">.</span><span class="n">aminmax</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">torch</span><span class="p">.</span><span class="n">return_types</span><span class="p">.</span><span class="n">aminmax</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="n">tensor</span><span class="p">(</span><span class="mi">304</span><span class="p">),</span> <span class="nb">max</span><span class="o">=</span><span class="n">tensor</span><span class="p">(</span><span class="mi">19028</span><span class="p">))</span></code></pre></figure>
+
+<p>There are a lot of out of the box operations we can perform on a tensor, all of them documented in <a href="https://github.com/tatsu-lab/stanford_alpaca" target="_blank">PyTorch’s API</a>.</p>
+
+<h4 id="max-sequence-length">Max sequence length</h4>
+<p>Depending on the model capabilities and the hardware you’re running (specifically GPU), you’ll want to set
+the max length sequence which will limit the number of tokens produced by the tokenizer to avoid out of memory errors.<br />
+As you can see from the example above, the training prompts are tokenized into sequence of numbers representing the text.<br />
+The max sequence length parameter limiting the number of produced tokens.</p>
+
+<h3 id="starting-the-actual-fine-tuning">Starting the actual fine tuning</h3>
+<p>Once we got the data ready, we can start with the actual fine tuning process by running:</p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">python</span> <span class="n">finetune</span><span class="o">/</span><span class="n">adapter_v2</span><span class="p">.</span><span class="n">py</span></code></pre></figure>
+
+<p>But before doing so, let’s check out this file and understand how fine tuning works and the configuration we need to apply for our use case.</p>
+
+<h4 id="fine-tuning-flow">Fine-tuning flow</h4>
+<p>In our case (and many others), in a high level, fine tuning flow is as follows:</p>
+
+<ul>
+  <li>Taking data from the training data set.</li>
+  <li>Running X training iterations adjusting the weights and biases.</li>
+  <li>Saving checkpoints with weights and biases every Y iterations.</li>
+  <li>Evaluating every Z times the performance with a <code class="language-plaintext highlighter-rouge">loss function</code> (explained above).</li>
+  <li>If pleased with the results, saves final version of the weights and biases.</li>
+</ul>
+
+<p>As you can see from examining the file, we have bunch parameters related to actual flow.</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">eval_iters</code> - controls how many times time we will adjust the weights and biases.</li>
+  <li><code class="language-plaintext highlighter-rouge">eval_interval</code> - controls how often we will run a loss function to evaluate the performance.</li>
+  <li><code class="language-plaintext highlighter-rouge">save_interval</code> - controls how ofter we will save checkpoints during the training.</li>
+  <li><code class="language-plaintext highlighter-rouge">devices</code> - determines on how many GPUs we will be running.</li>
+</ul>
+
+<p>Now that we got the gist of the fine tuning flow, let’s go over the more significant hyperparameters that 
+will determine the quality of the training.</p>
+
+<h4 id="learning-rate-and-catastrophic-forgetting">Learning rate and catastrophic forgetting</h4>
+<p>Learning rate is a hyperparameter which dictates how drastically the model weights will be modified during fine tuning.
+This should be a relatively a low number (hence the default value is 0.009) so the model will not forget it’s initial training (a process called catastrophic forgetting),
+but high enough for the weights to represent the newly learned data.</p>
+
+<h4 id="epochs-and-epoch-sizes">Epochs and epoch sizes</h4>
+<p>An <code class="language-plaintext highlighter-rouge">epoch</code> is a term that refers to passing an entire training data set 1 time during fine tuning.<br />
+An <code class="language-plaintext highlighter-rouge">epoch_size</code> is the number of total samples to train on.</p>
+
+<h4 id="gradient-accumulation-batches-and-micro-batches">Gradient accumulation, batches and micro-batches</h4>
+<p>A <code class="language-plaintext highlighter-rouge">batch</code> is the number of samples to use at a time before updating the weights.<br />
+For example, if your entire training dataset consist of 1000 samples, and you define a batch as 100,
+it will take 10 iterations to complete 1 epoch.</p>
+
+<p>Finding the optimal batch size to achieve good results with minimum iterations and weights updates is no easy task.
+Too big of a batch - you’ll be out of memory,
+too small - training will be slow and weight updates will be noisy.</p>
+
+<p>This is where the gradient accumulation technique is used.<br />
+Perhaps I’m over simplifying the explanation since this is not a post for data scientists, but in simple terms -
+when we’re using gradient accumulation, we are processing <code class="language-plaintext highlighter-rouge">micro_batch</code> size of samples at a given time, which prevents out of memory errors,
+accumulating the required parameter changes to minimize the loss (aka make the prediction better), and once the micro batches reached
+the batch size, we’re actually updating the parameters (weights and biases).</p>
+
+<p>That way, we’re not constantly updating the parameters which reduces noice and improves performance, nor we’re risking running out of memory.</p>
+
+<p>For clarity, I’ve extracted the relevant code from the fine tuning script into a simple implementation example:</p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="c1"># setting parameters for batch and micro batch
+</span><span class="n">batch_size</span> <span class="o">=</span> <span class="mi">128</span> <span class="o">/</span> <span class="n">devices</span>
+<span class="n">micro_batch_size</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">gradient_accumulation_iters</span> <span class="o">=</span> <span class="n">batch_size</span> <span class="o">//</span> <span class="n">micro_batch_size</span>
+
+<span class="c1"># iter_num is the number of iteration, omitted from the example
+</span><span class="n">is_accumulating</span> <span class="o">=</span> <span class="n">iter_num</span> <span class="o">%</span> <span class="n">gradient_accumulation_iters</span> <span class="o">!=</span> <span class="mi">0</span>
+
+<span class="c1"># accumulate the changes to the parameters
+</span><span class="k">with</span> <span class="n">fabric</span><span class="p">.</span><span class="n">no_backward_sync</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">enabled</span><span class="o">=</span><span class="n">is_accumulating</span><span class="p">):</span>
+    <span class="n">logits</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">input_ids</span><span class="p">,</span> <span class="n">lm_head_chunk_size</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
+    <span class="c1"># shift the targets such that output n predicts token n+1
+</span>    <span class="n">logits</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">logits</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][...,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">chunked_cross_entropy</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">targets</span><span class="p">[...,</span> <span class="mi">1</span><span class="p">:])</span>
+    <span class="n">fabric</span><span class="p">.</span><span class="n">backward</span><span class="p">(</span><span class="n">loss</span> <span class="o">/</span> <span class="n">gradient_accumulation_iters</span><span class="p">)</span>
+
+<span class="c1"># if done accumulating, save
+</span><span class="k">if</span> <span class="ow">not</span> <span class="n">is_accumulating</span><span class="p">:</span>
+    <span class="n">optimizer</span><span class="p">.</span><span class="n">step</span><span class="p">()</span>
+    <span class="n">optimizer</span><span class="p">.</span><span class="n">zero_grad</span><span class="p">()</span>
+    <span class="n">step_count</span> <span class="o">+=</span> <span class="mi">1</span></code></pre></figure>
+
+<h4 id="overfitting-underfitting-and-weight-decay">Overfitting, underfitting and weight decay</h4>
+<p>In basic terms,
+<code class="language-plaintext highlighter-rouge">overfitting</code> occurs when a model performs very good on data it has seen but very poorly on new unseen data.<br />
+<code class="language-plaintext highlighter-rouge">Underfitting</code> occurs when a model performs poorly on both seen and unseen data.<br />
+<code class="language-plaintext highlighter-rouge">Weight decay</code> is a technique used to prevent overfitting of a model.
+This parameter basically reduce weight adjustment during an update and needs to be carefully adjusted since a number too small
+will cause overfitting while a number too big will cause underfitting.</p>
+
+<h4 id="warmup-iterations">Warmup iterations</h4>
+<p><code class="language-plaintext highlighter-rouge">Warmup iterations</code> is the number of epoch iterations where the defined <code class="language-plaintext highlighter-rouge">learning rate</code> (aka how drastically weights are changed) is lower than the default learning rate defined for the fine tuning process.<br />
+Each warmup iteration the learning rate is increasing up until it reaches the defined hyperparameter value.<br />
+It is used to prevent the model’s parameters drastically change upon exposure to new data, which might cause early over fitting and other undesired results.</p>
+
+<h3 id="running-inference">Running inference</h3>
+<p>Now that we have finished fine tuning the model we can run an inference.</p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="c1">## [adapter_path] - Path to the checkpoint with trained adapter weights, which are the output of `adapter_v2.py`.
+## [checkpoint_dir] - The path to the checkpoint folder of the base model.
+</span><span class="n">python</span> <span class="n">generate</span><span class="o">/</span><span class="n">adapter_v2</span><span class="p">.</span><span class="n">py</span> <span class="o">--</span><span class="n">adapter_path</span> <span class="p">[</span><span class="n">adapter_path</span><span class="p">]</span> <span class="o">--</span><span class="n">checkpoint_dir</span> <span class="p">[</span><span class="n">checkpoint_dir</span><span class="p">]</span> <span class="o">--</span><span class="n">prompt</span> <span class="s">"Annie, are you ok?"</span></code></pre></figure>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="LLM/ML/AI" /></entry><entry><title type="html">Reducing resource requirements: Hands-on LLM quantization and post-quantization performance assessment for dummies</title><link href="http://localhost:4000/jekyll/update/2023/09/18/llm-quantization.html" rel="alternate" type="text/html" title="Reducing resource requirements: Hands-on LLM quantization and post-quantization performance assessment for dummies" /><published>2023-09-18T12:31:29+03:00</published><updated>2023-09-18T12:31:29+03:00</updated><id>http://localhost:4000/jekyll/update/2023/09/18/llm-quantization</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2023/09/18/llm-quantization.html"><![CDATA[<ul id="markdown-toc">
+  <li><a href="#intro" id="markdown-toc-intro">Intro</a></li>
+  <li><a href="#post-training-quantization-vs-quantization-aware-training" id="markdown-toc-post-training-quantization-vs-quantization-aware-training">Post training quantization VS quantization aware training</a></li>
+  <li><a href="#precision-to-memory-usage-prediction" id="markdown-toc-precision-to-memory-usage-prediction">Precision to memory usage prediction</a></li>
+  <li><a href="#rule-of-thumb-accuracy-vs-resource-requirements-balance" id="markdown-toc-rule-of-thumb-accuracy-vs-resource-requirements-balance">Rule of thumb: accuracy VS resource requirements balance</a></li>
+  <li><a href="#running-quantized-model-inference" id="markdown-toc-running-quantized-model-inference">Running quantized model inference</a></li>
+  <li><a href="#automatic-post-quantization-accuracy-evaluation" id="markdown-toc-automatic-post-quantization-accuracy-evaluation">Automatic post-quantization accuracy evaluation</a>    <ul>
+      <li><a href="#pre-and-post-quantization-summarization-quality-example-using-evaluate" id="markdown-toc-pre-and-post-quantization-summarization-quality-example-using-evaluate">Pre and post quantization summarization quality example using evaluate</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="intro">Intro</h3>
+<p>In LLM context, <code class="language-plaintext highlighter-rouge">quantization</code> is a technique used to reduce the precision of the models parameters (weights and biases) in order to reduce
+the model’s memory footprint.<br />
+While it has a lot of advantages, the main ones are that it allows us to reduce hardware requirements for the model we use (or use a bigger model with the same hardware),
+and reduce inference cost (or increase the speed).</p>
+
+<p>Similar to <a href="/jekyll/update/2023/09/18/llm-fine-tuning-hypterparameters-simplified.html" target="_blank">Effective LLM fine-tuning for dummies</a>,
+the content of this post is for professionals (such as software engineers and architects) which aren’t specialized in AI and data science domains but required to gain
+sufficient knowledge to enable and lead features and projects in these domains, so the content is simplified and covers the main subjects without getting into too many details while maintaining the hands-on approach.</p>
+
+<h3 id="post-training-quantization-vs-quantization-aware-training">Post training quantization VS quantization aware training</h3>
+<p>Typically, quantization process can be implemented in two different phases, during training (or fine-tuning), or during inference.<br />
+Quantization during training usually referred to as <code class="language-plaintext highlighter-rouge">QAT</code> (quantization aware training), while quantization during inference referred to as <code class="language-plaintext highlighter-rouge">PTQ</code> (post training quantization).<br />
+<code class="language-plaintext highlighter-rouge">QAT</code> is a computationally expensive process but might result in a better model accuracy than the cheaper, simpler <code class="language-plaintext highlighter-rouge">PTQ</code>.<br />
+With that being said, depending on the data and the precision after the quantization, the reduction in the model accuracy is often negligible.
+In this post, we’ll do some hands-on <code class="language-plaintext highlighter-rouge">PTQ</code> quantization.</p>
+
+<h3 id="precision-to-memory-usage-prediction">Precision to memory usage prediction</h3>
+<p>As a generic rule of thumb, to predict <em>approximate</em> memory requirement of a specific model, you should multiply the number of parameters
+by the precision of the weights.<br />
+Let’s take <code class="language-plaintext highlighter-rouge">falcon-7b</code> with a <code class="language-plaintext highlighter-rouge">single precision float 32bit</code> weights as an example.<br />
+<code class="language-plaintext highlighter-rouge">Float 32bit</code> takes up 4 bytes, so if we multiply the number of the bytes by the number of parameters, we’ll get:<br />
+<code class="language-plaintext highlighter-rouge">4 × 7e9 = 2.8e10 = 28,000,000,000 bytes = 28gb</code>.<br />
+Based on the same logic, weight reduction to a <code class="language-plaintext highlighter-rouge">half precision float 16bit</code> which takes 2 bytes will require approximately 14gb memory.</p>
+
+<h3 id="rule-of-thumb-accuracy-vs-resource-requirements-balance">Rule of thumb: accuracy VS resource requirements balance</h3>
+<p>The optimal weight precision to accuracy balance, like a lot of things in the LLM ecosystem - depends on the use case and the data.<br />
+As a rule of thumb, quantizing to <code class="language-plaintext highlighter-rouge">int 8bit</code> offers hardly noticed accuracy degradation while reducing memory requirements by 50% or 75%, depending on the original
+parameter precision.<br />
+With that being said, more aggressive precision reduction such as <code class="language-plaintext highlighter-rouge">int4</code>, <code class="language-plaintext highlighter-rouge">float4</code>, or even <code class="language-plaintext highlighter-rouge">double quantization</code> does exist and definitely worth testing whether they are good enough
+for your data and use case.</p>
+
+<h3 id="running-quantized-model-inference">Running quantized model inference</h3>
+<p>Similar to the <a href="/jekyll/update/2023/09/18/llm-fine-tuning-hypterparameters-simplified.html" target="_blank">Effective LLM fine-tuning for dummies</a> post,
+I will use <code class="language-plaintext highlighter-rouge">LIT-GPT</code> as the tool due to its simplicity.<br />
+Running quantized inference with LIT-GPT is pretty straightforward, for example:</p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">python</span> <span class="n">generate</span><span class="o">/</span><span class="n">base</span><span class="p">.</span><span class="n">py</span> <span class="o">--</span><span class="n">prompt</span> <span class="s">"Annie, are you ok?"</span> <span class="o">--</span><span class="n">checkpoint_dir</span> <span class="n">checkpoints</span><span class="o">/</span><span class="n">tiiuae</span><span class="o">/</span><span class="n">falcon</span><span class="o">-</span><span class="mi">7</span><span class="n">b</span> <span class="o">--</span><span class="n">precision</span> <span class="n">bf16</span><span class="o">-</span><span class="n">true</span></code></pre></figure>
+
+<p>This command will run an inference with a 16bit precision parameters.<br />
+As explained above, there additional options such as <code class="language-plaintext highlighter-rouge">int4</code>, <code class="language-plaintext highlighter-rouge">float4</code> etc.<br />
+For the full list of options check <a href="https://github.com/Lightning-AI/lit-gpt/blob/main/tutorials/quantize.md" target="_blank">LIT-GPT quantization Github page</a>.</p>
+
+<h3 id="automatic-post-quantization-accuracy-evaluation">Automatic post-quantization accuracy evaluation</h3>
+<p>It’s a good idea to manually evaluate handpicked set of examples before and after quantization to assess the model’s performance after quantization.<br />
+But if we want to perform a more thorough assessment on a larger test set, or to run it as a step in one of our CI/CD pipelines, an automatic tool will be required.<br />
+One of these tools is <code class="language-plaintext highlighter-rouge">evalute</code>, which can be found in <a href="https://huggingface.co/evaluate-metric" target="_blank">hugging face</a> (or <a href="https://github.com/huggingface/evaluate" target="_blank">Github</a>).<br />
+<code class="language-plaintext highlighter-rouge">Evaluate</code> provides 53 easy tools evaluation tools which we can leverage to test post quantization model performance.</p>
+
+<h4 id="pre-and-post-quantization-summarization-quality-example-using-evaluate">Pre and post quantization summarization quality example using evaluate</h4>
+<p>For the sake of the example, let’s assume that our use case is to test text summarization capabilities of a language model pre- and post-quantization.<br />
+<em>One of the multiple</em> metrics we can use to compare the quality of the summary is ROUGE (Recall-Oriented Understudy for Gisting Evaluation).<br />
+We can run the evaluation module twice, first time with the pre-quantized inference output, second time with post-quantized - and compare the scores.</p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">evaluate</span>
+
+<span class="n">rouge</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">.</span><span class="n">load</span><span class="p">(</span><span class="s">'rouge'</span><span class="p">)</span>
+
+<span class="n">predictions</span> <span class="o">=</span> <span class="p">[</span><span class="s">"Star Trek and Star Wars, while both set in space, differ significantly in their themes and focus. Star Trek, primarily a TV franchise, explores scientific and philosophical issues, emphasizing diplomacy and exploration. Its stories are set in a universe where Earth is part of a vast, multi-species United Federation of Planets. The narrative often revolves around the crew of starships, like the USS Enterprise, as they embark on peaceful explorations and diplomatic missions. In contrast, Star Wars is a space opera centered around the epic battle between good (the Jedi) and evil (the Sith). It's a film series set in a galaxy far, far away, where mystical Force users and grand space battles take center stage. Star Wars is known for its iconic characters like Darth Vader and its focus on destiny and heroism, differing from Star Trek's more grounded and intellectual approach."</span><span class="p">]</span>
+<span class="n">references</span> <span class="o">=</span> <span class="p">[</span><span class="s">"Star Trek and Star Wars are both popular space franchises, but they have distinct differences. Star Trek, which originated as a television series, is known for its focus on exploration, science, and philosophy. It is set in a future where Earth is part of an interstellar federation, and the narrative usually involves the crew of spacecraft, such as the Enterprise, engaging in exploration and diplomatic efforts. Star Wars, on the other hand, is a cinematic saga that leans more towards the space opera genre, with a clear delineation of good (represented by the Jedi) and evil (embodied by the Sith). It takes place in a distant galaxy and is more centered on action, adventure, and the mystical Force, with legendary figures like Luke Skywalker and Darth Vader. Unlike Star Trek's emphasis on rationality and discovery, Star Wars focuses on the theme of heroism and the classic battle between light and dark."</span><span class="p">]</span>
+
+<span class="n">results</span> <span class="o">=</span> <span class="n">rouge</span><span class="p">.</span><span class="n">compute</span><span class="p">(</span><span class="n">predictions</span><span class="o">=</span><span class="n">predictions</span><span class="p">,</span><span class="n">references</span><span class="o">=</span><span class="n">references</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="p">{</span><span class="s">'rouge1'</span><span class="p">:</span> <span class="mf">0.5570469798657718</span><span class="p">,</span> <span class="s">'rouge2'</span><span class="p">:</span> <span class="mf">0.23648648648648649</span><span class="p">,</span> <span class="s">'rougeL'</span><span class="p">:</span> <span class="mf">0.3691275167785235</span><span class="p">,</span> <span class="s">'rougeLsum'</span><span class="p">:</span> <span class="mf">0.3691275167785235</span><span class="p">}</span></code></pre></figure>
+
+<p>As explained above, similar ROUGE score does not guarantee a good post quantization accuracy since it just measures similar terms and phrases, but it’s enough
+to demonstrate the ease of use of the <code class="language-plaintext highlighter-rouge">evaluate</code> package.</p>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="LLM/ML/AI" /></entry><entry><title type="html">Reducing I/O latency on EBS restored from snapshots with AWS FSR</title><link href="http://localhost:4000/jekyll/update/2023/03/26/aws-fast-snapshot-restore.html" rel="alternate" type="text/html" title="Reducing I/O latency on EBS restored from snapshots with AWS FSR" /><published>2023-03-26T11:31:29+02:00</published><updated>2023-03-26T11:31:29+02:00</updated><id>http://localhost:4000/jekyll/update/2023/03/26/aws-fast-snapshot-restore</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2023/03/26/aws-fast-snapshot-restore.html"><![CDATA[<p>When creating an EBS snapshot the data is saved to S3.<br />
 Snapshots are incremental, meaning that only the blocks that have been modified later than the most recent snapshot - are saved.<br />
 For obvious reasons this makes the snapshot faster to save and cheaper to store.</p>
 
@@ -24,7 +378,15 @@ So for example, initiating EBS from an FSR enabled snapshot of 10TB will take 10
 <p>Some limitations:<br />
 You can enable up to 5 FSR enabled snapshots per region and only to snapshots sized 16TiB or less.</p>
 
-<p>A full documentation of FSR can be found <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-fast-snapshot-restore.html" target="_blank">here</a>.</p>]]></content><author><name>j.shapira</name></author><category term="jekyll" /><category term="update" /><category term="DataEngineering" /><category term="BE" /><category term="Performance" /><category term="Cloud" /><category term="Architecture" /><summary type="html"><![CDATA[When creating an EBS snapshot the data is saved to S3. Snapshots are incremental, meaning that only the blocks that have been modified later than the most recent snapshot - are saved. For obvious reasons this makes the snapshot faster to save and cheaper to store.]]></summary></entry><entry><title type="html">Leverage AWS Direct Connect to use AWS services without exposing your data to the public internet</title><link href="/jekyll/update/2023/03/26/using-aws-without-exposing-data-to-public-internet.html" rel="alternate" type="text/html" title="Leverage AWS Direct Connect to use AWS services without exposing your data to the public internet" /><published>2023-03-26T12:31:29+03:00</published><updated>2023-03-26T12:31:29+03:00</updated><id>/jekyll/update/2023/03/26/using-aws-without-exposing-data-to-public-internet</id><content type="html" xml:base="/jekyll/update/2023/03/26/using-aws-without-exposing-data-to-public-internet.html"><![CDATA[<p>While there are a lot of tools to secure your data while being transferred over the internet,
+<p>A full documentation of FSR can be found <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-fast-snapshot-restore.html" target="_blank">here</a>.</p>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="DataEngineering" /><category term="BE" /><category term="Performance" /><category term="Cloud" /><category term="Architecture" /></entry><entry><title type="html">Leverage AWS Direct Connect to use AWS services without exposing your data to the public internet</title><link href="http://localhost:4000/jekyll/update/2023/03/26/using-aws-without-exposing-data-to-public-internet.html" rel="alternate" type="text/html" title="Leverage AWS Direct Connect to use AWS services without exposing your data to the public internet" /><published>2023-03-26T11:31:29+02:00</published><updated>2023-03-26T11:31:29+02:00</updated><id>http://localhost:4000/jekyll/update/2023/03/26/using-aws-without-exposing-data-to-public-internet</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2023/03/26/using-aws-without-exposing-data-to-public-internet.html"><![CDATA[<ul id="markdown-toc">
+  <li><a href="#intro" id="markdown-toc-intro">Intro</a></li>
+  <li><a href="#selecting-a-connection" id="markdown-toc-selecting-a-connection">Selecting a connection</a></li>
+  <li><a href="#creating-vifs-and-directing-traffic-to-the-correct" id="markdown-toc-creating-vifs-and-directing-traffic-to-the-correct">Creating VIFs and directing traffic to the correct</a></li>
+  <li><a href="#not-only-for-security" id="markdown-toc-not-only-for-security">Not only for security</a></li>
+</ul>
+
+<h3 id="intro">Intro</h3>
+<p>While there are a lot of tools to secure your data while being transferred over the internet,
 the most secured method of them all is not to do it at all.<br />
 Obviously this approach limits us in many ways, including (but not limited to) leveraging the power of public clouds.</p>
 
@@ -39,7 +401,7 @@ From there, the partner will cross connect your router to AWS router connected t
 After the physical connections are done, you need to create logical connections via VIFs (Virtual interface) in order to access
 AWS public services (such as S3) and your private VPCs or a transit gateway.</p>
 
-<h4 id="selection-a-connection">Selection a connection</h4>
+<h3 id="selecting-a-connection">Selecting a connection</h3>
 <p>You can select 2 types of connections according to your needs and limitations:</p>
 
 <table>
@@ -67,7 +429,7 @@ AWS public services (such as S3) and your private VPCs or a transit gateway.</p>
   </tbody>
 </table>
 
-<h4 id="creating-vifs-and-directing-traffic-to-the-correct">Creating VIFs and directing traffic to the correct</h4>
+<h3 id="creating-vifs-and-directing-traffic-to-the-correct">Creating VIFs and directing traffic to the correct</h3>
 <p>You can have 3 types of VIFs: public, private and transit VIFs.<br />
 Public VIF for AWS public services such as S3, private VIF for your VPC and transit VIF for a transit gateway.<br />
 Next, in order to correctly direct traffic, you should associate each VIF with a VLAN tag, so the traffic can be routed to the
@@ -82,9 +444,17 @@ correct routers on AWS.</p>
 <p>This is a high level diagram of how things work. 
 You can find a neat <a href="https://docs.aws.amazon.com/directconnect/latest/UserGuide/getting_started.html#ConnectionRequest" target="_blank">step-by-step guide in AWS documentation</a>.</p>
 
-<h4 id="not-only-for-security">Not only for security</h4>
+<h3 id="not-only-for-security">Not only for security</h3>
 <p>Security is not the only benefit of using direct connect. 
-You can also get increased bandwidth throughput and a more consistent network performance than what can be achieved with a public internet connection.</p>]]></content><author><name>j.shapira</name></author><category term="jekyll" /><category term="update" /><category term="DataEngineering" /><category term="BE" /><category term="Performance" /><category term="Cloud" /><category term="Architecture" /><category term="Devops" /><summary type="html"><![CDATA[While there are a lot of tools to secure your data while being transferred over the internet, the most secured method of them all is not to do it at all. Obviously this approach limits us in many ways, including (but not limited to) leveraging the power of public clouds.]]></summary></entry><entry><title type="html">Speeding up spark SQL with adaptive query execution</title><link href="/jekyll/update/2023/02/07/spark-adaptive-query-execution.html" rel="alternate" type="text/html" title="Speeding up spark SQL with adaptive query execution" /><published>2023-02-07T11:31:29+02:00</published><updated>2023-02-07T11:31:29+02:00</updated><id>/jekyll/update/2023/02/07/spark-adaptive-query-execution</id><content type="html" xml:base="/jekyll/update/2023/02/07/spark-adaptive-query-execution.html"><![CDATA[<p>Spark version 2.x introduced CBO (cost-based-optimization) framework.<br />
+You can also get increased bandwidth throughput and a more consistent network performance than what can be achieved with a public internet connection.</p>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="DataEngineering" /><category term="BE" /><category term="Performance" /><category term="Cloud" /><category term="Architecture" /><category term="Devops" /></entry><entry><title type="html">Speeding up spark SQL with adaptive query execution</title><link href="http://localhost:4000/jekyll/update/2023/02/07/spark-adaptive-query-execution.html" rel="alternate" type="text/html" title="Speeding up spark SQL with adaptive query execution" /><published>2023-02-07T11:31:29+02:00</published><updated>2023-02-07T11:31:29+02:00</updated><id>http://localhost:4000/jekyll/update/2023/02/07/spark-adaptive-query-execution</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2023/02/07/spark-adaptive-query-execution.html"><![CDATA[<ul id="markdown-toc">
+  <li><a href="#intro" id="markdown-toc-intro">Intro</a></li>
+  <li><a href="#dynamically-switching-join-strategies" id="markdown-toc-dynamically-switching-join-strategies">Dynamically switching join strategies</a></li>
+  <li><a href="#dynamically-coalescing-shuffle-partitions" id="markdown-toc-dynamically-coalescing-shuffle-partitions">Dynamically coalescing shuffle partitions</a></li>
+  <li><a href="#dynamically-optimizing-skew-joins" id="markdown-toc-dynamically-optimizing-skew-joins">Dynamically optimizing skew joins</a></li>
+</ul>
+
+<h3 id="intro">Intro</h3>
+<p>Spark version 2.x introduced CBO (cost-based-optimization) framework.<br />
 CBO collects and leverages different data statistics (e.g, row count, number of distinct values, etc.) in order to improve
 the quality of query execution plans.</p>
 
@@ -140,7 +510,33 @@ The longest task (A P1 to B P1) will take 3 minutes while all the others will ta
 <p><a href="/assets/post-images/2023-3-21-aqe/skew2.JPG" target="_blank"><img src="/assets/post-images/2023-3-21-aqe/skew2.JPG" alt="Skew" /></a></p>
 
 <p>AQE Optimization will split ABP1 into 2 different partitions, duplicate BP1 and join between them,
-increasing the number of tasks to 5, but reducing allowing a better parallelism, thus reducing the overall execution time by half.</p>]]></content><author><name>j.shapira</name></author><category term="jekyll" /><category term="update" /><category term="DataEngineering" /><category term="BE" /><category term="Performance" /><summary type="html"><![CDATA[Spark version 2.x introduced CBO (cost-based-optimization) framework. CBO collects and leverages different data statistics (e.g, row count, number of distinct values, etc.) in order to improve the quality of query execution plans.]]></summary></entry><entry><title type="html">Examining performance related information of your spark application via spark UI</title><link href="/jekyll/update/2022/11/14/performance-related-info-spark-ui.html" rel="alternate" type="text/html" title="Examining performance related information of your spark application via spark UI" /><published>2022-11-14T11:31:29+02:00</published><updated>2022-11-14T11:31:29+02:00</updated><id>/jekyll/update/2022/11/14/performance-related-info-spark-ui</id><content type="html" xml:base="/jekyll/update/2022/11/14/performance-related-info-spark-ui.html"><![CDATA[<p>Debugging and improving spark performance bottlenecks isn’t a straightforward task most of the time.
+increasing the number of tasks to 5, but reducing allowing a better parallelism, thus reducing the overall execution time by half.</p>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="DataEngineering" /><category term="BE" /><category term="Performance" /></entry><entry><title type="html">Examining performance related information of your spark application via spark UI</title><link href="http://localhost:4000/jekyll/update/2022/11/14/performance-related-info-spark-ui.html" rel="alternate" type="text/html" title="Examining performance related information of your spark application via spark UI" /><published>2022-11-14T11:31:29+02:00</published><updated>2022-11-14T11:31:29+02:00</updated><id>http://localhost:4000/jekyll/update/2022/11/14/performance-related-info-spark-ui</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2022/11/14/performance-related-info-spark-ui.html"><![CDATA[<ul id="markdown-toc">
+  <li><a href="#intro" id="markdown-toc-intro">Intro</a></li>
+  <li><a href="#application-event-timeline" id="markdown-toc-application-event-timeline">Application event timeline</a></li>
+  <li><a href="#jobs" id="markdown-toc-jobs">Jobs</a></li>
+  <li><a href="#job-details" id="markdown-toc-job-details">Job details</a>    <ul>
+      <li><a href="#associated-sql-query" id="markdown-toc-associated-sql-query">Associated SQL query</a></li>
+      <li><a href="#stages" id="markdown-toc-stages">Stages</a></li>
+    </ul>
+  </li>
+  <li><a href="#stage-details" id="markdown-toc-stage-details">Stage details</a>    <ul>
+      <li><a href="#event-timeline" id="markdown-toc-event-timeline">Event timeline</a></li>
+      <li><a href="#summary-metrics" id="markdown-toc-summary-metrics">Summary metrics</a></li>
+      <li><a href="#tasks-breakdown" id="markdown-toc-tasks-breakdown">Tasks breakdown</a></li>
+    </ul>
+  </li>
+  <li><a href="#the-main-course---understanding-sql-tab" id="markdown-toc-the-main-course---understanding-sql-tab">The main course - Understanding SQL tab</a>    <ul>
+      <li><a href="#scanning-parquet" id="markdown-toc-scanning-parquet">Scanning Parquet</a></li>
+      <li><a href="#wholestagecodegen---fuse-of-multiple-operators" id="markdown-toc-wholestagecodegen---fuse-of-multiple-operators">WholeStageCodeGen - fuse of multiple operators</a></li>
+      <li><a href="#exchange" id="markdown-toc-exchange">Exchange</a></li>
+      <li><a href="#narrow-transformation" id="markdown-toc-narrow-transformation">Narrow transformation</a></li>
+      <li><a href="#saving-the-output" id="markdown-toc-saving-the-output">Saving the output</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="intro">Intro</h3>
+<p>Debugging and improving spark performance bottlenecks isn’t a straightforward task most of the time.
 Performance issues can arise from easy to detect bottlenecks such as wasteful UDFs or issues in the executors,
 or a more illusive problems such as estimated metrics of input size in SQL plan being very inaccurate.</p>
 
@@ -353,7 +749,15 @@ If we were to remove the repartition command, the column value manipulation woul
 <ol>
   <li>Number of output rows &amp; data size - this is kind of self-explanatory.</li>
   <li>Number of written files - this is important to notice, since constantly creating a lot of small files might impact the performance of whatever reads your data. A good file size will be 512MiB or 1GiB.</li>
-</ol>]]></content><author><name>j.shapira</name></author><category term="jekyll" /><category term="update" /><category term="DataEngineering" /><category term="BE" /><category term="Performance" /><summary type="html"><![CDATA[Debugging and improving spark performance bottlenecks isn’t a straightforward task most of the time. Performance issues can arise from easy to detect bottlenecks such as wasteful UDFs or issues in the executors, or a more illusive problems such as estimated metrics of input size in SQL plan being very inaccurate.]]></summary></entry><entry><title type="html">Improve MTTR’s with observability platforms</title><link href="/jekyll/update/2022/10/23/improve-mttr-with-observability-platform.html" rel="alternate" type="text/html" title="Improve MTTR’s with observability platforms" /><published>2022-10-23T19:31:29+03:00</published><updated>2022-10-23T19:31:29+03:00</updated><id>/jekyll/update/2022/10/23/improve-mttr-with-observability-platform</id><content type="html" xml:base="/jekyll/update/2022/10/23/improve-mttr-with-observability-platform.html"><![CDATA[<p>Ability to quickly resolve production issues is one of the key factors in customer satisfaction.<br />
+</ol>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="DataEngineering" /><category term="BE" /><category term="Performance" /></entry><entry><title type="html">Improve MTTR’s with observability platforms</title><link href="http://localhost:4000/jekyll/update/2022/10/23/improve-mttr-with-observability-platform.html" rel="alternate" type="text/html" title="Improve MTTR’s with observability platforms" /><published>2022-10-23T19:31:29+03:00</published><updated>2022-10-23T19:31:29+03:00</updated><id>http://localhost:4000/jekyll/update/2022/10/23/improve-mttr-with-observability-platform</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2022/10/23/improve-mttr-with-observability-platform.html"><![CDATA[<ul id="markdown-toc">
+  <li><a href="#intro" id="markdown-toc-intro">Intro</a></li>
+  <li><a href="#observability-platforms-to-reduce-the-pain" id="markdown-toc-observability-platforms-to-reduce-the-pain">Observability platforms to reduce the pain</a></li>
+  <li><a href="#pricing" id="markdown-toc-pricing">Pricing</a></li>
+  <li><a href="#demos--choosing-the-right-tool-for-you" id="markdown-toc-demos--choosing-the-right-tool-for-you">Demos &amp; Choosing the right tool for you</a></li>
+</ul>
+
+<h3 id="intro">Intro</h3>
+<p>Ability to quickly resolve production issues is one of the key factors in customer satisfaction.<br />
 Not the mention it saves us resources and debugging time.<br />
 Cloud native and distributed systems are especially hard to debug due to high amount of moving parts.<br />
 An error in a flow can originate in a one of N containers of a specific service, in a flow composed of N different services, 
@@ -383,7 +787,16 @@ Obviously the exact price depending on the tool itself and the package you selec
   <li><a href="https://www.youtube.com/watch?v=5hR17z4Qm3g" target="_blank">Lightrun</a></li>
   <li><a href="https://www.youtube.com/watch?v=Tnsd_65jQLY" target="_blank">Rookout</a></li>
   <li><a href="https://www.youtube.com/watch?v=OI5oYxTCiV0&amp;t=957s" target="_blank">Helios</a></li>
-</ul>]]></content><author><name>j.shapira</name></author><category term="jekyll" /><category term="update" /><category term="Architecture" /><category term="Cloud" /><category term="BE" /><category term="Devops" /><summary type="html"><![CDATA[Ability to quickly resolve production issues is one of the key factors in customer satisfaction. Not the mention it saves us resources and debugging time. Cloud native and distributed systems are especially hard to debug due to high amount of moving parts. An error in a flow can originate in a one of N containers of a specific service, in a flow composed of N different services, and the erroneous container might as well be dead already due to different reasons (HPA, a crash, etc’). Debugging is hard, reproducing is sometimes harder.]]></summary></entry><entry><title type="html">Extending Flyweight pattern ideas to improve system-wide performance and reduce costs</title><link href="/jekyll/update/2022/07/10/leveraging-flyweight-pattern-to-system-arch.html" rel="alternate" type="text/html" title="Extending Flyweight pattern ideas to improve system-wide performance and reduce costs" /><published>2022-07-10T19:31:29+03:00</published><updated>2022-07-10T19:31:29+03:00</updated><id>/jekyll/update/2022/07/10/leveraging-flyweight-pattern-to-system-arch</id><content type="html" xml:base="/jekyll/update/2022/07/10/leveraging-flyweight-pattern-to-system-arch.html"><![CDATA[<p>There are plenty of sources online explaining the Flyweight design pattern in depth.<br />
+</ul>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="Architecture" /><category term="Cloud" /><category term="BE" /><category term="Devops" /></entry><entry><title type="html">Extending Flyweight pattern ideas to improve system-wide performance and reduce costs</title><link href="http://localhost:4000/jekyll/update/2022/07/10/leveraging-flyweight-pattern-to-system-arch.html" rel="alternate" type="text/html" title="Extending Flyweight pattern ideas to improve system-wide performance and reduce costs" /><published>2022-07-10T19:31:29+03:00</published><updated>2022-07-10T19:31:29+03:00</updated><id>http://localhost:4000/jekyll/update/2022/07/10/leveraging-flyweight-pattern-to-system-arch</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2022/07/10/leveraging-flyweight-pattern-to-system-arch.html"><![CDATA[<ul id="markdown-toc">
+  <li><a href="#intro" id="markdown-toc-intro">Intro</a>    <ul>
+      <li><a href="#taking-the-general-idea-to-a-system-wide-level" id="markdown-toc-taking-the-general-idea-to-a-system-wide-level">Taking the general idea to a system-wide level</a></li>
+      <li><a href="#be-careful-with-the-tradeoffs" id="markdown-toc-be-careful-with-the-tradeoffs">Be careful with the tradeoffs</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="intro">Intro</h3>
+<p>There are plenty of sources online explaining the Flyweight design pattern in depth.<br />
 The most common description of the pattern is that it designed to reduce memory footprint of a program without losing any capability.
 But the ideas behind it can be extended to a broader, system-wide scale.</p>
 
@@ -501,7 +914,24 @@ which will mean two things:</p>
 
 <p>Another thing to consider is the usage of the data, the analytics in our case - <br />
 can we preload the intrinsic data in the analytics? If not, will JOINing (with spark, for example) of small amount of intrinsic data
-will be faster than working with 84% more data which is already in the same dataframes?</p>]]></content><author><name>j.shapira</name></author><category term="jekyll" /><category term="update" /><category term="Architecture" /><category term="DataEngineering" /><category term="BE" /><category term="Performance" /><category term="Cloud" /><summary type="html"><![CDATA[There are plenty of sources online explaining the Flyweight design pattern in depth. The most common description of the pattern is that it designed to reduce memory footprint of a program without losing any capability. But the ideas behind it can be extended to a broader, system-wide scale.]]></summary></entry><entry><title type="html">Creating and sharing private npm packages without setting up a repository manager, using git urls</title><link href="/jekyll/update/2022/07/10/using-git-as-npm-registry.html" rel="alternate" type="text/html" title="Creating and sharing private npm packages without setting up a repository manager, using git urls" /><published>2022-07-10T19:31:29+03:00</published><updated>2022-07-10T19:31:29+03:00</updated><id>/jekyll/update/2022/07/10/using-git-as-npm-registry</id><content type="html" xml:base="/jekyll/update/2022/07/10/using-git-as-npm-registry.html"><![CDATA[<p>When working on JS/TS components (or any other), most chances are, that on relatively regular basis, you’re required to reuse some code you or your team wrote in multiple projects.</p>
+will be faster than working with 84% more data which is already in the same dataframes?</p>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="Architecture" /><category term="DataEngineering" /><category term="BE" /><category term="Performance" /><category term="Cloud" /></entry><entry><title type="html">Creating and sharing private npm packages without setting up a repository manager, using git urls</title><link href="http://localhost:4000/jekyll/update/2022/07/10/using-git-as-npm-registry.html" rel="alternate" type="text/html" title="Creating and sharing private npm packages without setting up a repository manager, using git urls" /><published>2022-07-10T19:31:29+03:00</published><updated>2022-07-10T19:31:29+03:00</updated><id>http://localhost:4000/jekyll/update/2022/07/10/using-git-as-npm-registry</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2022/07/10/using-git-as-npm-registry.html"><![CDATA[<ul id="markdown-toc">
+  <li><a href="#intro" id="markdown-toc-intro">Intro</a>    <ul>
+      <li><a href="#package-versioning" id="markdown-toc-package-versioning">Package Versioning</a></li>
+      <li><a href="#caveats-for-npm-packages-consumed-directly-from-git" id="markdown-toc-caveats-for-npm-packages-consumed-directly-from-git">Caveats for npm packages consumed directly from git</a></li>
+      <li><a href="#tree-shaking-to-mitigate-the-caveats" id="markdown-toc-tree-shaking-to-mitigate-the-caveats">Tree shaking to mitigate the caveats</a></li>
+      <li><a href="#wrapping-your-code-as-installable-npm-package" id="markdown-toc-wrapping-your-code-as-installable-npm-package">Wrapping your code as installable npm package</a></li>
+      <li><a href="#expanding-the-default-packagejson" id="markdown-toc-expanding-the-default-packagejson">Expanding the default package.json</a></li>
+    </ul>
+  </li>
+  <li><a href="#hello-world" id="markdown-toc-hello-world">Hello World</a>    <ul>
+      <li><a href="#pushing-to-git" id="markdown-toc-pushing-to-git">Pushing to git</a></li>
+      <li><a href="#using-the-package-from-the-main-project" id="markdown-toc-using-the-package-from-the-main-project">Using the package from the main project</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="intro">Intro</h3>
+<p>When working on JS/TS components (or any other), most chances are, that on relatively regular basis, you’re required to reuse some code you or your team wrote in multiple projects.</p>
 
 <p>A project can be multiple components of the same product, or completely different products.<br />
 A common approach to conveniently share your code is wrapping it as a package and import it wherever required. 
@@ -660,7 +1090,18 @@ You can find a <a href="https://www.typescriptlang.org/tsconfig" target="_blank"
 
 <p>Now we can use it from the main project:</p>
 
-<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="k">import</span> <span class="p">{</span><span class="nx">HelloWorld</span><span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">your-package</span><span class="dl">'</span><span class="p">;</span></code></pre></figure>]]></content><author><name>j.shapira</name></author><category term="jekyll" /><category term="update" /><category term="Architecture" /><category term="FE" /><category term="BE" /><category term="Devops" /><category term="JS/TS" /><summary type="html"><![CDATA[When working on JS/TS components (or any other), most chances are, that on relatively regular basis, you’re required to reuse some code you or your team wrote in multiple projects.]]></summary></entry><entry><title type="html">Cloud based standbys for on Premises workloads without changing your public IP</title><link href="/jekyll/update/2022/07/09/cloud-based-hot-standby-for-onprem-applications.html" rel="alternate" type="text/html" title="Cloud based standbys for on Premises workloads without changing your public IP" /><published>2022-07-09T19:31:29+03:00</published><updated>2022-07-09T19:31:29+03:00</updated><id>/jekyll/update/2022/07/09/cloud-based-hot-standby-for-onprem-applications</id><content type="html" xml:base="/jekyll/update/2022/07/09/cloud-based-hot-standby-for-onprem-applications.html"><![CDATA[<p>Some workloads rely heavily on having a specific public IP addresses.
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="k">import</span> <span class="p">{</span><span class="nx">HelloWorld</span><span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">your-package</span><span class="dl">'</span><span class="p">;</span></code></pre></figure>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="Architecture" /><category term="FE" /><category term="BE" /><category term="Devops" /><category term="JS/TS" /></entry><entry><title type="html">Cloud based standbys for on Premises workloads without changing your public IP</title><link href="http://localhost:4000/jekyll/update/2022/07/09/cloud-based-hot-standby-for-onprem-applications.html" rel="alternate" type="text/html" title="Cloud based standbys for on Premises workloads without changing your public IP" /><published>2022-07-09T19:31:29+03:00</published><updated>2022-07-09T19:31:29+03:00</updated><id>http://localhost:4000/jekyll/update/2022/07/09/cloud-based-hot-standby-for-onprem-applications</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2022/07/09/cloud-based-hot-standby-for-onprem-applications.html"><![CDATA[<ul id="markdown-toc">
+  <li><a href="#intro" id="markdown-toc-intro">Intro</a></li>
+  <li><a href="#prerequisites" id="markdown-toc-prerequisites">Prerequisites</a>    <ul>
+      <li><a href="#ip-range-registered-with-a-rir" id="markdown-toc-ip-range-registered-with-a-rir">IP range registered with a RIR</a></li>
+      <li><a href="#minimum-ipv4-address-range" id="markdown-toc-minimum-ipv4-address-range">Minimum IPv4 address range</a></li>
+      <li><a href="#other-provider-specific-requirements" id="markdown-toc-other-provider-specific-requirements">Other provider specific requirements</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="intro">Intro</h3>
+<p>Some workloads rely heavily on having a specific public IP addresses.
 For example:</p>
 
 <ul>
@@ -709,254 +1150,4 @@ validating reputation history of the address and more.</p>
   <li><a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-byoip.html" target="_blank">AWS BYOIP</a></li>
   <li><a href="https://cloud.google.com/vpc/docs/using-bring-your-own-ip" target="_blank">Google Cloud BYOIP</a></li>
   <li><a href="https://docs.microsoft.com/en-us/azure/virtual-network/ip-services/create-custom-ip-address-prefix-portal" target="_blank">Azure BYOIP</a></li>
-</ul>]]></content><author><name>j.shapira</name></author><category term="jekyll" /><category term="update" /><category term="Architecture" /><category term="Cloud" /><category term="BE" /><summary type="html"><![CDATA[Some workloads rely heavily on having a specific public IP addresses. For example:]]></summary></entry><entry><title type="html">Make your Kubernetes workloads more robust with startup, readiness and liveness probes</title><link href="/jekyll/update/2022/07/08/robustness-via-k8s-liveness-probes.html" rel="alternate" type="text/html" title="Make your Kubernetes workloads more robust with startup, readiness and liveness probes" /><published>2022-07-08T19:31:29+03:00</published><updated>2022-07-08T19:31:29+03:00</updated><id>/jekyll/update/2022/07/08/robustness-via-k8s-liveness-probes</id><content type="html" xml:base="/jekyll/update/2022/07/08/robustness-via-k8s-liveness-probes.html"><![CDATA[<p>It’s no easy task to make distributed workloads robust and resilient.
-Kubernetes coming into our lives made this job a lot easier.
-But, like many things in the engineering world, good can become better.</p>
-
-<p>Let’s take this a very simplified architecture of an online store backed up by an
-ML based recommendation system.</p>
-
-<p><a href="/assets/post-images/2022-07-07-liveness-probe/liveness-probe-arch1.JPG" target="_blank"><img src="/assets/post-images/2022-07-07-liveness-probe/liveness-probe-arch1.JPG" alt="Simplified Online Store" /></a></p>
-
-<p>As shown in the diagram, user interactions such as viewing a product sent to a UI BE.<br />
-UI BE writes the event to kafka.
-A big data &amp; analytic platform collects the data from kafka, doing some magic and produces list of recommended 
-products for the user, based on his past interests.</p>
-
-<h4 id="what-can-go-wrong">What can go wrong?</h4>
-<p>As you probably know, by default, K8S control loop will consider a container as functioning as long as the main process is up and running.<br />
-But, up and running not necessarily means that a container is ready to receive requests.
-As you can see, UI BE depends on MySQL DB. For the sake of the example, let’s say that on instantiation,
-each UI BE pod needs to bring some data from MySQL to memory to serve requests.</p>
-
-<h4 id="problem-1---replica-changes-in-time-of-manual-scaling-or-even-worse-hpa-horizontal-pod-autoscaling">Problem #1 - replica changes in time of manual scaling, or even worse, HPA (horizontal pod autoscaling)</h4>
-<p>You got to a point where you need to change the replicas number of your pods.
-This can be a simple case where your store gained popularity, and you need to add more replicas to cope with the increasing demand,
-or it can be a more complex case, where you’ve running in a cluster with configured HPA (Horizontal Pod Autoscaling).</p>
-
-<p>If we’ll get back to our example, once your server and application are running, from K8S perspective, the pod is ready to receive requests.
-Every time the UI will send a recordable action by the user (e.g, product view) - the BE service will proxy the request to the pod
-in a round-robin (by default) manner. If the request will be proxied to a replica where the main process is running, but the connection to DB 
-wasn’t established or the data required to serve the request still was not loaded to memory, the request will fail, and the data will be lost
-or a retry mechanism will need to be implemented.</p>
-
-<p>While this might be an edge case if you do manual scaling,
-if HPA is configured in your cluster, which means that replicas will be changed quite frequently - your workload will be extremely unstable.</p>
-
-<h4 id="problem-2---applicative-errors-that-dont-crash-the-main-process">Problem #2 - applicative errors that don’t crash the main process</h4>
-<p>Let’s say one of your containers encountered a critical applicative error which makes the application instance unusable, while the main
-process is still active.
-Same as before, all events proxied by the UI BE service to the pod with the unusable application, will be lost or will have to be retried.</p>
-
-<h4 id="enter-kubernetes-probes">Enter kubernetes probes</h4>
-<p>Basically, we need an additional indication that our pods are ready to receive requests, besides the main process state.
-For that, Kubernetes provides us with different kind of probes:</p>
-
-<ul>
-  <li>Startup</li>
-  <li>Liveness</li>
-  <li>Readiness</li>
-</ul>
-
-<p>To make it easy to understand, let’s create a comparison table:</p>
-
-<table>
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>When to use</th>
-      <th>Action on failure</th>
-      <th>When it runs</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>Startup Probe</td>
-      <td>When you have a slow loading container, and you wish it won’t receive traffic until your custom logic indicates it’s ready to serve requests.</td>
-      <td>Service won’t send traffic to the pod</td>
-      <td>Only on startup</td>
-    </tr>
-    <tr>
-      <td>Liveness Probe</td>
-      <td>When you want periodic liveness checks that your container is up and running and can serve incoming requests</td>
-      <td>K8S will kill the pod and attempt to spawn a new one</td>
-      <td>Throughout the entire life of the pod</td>
-    </tr>
-    <tr>
-      <td>Readiness Probe</td>
-      <td>Very similar to liveness probe, but the action taken on failure is different</td>
-      <td>Service won’t send traffic to the pod</td>
-      <td>Throughout the entire life of the pod</td>
-    </tr>
-  </tbody>
-</table>
-
-<h4 id="setting-probe-configuration">Setting probe configuration</h4>
-
-<table>
-  <thead>
-    <tr>
-      <th>Parameter</th>
-      <th>Description</th>
-      <th>Default</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>initialDelaySeconds</td>
-      <td>How long to wait (in seconds) after the container has started before liveness or readiness probes are initiated</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <td>periodSeconds</td>
-      <td>Probe interval (in seconds)</td>
-      <td>10  (min 1)</td>
-    </tr>
-    <tr>
-      <td>timeoutSeconds</td>
-      <td>Timeout configuration for the probe  (in seconds)</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <td>successThreshold</td>
-      <td>Minimum consecutive successes for the probe to be considered successful after having failed</td>
-      <td>Must be 1 for liveness and startup probes</td>
-    </tr>
-    <tr>
-      <td>failureThreshold</td>
-      <td>How many times a probe should run before failure is declared and an action on failure will be executed (as described in the table above)</td>
-      <td>3</td>
-    </tr>
-  </tbody>
-</table>
-
-<h4 id="types-of-probe-actions">Types of probe actions</h4>
-<p>There are 3 types of probe actions:</p>
-
-<ul>
-  <li>HTTP</li>
-  <li>TCP</li>
-  <li>Command</li>
-</ul>
-
-<h4 id="http-action">HTTP action</h4>
-
-<p>Kubelet will send an HTTP GET request to an endpoint, and will define any status code from the 200-300 ranges as a success.</p>
-
-<p>HTTP Can be configured with additional parameters:</p>
-
-<table>
-  <thead>
-    <tr>
-      <th>Parameter</th>
-      <th>Description</th>
-      <th>Default</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>host</td>
-      <td>Hostname to connect to</td>
-      <td>Pod IP</td>
-    </tr>
-    <tr>
-      <td>scheme</td>
-      <td>HTTP or HTTPS</td>
-      <td>HTTP</td>
-    </tr>
-    <tr>
-      <td>path</td>
-      <td>Path on the server</td>
-      <td>-</td>
-    </tr>
-    <tr>
-      <td>httpHeaders</td>
-      <td>Custom headers (e.g, Authorization header)</td>
-      <td>-</td>
-    </tr>
-    <tr>
-      <td>port</td>
-      <td>Access port</td>
-      <td>-</td>
-    </tr>
-  </tbody>
-</table>
-
-<h4 id="tcp-action">TCP action</h4>
-<p>Just checks a successful TCP connection. If a connection is established the probe considered successful.</p>
-
-<h4 id="command-action">Command action</h4>
-<p>Runs a shell command inside the container. On 0 exist code, action will be considered successful.</p>
-
-<h4 id="complete-example">Complete example</h4>
-<p>An example for 3 different type of probes, each of them with a different action method.</p>
-
-<figure class="highlight"><pre><code class="language-yaml" data-lang="yaml"><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span> 
-<span class="na">kind</span><span class="pi">:</span> <span class="s">Pod</span> 
-<span class="na">metadata</span><span class="pi">:</span> 
-  <span class="na">name</span><span class="pi">:</span> <span class="s">probes-demo</span>
-<span class="na">spec</span><span class="pi">:</span> 
-  <span class="na">containers</span><span class="pi">:</span> 
-  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">probes-demo</span> 
-    <span class="na">image</span><span class="pi">:</span> <span class="s">your-image</span> 
-    <span class="na">ports</span><span class="pi">:</span> 
-        <span class="pi">-</span> <span class="na">containerPort</span><span class="pi">:</span> <span class="s">80</span> 
-    <span class="na">livenessProbe</span><span class="pi">:</span> 
-      <span class="na">httpGet</span><span class="pi">:</span> 
-        <span class="na">path</span><span class="pi">:</span> <span class="s">/health</span>
-        <span class="na">port</span><span class="pi">:</span> <span class="s">80</span> 
-      <span class="na">initialDelaySeconds</span><span class="pi">:</span> <span class="m">2</span>
-      <span class="na">periodSeconds</span><span class="pi">:</span> <span class="m">2</span>
-      <span class="na">timeoutSeconds</span><span class="pi">:</span> <span class="m">1</span>
-      <span class="na">successThreshold</span><span class="pi">:</span> <span class="m">1</span>
-      <span class="na">failureThreshold</span><span class="pi">:</span> <span class="m">3</span>
-    <span class="na">readinessProbe</span><span class="pi">:</span>
-     <span class="na">exec</span><span class="pi">:</span>
-       <span class="na">command</span><span class="pi">:</span>
-        <span class="pi">-</span> <span class="s">/my-health-cmd</span>
-     <span class="na">initialDelaySeconds</span><span class="pi">:</span> <span class="m">5</span>
-     <span class="na">periodSeconds</span><span class="pi">:</span> <span class="m">5</span>
-    <span class="na">startupProbe</span><span class="pi">:</span>
-      <span class="na">tcpSocket</span><span class="pi">:</span>
-        <span class="na">port</span><span class="pi">:</span> <span class="m">8080</span>
-      <span class="na">initialDelaySeconds</span><span class="pi">:</span> <span class="m">15</span>
-      <span class="na">periodSeconds</span><span class="pi">:</span> <span class="s">20</span></code></pre></figure>]]></content><author><name>j.shapira</name></author><category term="jekyll" /><category term="update" /><category term="Architecture" /><category term="Devops" /><category term="BE" /><summary type="html"><![CDATA[It’s no easy task to make distributed workloads robust and resilient. Kubernetes coming into our lives made this job a lot easier. But, like many things in the engineering world, good can become better.]]></summary></entry><entry><title type="html">Anti-Corruption layer is not your way around legacy or badly designed implementation</title><link href="/jekyll/update/2022/07/07/anti-corruption-layer.html" rel="alternate" type="text/html" title="Anti-Corruption layer is not your way around legacy or badly designed implementation" /><published>2022-07-07T19:30:29+03:00</published><updated>2022-07-07T19:30:29+03:00</updated><id>/jekyll/update/2022/07/07/anti-corruption-layer</id><content type="html" xml:base="/jekyll/update/2022/07/07/anti-corruption-layer.html"><![CDATA[<p>So you and your team have been tasked with adding a set of new capabilities to an existing domain, a service or a sub system.<br />
-You research the existing implementation, APIs, databases and technological stack and come to a conclusion that it will be extremely
-difficult to extend existing code and capabilities to support those new features.</p>
-
-<p>One of the more experienced team members suggests a valid approach - <br />
-“The stack is outdated,” he says, “a badly designed monolith, and the only guy that could understand what’s going on quit 2 years ago,
-lets create anti-corruption layer, so we won’t corrupt our new code with this legacy mess.”</p>
-
-<p>The idea is good, the approach is valid, but it has nothing to do with anti corruption layer.<br />
-The suggested approach can be implemented with adapters or facades patterns, which are among the most important patterns in existence.
-Anti corruption layers can be composed out of many facades and adapters, but it’s not ACL’s job to cover up for interfaces you
-can’t or prefer not to deal with.</p>
-
-<h4 id="acls-should-prevent-concepts-intrusions-and-mismatches-between-different-bounded-contexts">ACLs should prevent concepts intrusions and mismatches between different bounded contexts</h4>
-<p>A bounded context is a term in domain driven design which represent a sub system.<br />
-Based on this understanding, lets examine a simplified example of a cyber investigation platform.</p>
-
-<p><a href="/assets/post-images/2022-08-07-acl/simplified-cyber-platform.JPG" target="_blank"><img src="/assets/post-images/2022-08-07-acl/simplified-cyber-platform.JPG" alt="Simplified Cyber Platform" /></a></p>
-
-<p>As you can see in the example, each context operates on need to know basis.</p>
-<ul>
-  <li>
-    <p>Analytics context needs to know about cyber events repository but should not be aware of the collection process,
-which in return decouples the analytic context from understanding and caring what happens in collection context.<br />
-This applies not only to technological perspective (such as backward compatibility, for example), but also from managerial
-point of view. The only thing that should be shared between teams responsible for data collection and analytics is
-the concepts of events.</p>
-  </li>
-  <li>
-    <p>Same example applies on investigation context, teams working in on this sub system should be only familiar with
-investigation artifacts and not how they are collected, or which models applied to produce them.</p>
-  </li>
-</ul>
-
-<h4 id="try-to-say-it-out-loud">Try to say it out loud</h4>
-<p>If you feel like this concept is too high level, over-engineered or not necessarily practical.
-Try to say it out loud, pretend you’re one of the engineers responsible for the investigation context and conducting
-a meeting with your teammates. Referring to “investigation artifacts” will feel perfectly natural, it’s a known and natural
-concept in investigation context. Now try to discuss DS models or which message queues will be used to gather the events, and you’ll
-see how it seems extremely out of context.</p>]]></content><author><name>j.shapira</name></author><category term="jekyll" /><category term="update" /><category term="Architecture" /><summary type="html"><![CDATA[So you and your team have been tasked with adding a set of new capabilities to an existing domain, a service or a sub system. You research the existing implementation, APIs, databases and technological stack and come to a conclusion that it will be extremely difficult to extend existing code and capabilities to support those new features.]]></summary></entry></feed>
+</ul>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="Architecture" /><category term="Cloud" /><category term="BE" /></entry></feed>

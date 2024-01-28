@@ -3,10 +3,15 @@ layout: post
 title:  "Creating and sharing private npm packages without setting up a repository manager, using git urls" 
 date:  2022-07-10 18:31:29 +0200
 categories: jekyll update
-author: j.shapira
+author: Jacob Shapira
 tags: ["Architecture", "FE", "BE", "Devops", "JS/TS"]
 ---
 
+* TOC
+{:toc}
+
+
+### Intro
 When working on JS/TS components (or any other), most chances are, that on relatively regular basis, you're required to reuse some code you or your team wrote in multiple projects. 
 
 A project can be multiple components of the same product, or completely different products.  

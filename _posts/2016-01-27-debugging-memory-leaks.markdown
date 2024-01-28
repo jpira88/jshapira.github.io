@@ -3,10 +3,15 @@ layout: post
 title:  "Debugging memory leaks: When the famous 3 snapshot technique can cost you days of development"
 date:  2016-01-17 18:33:28 +0200
 categories: jekyll update
-author: j.shapira
+author: Jacob Shapira
 tags: ["FE", "JS/TS"]
 ---
 
+
+* TOC
+{:toc}
+
+### Intro
 Pretty much every second article about debugging memory leaks demonstrates the great 3 snapshot technique introduced by the GMail team and which was used to
 debug heavy memory leaks in GMail. While there’s no doubt about it being a great idea,
 it seems that not many mention the possible problem that may occur if you rely on only 3 snapshots without understanding 100% of your framework,

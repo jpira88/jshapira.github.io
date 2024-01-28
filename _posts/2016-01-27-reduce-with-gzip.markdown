@@ -3,10 +3,14 @@ layout: post
 title:  "HTTP compression: reduce up to 90% of HTTP response size with Gzip"
 date:  2016-06-27 18:33:28 +0200
 categories: jekyll update
-author: j.shapira
+author: Jacob Shapira
 tags: ["BE", "Performance"]
 ---
 
+* TOC
+{:toc}
+
+### Intro
 Speed is one of the most important (if not the most important) aspects of a quality application.
 Among others, application speed is effected by the speed of the HTTP requests,
 which effected by things we can’t always (network connection) and can (responses size, structure etc’) control.

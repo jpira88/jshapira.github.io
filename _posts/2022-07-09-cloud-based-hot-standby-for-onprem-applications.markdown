@@ -3,10 +3,14 @@ layout: post
 title:  "Cloud based standbys for on Premises workloads without changing your public IP" 
 date:  2022-07-09 18:31:29 +0200
 categories: jekyll update
-author: j.shapira
+author: Jacob Shapira
 tags: ["Architecture", "Cloud", "BE"]
 ---
 
+* TOC
+{:toc}
+
+### Intro
 Some workloads rely heavily on having a specific public IP addresses.
 For example:
 

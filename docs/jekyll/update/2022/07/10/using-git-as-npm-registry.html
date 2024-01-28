@@ -3,30 +3,26 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
-<title>Creating and sharing private npm packages without setting up a repository manager, using git urls | jshapira Software architecture, engineering and AI</title>
+<title>Creating and sharing private npm packages without setting up a repository manager, using git urls | Jacob Shapira Software architecture, engineering and AI</title>
 <meta name="generator" content="Jekyll v4.2.2" />
 <meta property="og:title" content="Creating and sharing private npm packages without setting up a repository manager, using git urls" />
-<meta name="author" content="j.shapira" />
+<meta name="author" content="Jacob Shapira" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="When working on JS/TS components (or any other), most chances are, that on relatively regular basis, you’re required to reuse some code you or your team wrote in multiple projects." />
-<meta property="og:description" content="When working on JS/TS components (or any other), most chances are, that on relatively regular basis, you’re required to reuse some code you or your team wrote in multiple projects." />
-<link rel="canonical" href="/jekyll/update/2022/07/10/using-git-as-npm-registry.html" />
-<meta property="og:url" content="/jekyll/update/2022/07/10/using-git-as-npm-registry.html" />
-<meta property="og:site_name" content="jshapira Software architecture, engineering and AI" />
+<link rel="canonical" href="http://localhost:4000/jekyll/update/2022/07/10/using-git-as-npm-registry.html" />
+<meta property="og:url" content="http://localhost:4000/jekyll/update/2022/07/10/using-git-as-npm-registry.html" />
+<meta property="og:site_name" content="Jacob Shapira Software architecture, engineering and AI" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2022-07-10T19:31:29+03:00" />
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="Creating and sharing private npm packages without setting up a repository manager, using git urls" />
-<meta name="twitter:site" content="@" />
-<meta name="twitter:creator" content="@j.shapira" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"j.shapira"},"dateModified":"2022-07-10T19:31:29+03:00","datePublished":"2022-07-10T19:31:29+03:00","description":"When working on JS/TS components (or any other), most chances are, that on relatively regular basis, you’re required to reuse some code you or your team wrote in multiple projects.","headline":"Creating and sharing private npm packages without setting up a repository manager, using git urls","mainEntityOfPage":{"@type":"WebPage","@id":"/jekyll/update/2022/07/10/using-git-as-npm-registry.html"},"url":"/jekyll/update/2022/07/10/using-git-as-npm-registry.html"}</script>
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Jacob Shapira"},"dateModified":"2022-07-10T19:31:29+03:00","datePublished":"2022-07-10T19:31:29+03:00","headline":"Creating and sharing private npm packages without setting up a repository manager, using git urls","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/jekyll/update/2022/07/10/using-git-as-npm-registry.html"},"url":"http://localhost:4000/jekyll/update/2022/07/10/using-git-as-npm-registry.html"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/assets/css/styles.css">
-  <link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="/feed.xml" title="jshapira | Software architecture, engineering and AI" /></head>
+  <link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Jacob Shapira | Software architecture, engineering and AI" /></head>
 <body><header class="site-header" role="banner">
 
-  <div class="wrapper"><a class="site-title" rel="author" href="/">jshapira | Software architecture, engineering and AI</a><nav class="site-nav">
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Jacob Shapira | Software architecture, engineering and AI</a><nav class="site-nav">
         <input type="checkbox" id="nav-trigger" class="nav-trigger" />
         <label for="nav-trigger">
           <span class="menu-icon">
@@ -36,7 +32,7 @@
           </span>
         </label>
 
-        <div class="trigger"><a class="page-link" href="/tag/FE/">FE</a><a class="page-link" href="/tag/JS/TS/">JS/TS</a><a class="page-link" href="/tag/BE/">BE</a><a class="page-link" href="/tag/PHP/">PHP</a><a class="page-link" href="/tag/Performance/">Performance</a><a class="page-link" href="/tag/DataEngineering/">DataEngineering</a><a class="page-link" href="/tag/Java/">Java</a><a class="page-link" href="/tag/Python/">Python</a><a class="page-link" href="/tag/Architecture/">Architecture</a><a class="page-link" href="/tag/Devops/">Devops</a><a class="page-link" href="/tag/Cloud/">Cloud</a></div>
+        <div class="trigger"><a class="page-link" href="/tag/FE/">FE</a><a class="page-link" href="/tag/JS/TS/">JS/TS</a><a class="page-link" href="/tag/BE/">BE</a><a class="page-link" href="/tag/PHP/">PHP</a><a class="page-link" href="/tag/Performance/">Performance</a><a class="page-link" href="/tag/DataEngineering/">DataEngineering</a><a class="page-link" href="/tag/Java/">Java</a><a class="page-link" href="/tag/Python/">Python</a><a class="page-link" href="/tag/Architecture/">Architecture</a><a class="page-link" href="/tag/Devops/">Devops</a><a class="page-link" href="/tag/Cloud/">Cloud</a><a class="page-link" href="/tag/LLM/ML/AI/">LLM/ML/AI</a></div>
       </nav></div>
 </header>
 <main class="page-content" aria-label="Content">
@@ -47,16 +43,39 @@
     <h1 class="post-title p-name" itemprop="name headline">Creating and sharing private npm packages without setting up a repository manager, using git urls</h1>
     <p class="post-meta">
       <time class="dt-published" datetime="2022-07-10T19:31:29+03:00" itemprop="datePublished">Jul 10, 2022
-      </time>• <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">j.shapira</span></span></p>
+      </time>• <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">Jacob Shapira</span></span></p>
   </header>
 
   
   
   
   
+  <div id="dateValidity" class="outdated-warning">
+    <strong>Important Warning:</strong><br/>
+    This post was written a long time ago and its contents and code might be outdated or not aligned to current industry standards.<br/>
+    Please proceed with caution :-)
+  </div>
+  
 
   <div class="post-content e-content" itemprop="articleBody">
-    <p>When working on JS/TS components (or any other), most chances are, that on relatively regular basis, you’re required to reuse some code you or your team wrote in multiple projects.</p>
+    <ul id="markdown-toc">
+  <li><a href="#intro" id="markdown-toc-intro">Intro</a>    <ul>
+      <li><a href="#package-versioning" id="markdown-toc-package-versioning">Package Versioning</a></li>
+      <li><a href="#caveats-for-npm-packages-consumed-directly-from-git" id="markdown-toc-caveats-for-npm-packages-consumed-directly-from-git">Caveats for npm packages consumed directly from git</a></li>
+      <li><a href="#tree-shaking-to-mitigate-the-caveats" id="markdown-toc-tree-shaking-to-mitigate-the-caveats">Tree shaking to mitigate the caveats</a></li>
+      <li><a href="#wrapping-your-code-as-installable-npm-package" id="markdown-toc-wrapping-your-code-as-installable-npm-package">Wrapping your code as installable npm package</a></li>
+      <li><a href="#expanding-the-default-packagejson" id="markdown-toc-expanding-the-default-packagejson">Expanding the default package.json</a></li>
+    </ul>
+  </li>
+  <li><a href="#hello-world" id="markdown-toc-hello-world">Hello World</a>    <ul>
+      <li><a href="#pushing-to-git" id="markdown-toc-pushing-to-git">Pushing to git</a></li>
+      <li><a href="#using-the-package-from-the-main-project" id="markdown-toc-using-the-package-from-the-main-project">Using the package from the main project</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="intro">Intro</h3>
+<p>When working on JS/TS components (or any other), most chances are, that on relatively regular basis, you’re required to reuse some code you or your team wrote in multiple projects.</p>
 
 <p>A project can be multiple components of the same product, or completely different products.<br />
 A common approach to conveniently share your code is wrapping it as a package and import it wherever required. 
@@ -229,7 +248,7 @@ You can find a <a href="https://www.typescriptlang.org/tsconfig" target="_blank"
     <div class="footer-col-wrapper">
       <div class="footer-col footer-col-1">
         <ul class="contact-list">
-          <li class="p-name">jshapira | Software architecture, engineering and AI</li><li><a class="u-email" href="https://twitter.com/shapira_j">https://twitter.com/shapira_j</a></li></ul>
+          <li class="p-name">Jacob Shapira | Software architecture, engineering and AI</li><li><a class="u-email" href="https://il.linkedin.com/in/jacob-shapira">https://il.linkedin.com/in/jacob-shapira</a></li></ul>
       </div>
 
       <div class="footer-col footer-col-2"><ul class="social-media-list"></ul>

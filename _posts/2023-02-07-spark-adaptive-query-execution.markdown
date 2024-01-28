@@ -3,10 +3,14 @@ layout: post
 title:  "Speeding up spark SQL with adaptive query execution" 
 date:  2023-02-07 11:31:29 +0200
 categories: jekyll update
-author: j.shapira
+author: Jacob Shapira
 tags: ["DataEngineering", "BE", "Performance"]
 ---
 
+* TOC
+{:toc}
+
+### Intro
 Spark version 2.x introduced CBO (cost-based-optimization) framework.  
 CBO collects and leverages different data statistics (e.g, row count, number of distinct values, etc.) in order to improve
 the quality of query execution plans.  

@@ -7,7 +7,7 @@
 	],
 	"sourcesContent": [
 		"@import \"custom\";\n\nh2, h3, h4 {\n  margin-top: 35px !important;\n}",
-		".outdated-warning {\r\n  padding: 20px;\r\n  background-color: #ff9800;\r\n  color: white;\r\n  opacity: 1;\r\n  transition: opacity 0.6s;\r\n  margin-bottom: 35px;\r\n  border-radius: 5px;\r\n  max-width: 90%;\r\n}\r\n\r\n.site-nav {\r\n    width: 100%;\r\n  max-width: 100%;\r\n}\r\n\r\n.footer-col {\r\n  width: 100% !important;\r\n}"
+		".outdated-warning {\r\n  padding: 20px;\r\n  background-color: #ff9800;\r\n  color: white;\r\n  opacity: 1;\r\n  transition: opacity 0.6s;\r\n  margin-bottom: 35px;\r\n  border-radius: 5px;\r\n  max-width: 90%;\r\n}\r\n\r\n.site-nav {\r\n    width: 100%;\r\n  max-width: 100%;\r\n}\r\n\r\n.footer-col {\r\n  width: 100% !important;\r\n}\r\n\r\n"
 	],
 	"names": [],
 	"mappings": "ACAA,AAAA,iBAAiB,CAAC,EAChB,OAAO,EAAE,IAAI,EACb,gBAAgB,EAAE,OAAO,EACzB,KAAK,EAAE,KAAK,EACZ,OAAO,EAAE,CAAC,EACV,UAAU,EAAE,YAAY,EACxB,aAAa,EAAE,IAAI,EACnB,aAAa,EAAE,GAAG,EAClB,SAAS,EAAE,GAAG,GACf;;AAED,AAAA,SAAS,CAAC,EACN,KAAK,EAAE,IAAI,EACb,SAAS,EAAE,IAAI,GAChB;;AAED,AAAA,WAAW,CAAC,EACV,KAAK,EAAE,eAAe,GACvB;;ADhBD,AAAA,EAAE,EAAE,EAAE,EAAE,EAAE,CAAC,EACT,UAAU,EAAE,eAAe,GAC5B"

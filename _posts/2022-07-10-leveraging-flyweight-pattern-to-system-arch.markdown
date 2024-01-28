@@ -3,10 +3,14 @@ layout: post
 title:  "Extending Flyweight pattern ideas to improve system-wide performance and reduce costs" 
 date:  2022-07-10 18:31:29 +0200
 categories: jekyll update
-author: j.shapira
+author: Jacob Shapira
 tags: ["Architecture", "DataEngineering", "BE", "Performance", "Cloud"]
 ---
 
+* TOC
+{:toc}
+
+### Intro
 There are plenty of sources online explaining the Flyweight design pattern in depth.  
 The most common description of the pattern is that it designed to reduce memory footprint of a program without losing any capability.
 But the ideas behind it can be extended to a broader, system-wide scale.

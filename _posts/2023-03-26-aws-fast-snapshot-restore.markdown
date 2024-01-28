@@ -3,9 +3,13 @@ layout: post
 title:  "Reducing I/O latency on EBS restored from snapshots with AWS FSR" 
 date:  2023-03-26 11:31:29 +0200
 categories: jekyll update
-author: j.shapira
+author: Jacob Shapira
 tags: ["DataEngineering", "BE", "Performance", "Cloud", "Architecture"]
 ---
+
+* TOC
+{:toc}
+
 
 When creating an EBS snapshot the data is saved to S3.  
 Snapshots are incremental, meaning that only the blocks that have been modified later than the most recent snapshot - are saved.  

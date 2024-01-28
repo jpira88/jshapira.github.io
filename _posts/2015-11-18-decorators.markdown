@@ -3,11 +3,15 @@ layout: post
 title:  "Using decorators to replace and tweak 3rd party services for your specific needs"
 date:  2015-11-18 18:33:28 +0200
 categories: jekyll update
-author: j.shapira
+author: Jacob Shapira
 tags: ["FE", "JS/TS"]
 ---
 
-### What are decorators?
+* TOC
+{:toc}
+
+
+### Intro
 Decorators allows us to enrich, or replace certain part of module we are not allowed (or shouldn’t) touch it’s source code. For example: 3rd party libraries, modules that we are not maintaining and the list can go on. 
 
 ### Real-life scenario

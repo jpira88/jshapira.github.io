@@ -3,10 +3,14 @@ layout: post
 title:  "Examining performance related information of your spark application via spark UI" 
 date:  2022-11-14 11:31:29 +0200
 categories: jekyll update
-author: j.shapira
+author: Jacob Shapira
 tags: ["DataEngineering", "BE", "Performance"]
 ---
 
+* TOC
+{:toc}
+
+### Intro
 Debugging and improving spark performance bottlenecks isn't a straightforward task most of the time.
 Performance issues can arise from easy to detect bottlenecks such as wasteful UDFs or issues in the executors,
 or a more illusive problems such as estimated metrics of input size in SQL plan being very inaccurate.

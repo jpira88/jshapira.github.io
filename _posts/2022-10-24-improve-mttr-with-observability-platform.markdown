@@ -3,10 +3,14 @@ layout: post
 title:  "Improve MTTR's with observability platforms" 
 date:  2022-10-23 18:31:29 +0200
 categories: jekyll update
-author: j.shapira
+author: Jacob Shapira
 tags: ["Architecture", "Cloud", "BE", "Devops"]
 ---
 
+* TOC
+{:toc}
+
+### Intro
 Ability to quickly resolve production issues is one of the key factors in customer satisfaction.  
 Not the mention it saves us resources and debugging time.  
 Cloud native and distributed systems are especially hard to debug due to high amount of moving parts.  

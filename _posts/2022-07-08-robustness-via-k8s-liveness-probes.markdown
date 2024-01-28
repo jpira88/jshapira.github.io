@@ -3,10 +3,14 @@ layout: post
 title:  "Make your Kubernetes workloads more robust with startup, readiness and liveness probes" 
 date:  2022-07-08 18:31:29 +0200
 categories: jekyll update
-author: j.shapira
+author: Jacob Shapira
 tags: ["Architecture", "Devops", "BE"]
 ---
 
+* TOC
+{:toc}
+
+### Intro
 It's no easy task to make distributed workloads robust and resilient.
 Kubernetes coming into our lives made this job a lot easier.
 But, like many things in the engineering world, good can become better.  

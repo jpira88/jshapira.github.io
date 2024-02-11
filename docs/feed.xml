@@ -1,4 +1,47 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2024-01-28T12:27:04+02:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Jacob Shapira | Software architecture, engineering and AI</title><subtitle></subtitle><entry><title type="html">Effective LLM fine-tuning for dummies</title><link href="http://localhost:4000/jekyll/update/2023/09/18/llm-fine-tuning-hypterparameters-simplified.html" rel="alternate" type="text/html" title="Effective LLM fine-tuning for dummies" /><published>2023-09-18T12:31:29+03:00</published><updated>2023-09-18T12:31:29+03:00</updated><id>http://localhost:4000/jekyll/update/2023/09/18/llm-fine-tuning-hypterparameters-simplified</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2023/09/18/llm-fine-tuning-hypterparameters-simplified.html"><![CDATA[<ul id="markdown-toc">
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2024-02-11T19:47:08+02:00</updated><id>/feed.xml</id><title type="html">Jacob Shapira | Software architecture, engineering and AI</title><subtitle></subtitle><entry><title type="html">Improving consistency in distributed applications using Saga pattern with Orkes (Netflix) conductor</title><link href="/jekyll/update/2024/01/28/mircroservice-transactions.html" rel="alternate" type="text/html" title="Improving consistency in distributed applications using Saga pattern with Orkes (Netflix) conductor" /><published>2024-01-28T11:31:29+02:00</published><updated>2024-01-28T11:31:29+02:00</updated><id>/jekyll/update/2024/01/28/mircroservice-transactions</id><content type="html" xml:base="/jekyll/update/2024/01/28/mircroservice-transactions.html"><![CDATA[<ul id="markdown-toc">
+  <li><a href="#intro" id="markdown-toc-intro">Intro</a></li>
+  <li><a href="#saga-pattern" id="markdown-toc-saga-pattern">Saga Pattern</a></li>
+  <li><a href="#orkes-netflix-conductor-as-infrastructure-level-solution" id="markdown-toc-orkes-netflix-conductor-as-infrastructure-level-solution">Orkes (Netflix) Conductor as infrastructure level solution</a></li>
+  <li><a href="#compensation-transactions" id="markdown-toc-compensation-transactions">Compensation transactions</a></li>
+</ul>
+
+<h3 id="intro">Intro</h3>
+<p>Microservice architecture has become the standard for most complex systems.
+While it addresses many issues, it also introduces certain complexities.
+One such complexity is maintaining ACID principles in distributed flows across multiple services.<br />
+A basic example involves a product purchase flow, requiring:</p>
+
+<ul>
+  <li>Inventory verification (Inventory Service)</li>
+  <li>Payment processing (Payment Service)</li>
+  <li>Product shipment submission (Shipment Service)</li>
+</ul>
+
+<p>Consider a situation where both the inventory verification and payment processing succeed, but your request is denied by the Shipment Service.<br />
+Assume, for instance, the rejection stems from a sudden change in shipping policies that disallows delivery to the provided customer address, rather than from some technical reason,
+which theoretically can allow us to retry instead of failing a flow.<br />
+In such circumstances, you would likely need to process a refund and possibly inform the Inventory Service that the item is available again.<br />
+This scenario highlights a particular challenge, but that there may be additional, similar situations. 
+Therefore, a more general, infrastructure-level solution is necessary to manage failures within distributed workflows effectively.</p>
+
+<h3 id="saga-pattern">Saga Pattern</h3>
+<p>In simple terms, the Saga pattern is utilized to maintain consistency in distributed applications through coordination and failures management. 
+A Saga consists of a series of transactions that are initiated either by a central coordinator (Orchestrated) or through a reactive approach by responding to events (Choreographed).<br />
+When any transaction within the Saga fails, a compensation transaction is activated to revert the application back to a consistent state.<br />
+Taking our example (assuming we’re using a coordinator), if the shipment service transaction fails, 
+the coordinator will initiate a refund transaction with the payment service and update the inventory status with the inventory service.</p>
+
+<h3 id="orkes-netflix-conductor-as-infrastructure-level-solution">Orkes (Netflix) Conductor as infrastructure level solution</h3>
+<p>Conductor is a microservice orchestration tool created by Netflix and later forked by Orkes.<br />
+Given the right circumstances, it is a good solution if you’re looking to implement a generic, infrastructure-level solution to orchestrate your distributed flows.<br />
+It supports creating and managing complex applicative flows, including timeouts, retries and a lot of useful features, among them - failure handling.<br />
+With that being said, it is not without caveats, starting from maintaining additional infrastructure to the need for careful workflow design (e.g, not passing large payloads between workflows).</p>
+
+<h3 id="compensation-transactions">Compensation transactions</h3>
+<p>Conductor offers a concept of a <a href="https://orkes.io/content/error-handling" target="_blank">failureWorkflow</a>.<br />
+Failure workflows can be added to your distributed workflows and triggered if one of the transaction in the Saga did not successfully complete.<br />
+Conductor interface provides a clear visibility over the workflow itself and the routes it can take whether succeeded or failed, making it a solid choice if you’re looking for a
+battle tested infrastructure level microservice orchestration solution.</p>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="BE" /><category term="Architecture" /><category term="Cloud" /></entry><entry><title type="html">Effective LLM fine-tuning for dummies</title><link href="/jekyll/update/2023/09/18/llm-fine-tuning-hypterparameters-simplified.html" rel="alternate" type="text/html" title="Effective LLM fine-tuning for dummies" /><published>2023-09-18T12:31:29+03:00</published><updated>2023-09-18T12:31:29+03:00</updated><id>/jekyll/update/2023/09/18/llm-fine-tuning-hypterparameters-simplified</id><content type="html" xml:base="/jekyll/update/2023/09/18/llm-fine-tuning-hypterparameters-simplified.html"><![CDATA[<ul id="markdown-toc">
   <li><a href="#intro" id="markdown-toc-intro">Intro</a></li>
   <li><a href="#base-model-fine-tuned-model-and-initial-weight-and-biases" id="markdown-toc-base-model-fine-tuned-model-and-initial-weight-and-biases">Base model, fine-tuned model and initial weight and biases</a></li>
   <li><a href="#preparing-the-base-model" id="markdown-toc-preparing-the-base-model">Preparing the base model</a></li>
@@ -273,7 +316,7 @@ It is used to prevent the model’s parameters drastically change upon exposure 
 
 <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="c1">## [adapter_path] - Path to the checkpoint with trained adapter weights, which are the output of `adapter_v2.py`.
 ## [checkpoint_dir] - The path to the checkpoint folder of the base model.
-</span><span class="n">python</span> <span class="n">generate</span><span class="o">/</span><span class="n">adapter_v2</span><span class="p">.</span><span class="n">py</span> <span class="o">--</span><span class="n">adapter_path</span> <span class="p">[</span><span class="n">adapter_path</span><span class="p">]</span> <span class="o">--</span><span class="n">checkpoint_dir</span> <span class="p">[</span><span class="n">checkpoint_dir</span><span class="p">]</span> <span class="o">--</span><span class="n">prompt</span> <span class="s">"Annie, are you ok?"</span></code></pre></figure>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="LLM/ML/AI" /></entry><entry><title type="html">Reducing resource requirements: Hands-on LLM quantization and post-quantization performance assessment for dummies</title><link href="http://localhost:4000/jekyll/update/2023/09/18/llm-quantization.html" rel="alternate" type="text/html" title="Reducing resource requirements: Hands-on LLM quantization and post-quantization performance assessment for dummies" /><published>2023-09-18T12:31:29+03:00</published><updated>2023-09-18T12:31:29+03:00</updated><id>http://localhost:4000/jekyll/update/2023/09/18/llm-quantization</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2023/09/18/llm-quantization.html"><![CDATA[<ul id="markdown-toc">
+</span><span class="n">python</span> <span class="n">generate</span><span class="o">/</span><span class="n">adapter_v2</span><span class="p">.</span><span class="n">py</span> <span class="o">--</span><span class="n">adapter_path</span> <span class="p">[</span><span class="n">adapter_path</span><span class="p">]</span> <span class="o">--</span><span class="n">checkpoint_dir</span> <span class="p">[</span><span class="n">checkpoint_dir</span><span class="p">]</span> <span class="o">--</span><span class="n">prompt</span> <span class="s">"Annie, are you ok?"</span></code></pre></figure>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="LLM/ML/AI" /></entry><entry><title type="html">Reducing resource requirements: Hands-on LLM quantization and post-quantization performance assessment for dummies</title><link href="/jekyll/update/2023/09/18/llm-quantization.html" rel="alternate" type="text/html" title="Reducing resource requirements: Hands-on LLM quantization and post-quantization performance assessment for dummies" /><published>2023-09-18T12:31:29+03:00</published><updated>2023-09-18T12:31:29+03:00</updated><id>/jekyll/update/2023/09/18/llm-quantization</id><content type="html" xml:base="/jekyll/update/2023/09/18/llm-quantization.html"><![CDATA[<ul id="markdown-toc">
   <li><a href="#intro" id="markdown-toc-intro">Intro</a></li>
   <li><a href="#post-training-quantization-vs-quantization-aware-training" id="markdown-toc-post-training-quantization-vs-quantization-aware-training">Post training quantization VS quantization aware training</a></li>
   <li><a href="#precision-to-memory-usage-prediction" id="markdown-toc-precision-to-memory-usage-prediction">Precision to memory usage prediction</a></li>
@@ -352,7 +395,7 @@ We can run the evaluation module twice, first time with the pre-quantized infere
 <span class="o">&gt;&gt;&gt;</span> <span class="p">{</span><span class="s">'rouge1'</span><span class="p">:</span> <span class="mf">0.5570469798657718</span><span class="p">,</span> <span class="s">'rouge2'</span><span class="p">:</span> <span class="mf">0.23648648648648649</span><span class="p">,</span> <span class="s">'rougeL'</span><span class="p">:</span> <span class="mf">0.3691275167785235</span><span class="p">,</span> <span class="s">'rougeLsum'</span><span class="p">:</span> <span class="mf">0.3691275167785235</span><span class="p">}</span></code></pre></figure>
 
 <p>As explained above, similar ROUGE score does not guarantee a good post quantization accuracy since it just measures similar terms and phrases, but it’s enough
-to demonstrate the ease of use of the <code class="language-plaintext highlighter-rouge">evaluate</code> package.</p>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="LLM/ML/AI" /></entry><entry><title type="html">Reducing I/O latency on EBS restored from snapshots with AWS FSR</title><link href="http://localhost:4000/jekyll/update/2023/03/26/aws-fast-snapshot-restore.html" rel="alternate" type="text/html" title="Reducing I/O latency on EBS restored from snapshots with AWS FSR" /><published>2023-03-26T11:31:29+02:00</published><updated>2023-03-26T11:31:29+02:00</updated><id>http://localhost:4000/jekyll/update/2023/03/26/aws-fast-snapshot-restore</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2023/03/26/aws-fast-snapshot-restore.html"><![CDATA[<p>When creating an EBS snapshot the data is saved to S3.<br />
+to demonstrate the ease of use of the <code class="language-plaintext highlighter-rouge">evaluate</code> package.</p>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="LLM/ML/AI" /></entry><entry><title type="html">Reducing I/O latency on EBS restored from snapshots with AWS FSR</title><link href="/jekyll/update/2023/03/26/aws-fast-snapshot-restore.html" rel="alternate" type="text/html" title="Reducing I/O latency on EBS restored from snapshots with AWS FSR" /><published>2023-03-26T11:31:29+02:00</published><updated>2023-03-26T11:31:29+02:00</updated><id>/jekyll/update/2023/03/26/aws-fast-snapshot-restore</id><content type="html" xml:base="/jekyll/update/2023/03/26/aws-fast-snapshot-restore.html"><![CDATA[<p>When creating an EBS snapshot the data is saved to S3.<br />
 Snapshots are incremental, meaning that only the blocks that have been modified later than the most recent snapshot - are saved.<br />
 For obvious reasons this makes the snapshot faster to save and cheaper to store.</p>
 
@@ -378,7 +421,7 @@ So for example, initiating EBS from an FSR enabled snapshot of 10TB will take 10
 <p>Some limitations:<br />
 You can enable up to 5 FSR enabled snapshots per region and only to snapshots sized 16TiB or less.</p>
 
-<p>A full documentation of FSR can be found <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-fast-snapshot-restore.html" target="_blank">here</a>.</p>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="DataEngineering" /><category term="BE" /><category term="Performance" /><category term="Cloud" /><category term="Architecture" /></entry><entry><title type="html">Leverage AWS Direct Connect to use AWS services without exposing your data to the public internet</title><link href="http://localhost:4000/jekyll/update/2023/03/26/using-aws-without-exposing-data-to-public-internet.html" rel="alternate" type="text/html" title="Leverage AWS Direct Connect to use AWS services without exposing your data to the public internet" /><published>2023-03-26T11:31:29+02:00</published><updated>2023-03-26T11:31:29+02:00</updated><id>http://localhost:4000/jekyll/update/2023/03/26/using-aws-without-exposing-data-to-public-internet</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2023/03/26/using-aws-without-exposing-data-to-public-internet.html"><![CDATA[<ul id="markdown-toc">
+<p>A full documentation of FSR can be found <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-fast-snapshot-restore.html" target="_blank">here</a>.</p>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="DataEngineering" /><category term="BE" /><category term="Performance" /><category term="Cloud" /><category term="Architecture" /></entry><entry><title type="html">Leverage AWS Direct Connect to use AWS services without exposing your data to the public internet</title><link href="/jekyll/update/2023/03/26/using-aws-without-exposing-data-to-public-internet.html" rel="alternate" type="text/html" title="Leverage AWS Direct Connect to use AWS services without exposing your data to the public internet" /><published>2023-03-26T11:31:29+02:00</published><updated>2023-03-26T11:31:29+02:00</updated><id>/jekyll/update/2023/03/26/using-aws-without-exposing-data-to-public-internet</id><content type="html" xml:base="/jekyll/update/2023/03/26/using-aws-without-exposing-data-to-public-internet.html"><![CDATA[<ul id="markdown-toc">
   <li><a href="#intro" id="markdown-toc-intro">Intro</a></li>
   <li><a href="#selecting-a-connection" id="markdown-toc-selecting-a-connection">Selecting a connection</a></li>
   <li><a href="#creating-vifs-and-directing-traffic-to-the-correct" id="markdown-toc-creating-vifs-and-directing-traffic-to-the-correct">Creating VIFs and directing traffic to the correct</a></li>
@@ -446,7 +489,7 @@ You can find a neat <a href="https://docs.aws.amazon.com/directconnect/latest/Us
 
 <h3 id="not-only-for-security">Not only for security</h3>
 <p>Security is not the only benefit of using direct connect. 
-You can also get increased bandwidth throughput and a more consistent network performance than what can be achieved with a public internet connection.</p>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="DataEngineering" /><category term="BE" /><category term="Performance" /><category term="Cloud" /><category term="Architecture" /><category term="Devops" /></entry><entry><title type="html">Speeding up spark SQL with adaptive query execution</title><link href="http://localhost:4000/jekyll/update/2023/02/07/spark-adaptive-query-execution.html" rel="alternate" type="text/html" title="Speeding up spark SQL with adaptive query execution" /><published>2023-02-07T11:31:29+02:00</published><updated>2023-02-07T11:31:29+02:00</updated><id>http://localhost:4000/jekyll/update/2023/02/07/spark-adaptive-query-execution</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2023/02/07/spark-adaptive-query-execution.html"><![CDATA[<ul id="markdown-toc">
+You can also get increased bandwidth throughput and a more consistent network performance than what can be achieved with a public internet connection.</p>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="DataEngineering" /><category term="BE" /><category term="Performance" /><category term="Cloud" /><category term="Architecture" /><category term="Devops" /></entry><entry><title type="html">Speeding up spark SQL with adaptive query execution</title><link href="/jekyll/update/2023/02/07/spark-adaptive-query-execution.html" rel="alternate" type="text/html" title="Speeding up spark SQL with adaptive query execution" /><published>2023-02-07T11:31:29+02:00</published><updated>2023-02-07T11:31:29+02:00</updated><id>/jekyll/update/2023/02/07/spark-adaptive-query-execution</id><content type="html" xml:base="/jekyll/update/2023/02/07/spark-adaptive-query-execution.html"><![CDATA[<ul id="markdown-toc">
   <li><a href="#intro" id="markdown-toc-intro">Intro</a></li>
   <li><a href="#dynamically-switching-join-strategies" id="markdown-toc-dynamically-switching-join-strategies">Dynamically switching join strategies</a></li>
   <li><a href="#dynamically-coalescing-shuffle-partitions" id="markdown-toc-dynamically-coalescing-shuffle-partitions">Dynamically coalescing shuffle partitions</a></li>
@@ -510,7 +553,7 @@ The longest task (A P1 to B P1) will take 3 minutes while all the others will ta
 <p><a href="/assets/post-images/2023-3-21-aqe/skew2.JPG" target="_blank"><img src="/assets/post-images/2023-3-21-aqe/skew2.JPG" alt="Skew" /></a></p>
 
 <p>AQE Optimization will split ABP1 into 2 different partitions, duplicate BP1 and join between them,
-increasing the number of tasks to 5, but reducing allowing a better parallelism, thus reducing the overall execution time by half.</p>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="DataEngineering" /><category term="BE" /><category term="Performance" /></entry><entry><title type="html">Examining performance related information of your spark application via spark UI</title><link href="http://localhost:4000/jekyll/update/2022/11/14/performance-related-info-spark-ui.html" rel="alternate" type="text/html" title="Examining performance related information of your spark application via spark UI" /><published>2022-11-14T11:31:29+02:00</published><updated>2022-11-14T11:31:29+02:00</updated><id>http://localhost:4000/jekyll/update/2022/11/14/performance-related-info-spark-ui</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2022/11/14/performance-related-info-spark-ui.html"><![CDATA[<ul id="markdown-toc">
+increasing the number of tasks to 5, but reducing allowing a better parallelism, thus reducing the overall execution time by half.</p>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="DataEngineering" /><category term="BE" /><category term="Performance" /></entry><entry><title type="html">Examining performance related information of your spark application via spark UI</title><link href="/jekyll/update/2022/11/14/performance-related-info-spark-ui.html" rel="alternate" type="text/html" title="Examining performance related information of your spark application via spark UI" /><published>2022-11-14T11:31:29+02:00</published><updated>2022-11-14T11:31:29+02:00</updated><id>/jekyll/update/2022/11/14/performance-related-info-spark-ui</id><content type="html" xml:base="/jekyll/update/2022/11/14/performance-related-info-spark-ui.html"><![CDATA[<ul id="markdown-toc">
   <li><a href="#intro" id="markdown-toc-intro">Intro</a></li>
   <li><a href="#application-event-timeline" id="markdown-toc-application-event-timeline">Application event timeline</a></li>
   <li><a href="#jobs" id="markdown-toc-jobs">Jobs</a></li>
@@ -749,7 +792,7 @@ If we were to remove the repartition command, the column value manipulation woul
 <ol>
   <li>Number of output rows &amp; data size - this is kind of self-explanatory.</li>
   <li>Number of written files - this is important to notice, since constantly creating a lot of small files might impact the performance of whatever reads your data. A good file size will be 512MiB or 1GiB.</li>
-</ol>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="DataEngineering" /><category term="BE" /><category term="Performance" /></entry><entry><title type="html">Improve MTTR’s with observability platforms</title><link href="http://localhost:4000/jekyll/update/2022/10/23/improve-mttr-with-observability-platform.html" rel="alternate" type="text/html" title="Improve MTTR’s with observability platforms" /><published>2022-10-23T19:31:29+03:00</published><updated>2022-10-23T19:31:29+03:00</updated><id>http://localhost:4000/jekyll/update/2022/10/23/improve-mttr-with-observability-platform</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2022/10/23/improve-mttr-with-observability-platform.html"><![CDATA[<ul id="markdown-toc">
+</ol>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="DataEngineering" /><category term="BE" /><category term="Performance" /></entry><entry><title type="html">Improve MTTR’s with observability platforms</title><link href="/jekyll/update/2022/10/23/improve-mttr-with-observability-platform.html" rel="alternate" type="text/html" title="Improve MTTR’s with observability platforms" /><published>2022-10-23T19:31:29+03:00</published><updated>2022-10-23T19:31:29+03:00</updated><id>/jekyll/update/2022/10/23/improve-mttr-with-observability-platform</id><content type="html" xml:base="/jekyll/update/2022/10/23/improve-mttr-with-observability-platform.html"><![CDATA[<ul id="markdown-toc">
   <li><a href="#intro" id="markdown-toc-intro">Intro</a></li>
   <li><a href="#observability-platforms-to-reduce-the-pain" id="markdown-toc-observability-platforms-to-reduce-the-pain">Observability platforms to reduce the pain</a></li>
   <li><a href="#pricing" id="markdown-toc-pricing">Pricing</a></li>
@@ -787,134 +830,7 @@ Obviously the exact price depending on the tool itself and the package you selec
   <li><a href="https://www.youtube.com/watch?v=5hR17z4Qm3g" target="_blank">Lightrun</a></li>
   <li><a href="https://www.youtube.com/watch?v=Tnsd_65jQLY" target="_blank">Rookout</a></li>
   <li><a href="https://www.youtube.com/watch?v=OI5oYxTCiV0&amp;t=957s" target="_blank">Helios</a></li>
-</ul>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="Architecture" /><category term="Cloud" /><category term="BE" /><category term="Devops" /></entry><entry><title type="html">Extending Flyweight pattern ideas to improve system-wide performance and reduce costs</title><link href="http://localhost:4000/jekyll/update/2022/07/10/leveraging-flyweight-pattern-to-system-arch.html" rel="alternate" type="text/html" title="Extending Flyweight pattern ideas to improve system-wide performance and reduce costs" /><published>2022-07-10T19:31:29+03:00</published><updated>2022-07-10T19:31:29+03:00</updated><id>http://localhost:4000/jekyll/update/2022/07/10/leveraging-flyweight-pattern-to-system-arch</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2022/07/10/leveraging-flyweight-pattern-to-system-arch.html"><![CDATA[<ul id="markdown-toc">
-  <li><a href="#intro" id="markdown-toc-intro">Intro</a>    <ul>
-      <li><a href="#taking-the-general-idea-to-a-system-wide-level" id="markdown-toc-taking-the-general-idea-to-a-system-wide-level">Taking the general idea to a system-wide level</a></li>
-      <li><a href="#be-careful-with-the-tradeoffs" id="markdown-toc-be-careful-with-the-tradeoffs">Be careful with the tradeoffs</a></li>
-    </ul>
-  </li>
-</ul>
-
-<h3 id="intro">Intro</h3>
-<p>There are plenty of sources online explaining the Flyweight design pattern in depth.<br />
-The most common description of the pattern is that it designed to reduce memory footprint of a program without losing any capability.
-But the ideas behind it can be extended to a broader, system-wide scale.</p>
-
-<p>I won’t get into the depth of the design pattern itself (if you’re not familiar with it, you can check out a <a href="https://en.wikipedia.org/wiki/Flyweight_pattern" target="_blank">good explanation in wikipedia</a>),
-but I will sum it up to a very simplistic explanation:</p>
-
-<p>The Flyweight pattern suggests minimizing the memory footprint of a large amount of objects, by storing commonly shared data in external data structures,
-and share these data structures with the objects themselves.</p>
-
-<p>Terminology wise, we’ll have:</p>
-
-<ul>
-  <li>Intrinsic state, which refers to the commonly shared data.</li>
-  <li>Extrinsic state, which refers to context related data, we can call it <i>dynamic</i> data.</li>
-</ul>
-
-<p>A simple example for it can be bullets in a shooter game,
-an extrinsic state will refer to the x,y of the bullet location, while the intrinsic state will refer to the color, size and other constant properties of the bullet.
-We will have a lot of minimalistic bullet objects, which will refer to a single graphical representation object.</p>
-
-<h4 id="taking-the-general-idea-to-a-system-wide-level">Taking the general idea to a system-wide level</h4>
-<p>Let’s say you’re working on a cyber-security system which monitors and ingests network traffic from 3rd party sensors, analyzes the traffic and reports suspicious activity.
-It’s simplified architecture will look something like this:</p>
-
-<p><a href="/assets/post-images/2022-08-10-flyweight/simplified-event-ingestion.JPG" target="_blank"><img src="/assets/post-images/2022-08-10-flyweight/simplified-event-ingestion.JPG" alt="Simplified Ingesting flow" /></a></p>
-
-<p>Let’s assume that one of the events the sensor records, is DNS lookups done by endpoints and servers in the network.
-The sensor enriches it with owner info - such as ASN, and produce it to Kafka, from which ETL reads the event and saves it to storage.
-The event structured something like this:</p>
-
-<figure class="highlight"><pre><code class="language-json" data-lang="json"><span class="p">{</span><span class="w">
-  </span><span class="nl">"event_initiator_ip"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1.1.1.1"</span><span class="p">,</span><span class="w">
-  </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"dns_lookup"</span><span class="p">,</span><span class="w">
-  </span><span class="nl">"domain_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"www.google.com"</span><span class="p">,</span><span class="w">
-  </span><span class="nl">"record_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"a"</span><span class="p">,</span><span class="w">
-  </span><span class="nl">"ttl"</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w">
-  </span><span class="nl">"address"</span><span class="p">:</span><span class="w"> </span><span class="s2">"142.251.40.164"</span><span class="p">,</span><span class="w">
-  </span><span class="nl">"owner_asn_info"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-    </span><span class="nl">"ASNumber"</span><span class="p">:</span><span class="w"> </span><span class="s2">"15169"</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"ASName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"GOOGLE"</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"RegDate"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2000-03-30"</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"Updated"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2012-02-24"</span><span class="p">,</span><span class="w"> 
-    </span><span class="nl">"Ref"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://rdap.arin.net/registry/autnum/15169"</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"OrgName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Google LLC"</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"OrgId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"GOGL"</span><span class="w">
-  </span><span class="p">},</span><span class="w">
-  </span><span class="nl">"owner_whois_info"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-    </span><span class="nl">"NetRange"</span><span class="p">:</span><span class="w">       </span><span class="s2">"142.250.0.0 - 142.251.255.255"</span><span class="w">
-    </span><span class="nl">"CIDR"</span><span class="p">:</span><span class="w">           </span><span class="s2">"142.250.0.0/15"</span><span class="w">
-    </span><span class="nl">"NetName"</span><span class="p">:</span><span class="w">        </span><span class="s2">"GOOGLE"</span><span class="w">
-    </span><span class="nl">"NetHandle"</span><span class="p">:</span><span class="w">      </span><span class="s2">"NET-142-250-0-0-1"</span><span class="w">
-    </span><span class="nl">"Parent"</span><span class="p">:</span><span class="w">         </span><span class="s2">"NET142 (NET-142-0-0-0-0)"</span><span class="w">
-    </span><span class="nl">"NetType"</span><span class="p">:</span><span class="w">        </span><span class="s2">"Direct Allocation"</span><span class="w">
-    </span><span class="nl">"OriginAS"</span><span class="p">:</span><span class="w">       </span><span class="s2">"AS15169"</span><span class="w">
-    </span><span class="nl">"Organization"</span><span class="p">:</span><span class="w">   </span><span class="s2">"Google LLC (GOGL)"</span><span class="w">
-    </span><span class="nl">"RegDate"</span><span class="p">:</span><span class="w">        </span><span class="s2">"2012-05-24"</span><span class="w">
-    </span><span class="nl">"Updated"</span><span class="p">:</span><span class="w">        </span><span class="s2">"2012-05-24"</span><span class="w">
-    </span><span class="nl">"Ref"</span><span class="p">:</span><span class="w">            </span><span class="s2">"https://rdap.arin.net/registry/ip/142.250.0.0"</span><span class="w">
-  </span><span class="p">}</span><span class="w">
-</span><span class="p">}</span></code></pre></figure>
-
-<p>For simplicity of the example, lets assume we’re not compressing, nor using better suited formats to store the data,
-and we’re just saving it as is in JSON format. This will cost us roughly 1kb per event.
-In a network with 10K/S lookups to google, it means a rough estimate of 864gb of daily data only for DNS lookups.</p>
-
-<ul>
-  <li>It means 864gb worth of daily addition to storage</li>
-  <li>It means that if we’ll attempt to write a daily scheduled analytic, it’ll have to handle 864gb of data</li>
-</ul>
-
-<p>You probably already see where I’m going with this.</p>
-
-<p>If we take a close look at the event data, we’ll see that the owner info is not context related, and probably won’t be frequently modified
-between each lookup event for the same domain. We can consider it as an intrinsic state.</p>
-
-<p>If we change our ETL to work with a cache of ownership info, writing it to a separate intrinsic data storage only when needed,
-we can reduce the amount of data we need to store and process by roughly 84%.</p>
-
-<p>Our updated architecture will look something like this:</p>
-
-<p><a href="/assets/post-images/2022-08-10-flyweight/intrinsic-extrinsic-storage-arch.JPG" target="_blank"><img src="/assets/post-images/2022-08-10-flyweight/intrinsic-extrinsic-storage-arch.JPG" alt="Updated Architecture" /></a></p>
-
-<p>The majority of the data (extrinsic data) will be reduced to this:</p>
-
-<figure class="highlight"><pre><code class="language-json" data-lang="json"><span class="p">{</span><span class="w">
-  </span><span class="nl">"event_initiator_ip"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1.1.1.1"</span><span class="p">,</span><span class="w">
-  </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"dns_lookup"</span><span class="p">,</span><span class="w">
-  </span><span class="nl">"domain_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"www.google.com"</span><span class="p">,</span><span class="w">
-  </span><span class="nl">"record_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"a"</span><span class="p">,</span><span class="w">
-  </span><span class="nl">"ttl"</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w">
-  </span><span class="nl">"address"</span><span class="p">:</span><span class="w"> </span><span class="s2">"142.251.40.164"</span><span class="w">
-</span><span class="p">}</span></code></pre></figure>
-
-<h4 id="be-careful-with-the-tradeoffs">Be careful with the tradeoffs</h4>
-<p>As you probably understand, separating the data to intrinsic and extrinsic states is not a cost free action.
-You need to consider your data and it’s usages before separating it.</p>
-
-<p>In our example, the ETL will have to do more work before saving the data:</p>
-<ol>
-  <li>Managing a cache, in memory or external</li>
-  <li>Checking for existence of owner data and comparing the update dates</li>
-  <li>Doing an extra store action in case of a new intrinsic info</li>
-</ol>
-
-<p>A lot will be decided by the implementation.</p>
-
-<p>For example,
-in our use case, we can decide that only common domxzxains (google, stackoverflow etc’) and their owner info will be go through intrinsic pipeline, and use in memory cache,
-which will mean two things:</p>
-
-<ol>
-  <li>Working with cache will be extremely performant</li>
-  <li>Storing most common domains will reduce the majority of the data, while taking relatively small amount of memory</li>
-</ol>
-
-<p>Another thing to consider is the usage of the data, the analytics in our case - <br />
-can we preload the intrinsic data in the analytics? If not, will JOINing (with spark, for example) of small amount of intrinsic data
-will be faster than working with 84% more data which is already in the same dataframes?</p>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="Architecture" /><category term="DataEngineering" /><category term="BE" /><category term="Performance" /><category term="Cloud" /></entry><entry><title type="html">Creating and sharing private npm packages without setting up a repository manager, using git urls</title><link href="http://localhost:4000/jekyll/update/2022/07/10/using-git-as-npm-registry.html" rel="alternate" type="text/html" title="Creating and sharing private npm packages without setting up a repository manager, using git urls" /><published>2022-07-10T19:31:29+03:00</published><updated>2022-07-10T19:31:29+03:00</updated><id>http://localhost:4000/jekyll/update/2022/07/10/using-git-as-npm-registry</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2022/07/10/using-git-as-npm-registry.html"><![CDATA[<ul id="markdown-toc">
+</ul>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="Architecture" /><category term="Cloud" /><category term="BE" /><category term="Devops" /></entry><entry><title type="html">Creating and sharing private npm packages without setting up a repository manager, using git urls</title><link href="/jekyll/update/2022/07/10/using-git-as-npm-registry.html" rel="alternate" type="text/html" title="Creating and sharing private npm packages without setting up a repository manager, using git urls" /><published>2022-07-10T19:31:29+03:00</published><updated>2022-07-10T19:31:29+03:00</updated><id>/jekyll/update/2022/07/10/using-git-as-npm-registry</id><content type="html" xml:base="/jekyll/update/2022/07/10/using-git-as-npm-registry.html"><![CDATA[<ul id="markdown-toc">
   <li><a href="#intro" id="markdown-toc-intro">Intro</a>    <ul>
       <li><a href="#package-versioning" id="markdown-toc-package-versioning">Package Versioning</a></li>
       <li><a href="#caveats-for-npm-packages-consumed-directly-from-git" id="markdown-toc-caveats-for-npm-packages-consumed-directly-from-git">Caveats for npm packages consumed directly from git</a></li>
@@ -1090,64 +1006,131 @@ You can find a <a href="https://www.typescriptlang.org/tsconfig" target="_blank"
 
 <p>Now we can use it from the main project:</p>
 
-<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="k">import</span> <span class="p">{</span><span class="nx">HelloWorld</span><span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">your-package</span><span class="dl">'</span><span class="p">;</span></code></pre></figure>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="Architecture" /><category term="FE" /><category term="BE" /><category term="Devops" /><category term="JS/TS" /></entry><entry><title type="html">Cloud based standbys for on Premises workloads without changing your public IP</title><link href="http://localhost:4000/jekyll/update/2022/07/09/cloud-based-hot-standby-for-onprem-applications.html" rel="alternate" type="text/html" title="Cloud based standbys for on Premises workloads without changing your public IP" /><published>2022-07-09T19:31:29+03:00</published><updated>2022-07-09T19:31:29+03:00</updated><id>http://localhost:4000/jekyll/update/2022/07/09/cloud-based-hot-standby-for-onprem-applications</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2022/07/09/cloud-based-hot-standby-for-onprem-applications.html"><![CDATA[<ul id="markdown-toc">
-  <li><a href="#intro" id="markdown-toc-intro">Intro</a></li>
-  <li><a href="#prerequisites" id="markdown-toc-prerequisites">Prerequisites</a>    <ul>
-      <li><a href="#ip-range-registered-with-a-rir" id="markdown-toc-ip-range-registered-with-a-rir">IP range registered with a RIR</a></li>
-      <li><a href="#minimum-ipv4-address-range" id="markdown-toc-minimum-ipv4-address-range">Minimum IPv4 address range</a></li>
-      <li><a href="#other-provider-specific-requirements" id="markdown-toc-other-provider-specific-requirements">Other provider specific requirements</a></li>
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="k">import</span> <span class="p">{</span><span class="nx">HelloWorld</span><span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">your-package</span><span class="dl">'</span><span class="p">;</span></code></pre></figure>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="Architecture" /><category term="FE" /><category term="BE" /><category term="Devops" /><category term="JS/TS" /></entry><entry><title type="html">Extending Flyweight pattern ideas to improve system-wide performance and reduce costs</title><link href="/jekyll/update/2022/07/10/leveraging-flyweight-pattern-to-system-arch.html" rel="alternate" type="text/html" title="Extending Flyweight pattern ideas to improve system-wide performance and reduce costs" /><published>2022-07-10T19:31:29+03:00</published><updated>2022-07-10T19:31:29+03:00</updated><id>/jekyll/update/2022/07/10/leveraging-flyweight-pattern-to-system-arch</id><content type="html" xml:base="/jekyll/update/2022/07/10/leveraging-flyweight-pattern-to-system-arch.html"><![CDATA[<ul id="markdown-toc">
+  <li><a href="#intro" id="markdown-toc-intro">Intro</a>    <ul>
+      <li><a href="#taking-the-general-idea-to-a-system-wide-level" id="markdown-toc-taking-the-general-idea-to-a-system-wide-level">Taking the general idea to a system-wide level</a></li>
+      <li><a href="#be-careful-with-the-tradeoffs" id="markdown-toc-be-careful-with-the-tradeoffs">Be careful with the tradeoffs</a></li>
     </ul>
   </li>
 </ul>
 
 <h3 id="intro">Intro</h3>
-<p>Some workloads rely heavily on having a specific public IP addresses.
-For example:</p>
+<p>There are plenty of sources online explaining the Flyweight design pattern in depth.<br />
+The most common description of the pattern is that it designed to reduce memory footprint of a program without losing any capability.
+But the ideas behind it can be extended to a broader, system-wide scale.</p>
+
+<p>I won’t get into the depth of the design pattern itself (if you’re not familiar with it, you can check out a <a href="https://en.wikipedia.org/wiki/Flyweight_pattern" target="_blank">good explanation in wikipedia</a>),
+but I will sum it up to a very simplistic explanation:</p>
+
+<p>The Flyweight pattern suggests minimizing the memory footprint of a large amount of objects, by storing commonly shared data in external data structures,
+and share these data structures with the objects themselves.</p>
+
+<p>Terminology wise, we’ll have:</p>
 
 <ul>
-  <li>Workloads with emailing features, where the IP reputation is extremely important to get high delivery rates.</li>
-  <li>Workloads in which access to other systems (partners, 3rd party etc’) based on IP whitelisting.</li>
-  <li>Workloads providing access for field consumers which rely on direct IP address and not on a DNS Server, delivery trucks sending GPS data for example.</li>
+  <li>Intrinsic state, which refers to the commonly shared data.</li>
+  <li>Extrinsic state, which refers to context related data, we can call it <i>dynamic</i> data.</li>
 </ul>
 
-<p>Let’s assume your team/group is developing an on premise workload which implements both of the examples above.
-Now you’ve been tasked with designing a standby, or even migrating the entire workload to the cloud.</p>
+<p>A simple example for it can be bullets in a shooter game,
+an extrinsic state will refer to the x,y of the bullet location, while the intrinsic state will refer to the color, size and other constant properties of the bullet.
+We will have a lot of minimalistic bullet objects, which will refer to a single graphical representation object.</p>
 
-<p>One of the requirements is to maintain your existing IP address to keep all of your existing integrations intact.</p>
+<h4 id="taking-the-general-idea-to-a-system-wide-level">Taking the general idea to a system-wide level</h4>
+<p>Let’s say you’re working on a cyber-security system which monitors and ingests network traffic from 3rd party sensors, analyzes the traffic and reports suspicious activity.
+It’s simplified architecture will look something like this:</p>
 
-<p>Luckily, in recent years, all the main cloud providers (AWS, Azure, Google Cloud) introduced BYOIP (Bring your own IP) feature.</p>
+<p><a href="/assets/post-images/2022-08-10-flyweight/simplified-event-ingestion.JPG" target="_blank"><img src="/assets/post-images/2022-08-10-flyweight/simplified-event-ingestion.JPG" alt="Simplified Ingesting flow" /></a></p>
 
-<p>With this feature, you can basically reuse and remain the owner of your IP range, but allow the cloud provider to advertise it.
-It means you can prepare a standby for your workload, may it be cold, warm or hot, and if the need arise, instantiate the standby
-workload and attach your existing IP range to it, making the process completely transparent to all existing parties consuming/producing data
-from/to your workload.</p>
+<p>Let’s assume that one of the events the sensor records, is DNS lookups done by endpoints and servers in the network.
+The sensor enriches it with owner info - such as ASN, and produce it to Kafka, from which ETL reads the event and saves it to storage.
+The event structured something like this:</p>
 
-<h3 id="prerequisites">Prerequisites</h3>
-<p>The process of bringing your own IP and the prerequisites are pretty similar
-among all the providers.</p>
+<figure class="highlight"><pre><code class="language-json" data-lang="json"><span class="p">{</span><span class="w">
+  </span><span class="nl">"event_initiator_ip"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1.1.1.1"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"dns_lookup"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"domain_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"www.google.com"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"record_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"a"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"ttl"</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"address"</span><span class="p">:</span><span class="w"> </span><span class="s2">"142.251.40.164"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"owner_asn_info"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"ASNumber"</span><span class="p">:</span><span class="w"> </span><span class="s2">"15169"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"ASName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"GOOGLE"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"RegDate"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2000-03-30"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Updated"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2012-02-24"</span><span class="p">,</span><span class="w"> 
+    </span><span class="nl">"Ref"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://rdap.arin.net/registry/autnum/15169"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"OrgName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Google LLC"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"OrgId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"GOGL"</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nl">"owner_whois_info"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"NetRange"</span><span class="p">:</span><span class="w">       </span><span class="s2">"142.250.0.0 - 142.251.255.255"</span><span class="w">
+    </span><span class="nl">"CIDR"</span><span class="p">:</span><span class="w">           </span><span class="s2">"142.250.0.0/15"</span><span class="w">
+    </span><span class="nl">"NetName"</span><span class="p">:</span><span class="w">        </span><span class="s2">"GOOGLE"</span><span class="w">
+    </span><span class="nl">"NetHandle"</span><span class="p">:</span><span class="w">      </span><span class="s2">"NET-142-250-0-0-1"</span><span class="w">
+    </span><span class="nl">"Parent"</span><span class="p">:</span><span class="w">         </span><span class="s2">"NET142 (NET-142-0-0-0-0)"</span><span class="w">
+    </span><span class="nl">"NetType"</span><span class="p">:</span><span class="w">        </span><span class="s2">"Direct Allocation"</span><span class="w">
+    </span><span class="nl">"OriginAS"</span><span class="p">:</span><span class="w">       </span><span class="s2">"AS15169"</span><span class="w">
+    </span><span class="nl">"Organization"</span><span class="p">:</span><span class="w">   </span><span class="s2">"Google LLC (GOGL)"</span><span class="w">
+    </span><span class="nl">"RegDate"</span><span class="p">:</span><span class="w">        </span><span class="s2">"2012-05-24"</span><span class="w">
+    </span><span class="nl">"Updated"</span><span class="p">:</span><span class="w">        </span><span class="s2">"2012-05-24"</span><span class="w">
+    </span><span class="nl">"Ref"</span><span class="p">:</span><span class="w">            </span><span class="s2">"https://rdap.arin.net/registry/ip/142.250.0.0"</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span></code></pre></figure>
 
-<h4 id="ip-range-registered-with-a-rir">IP range registered with a RIR</h4>
-<p>The main requirement is that the address you are importing must be registered with one of the following RIRs (Regional Internet Registry):</p>
+<p>For simplicity of the example, lets assume we’re not compressing, nor using better suited formats to store the data,
+and we’re just saving it as is in JSON format. This will cost us roughly 1kb per event.
+In a network with 10K/S lookups to google, it means a rough estimate of 864gb of daily data only for DNS lookups.</p>
 
 <ul>
-  <li>AFRINIC (Africa)</li>
-  <li>APNIC (Portions of Asia and Oceania)</li>
-  <li>ARIN (North America and some Caribbean Islands)</li>
-  <li>LACNIC (Latin America)</li>
-  <li>RIPE NCC (Europe, Central Asia, Middle East)</li>
+  <li>It means 864gb worth of daily addition to storage</li>
+  <li>It means that if we’ll attempt to write a daily scheduled analytic, it’ll have to handle 864gb of data</li>
 </ul>
 
-<h4 id="minimum-ipv4-address-range">Minimum IPv4 address range</h4>
-<p>The address range must be no smaller than a /24 so it will be accepted by Internet Service Providers.</p>
+<p>You probably already see where I’m going with this.</p>
 
-<h4 id="other-provider-specific-requirements">Other provider specific requirements</h4>
-<p>On top of the generic requirements, each provider enforces additional specific requirements, such as limit on the amount of ranges you can bring,
-validating reputation history of the address and more.</p>
+<p>If we take a close look at the event data, we’ll see that the owner info is not context related, and probably won’t be frequently modified
+between each lookup event for the same domain. We can consider it as an intrinsic state.</p>
 
-<p>For your convenience here are direct URLs to each provider step-by-step guide to bring your own IP.</p>
+<p>If we change our ETL to work with a cache of ownership info, writing it to a separate intrinsic data storage only when needed,
+we can reduce the amount of data we need to store and process by roughly 84%.</p>
 
-<ul>
-  <li><a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-byoip.html" target="_blank">AWS BYOIP</a></li>
-  <li><a href="https://cloud.google.com/vpc/docs/using-bring-your-own-ip" target="_blank">Google Cloud BYOIP</a></li>
-  <li><a href="https://docs.microsoft.com/en-us/azure/virtual-network/ip-services/create-custom-ip-address-prefix-portal" target="_blank">Azure BYOIP</a></li>
-</ul>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="Architecture" /><category term="Cloud" /><category term="BE" /></entry></feed>
+<p>Our updated architecture will look something like this:</p>
+
+<p><a href="/assets/post-images/2022-08-10-flyweight/intrinsic-extrinsic-storage-arch.JPG" target="_blank"><img src="/assets/post-images/2022-08-10-flyweight/intrinsic-extrinsic-storage-arch.JPG" alt="Updated Architecture" /></a></p>
+
+<p>The majority of the data (extrinsic data) will be reduced to this:</p>
+
+<figure class="highlight"><pre><code class="language-json" data-lang="json"><span class="p">{</span><span class="w">
+  </span><span class="nl">"event_initiator_ip"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1.1.1.1"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"dns_lookup"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"domain_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"www.google.com"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"record_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"a"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"ttl"</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"address"</span><span class="p">:</span><span class="w"> </span><span class="s2">"142.251.40.164"</span><span class="w">
+</span><span class="p">}</span></code></pre></figure>
+
+<h4 id="be-careful-with-the-tradeoffs">Be careful with the tradeoffs</h4>
+<p>As you probably understand, separating the data to intrinsic and extrinsic states is not a cost free action.
+You need to consider your data and it’s usages before separating it.</p>
+
+<p>In our example, the ETL will have to do more work before saving the data:</p>
+<ol>
+  <li>Managing a cache, in memory or external</li>
+  <li>Checking for existence of owner data and comparing the update dates</li>
+  <li>Doing an extra store action in case of a new intrinsic info</li>
+</ol>
+
+<p>A lot will be decided by the implementation.</p>
+
+<p>For example,
+in our use case, we can decide that only common domxzxains (google, stackoverflow etc’) and their owner info will be go through intrinsic pipeline, and use in memory cache,
+which will mean two things:</p>
+
+<ol>
+  <li>Working with cache will be extremely performant</li>
+  <li>Storing most common domains will reduce the majority of the data, while taking relatively small amount of memory</li>
+</ol>
+
+<p>Another thing to consider is the usage of the data, the analytics in our case - <br />
+can we preload the intrinsic data in the analytics? If not, will JOINing (with spark, for example) of small amount of intrinsic data
+will be faster than working with 84% more data which is already in the same dataframes?</p>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="Architecture" /><category term="DataEngineering" /><category term="BE" /><category term="Performance" /><category term="Cloud" /></entry></feed>

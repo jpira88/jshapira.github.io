@@ -4,7 +4,7 @@ title:  "Improve MTTR's with observability platforms"
 date:  2022-10-23 18:31:29 +0200
 categories: jekyll update
 author: Jacob Shapira
-tags: ["Architecture", "Cloud", "BE", "Devops"]
+tags: ["Architecture", "Cloud", "BackEnd", "Devops"]
 ---
 
 * TOC

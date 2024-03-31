@@ -4,7 +4,8 @@ title:  "Examining performance related information of your spark application via
 date:  2022-11-14 11:31:29 +0200
 categories: jekyll update
 author: Jacob Shapira
-tags: ["DataEngineering", "BE", "Performance"]
+sticky: "true"
+tags: ["DataEngineering", "BackEnd", "Performance"]
 ---
 
 * TOC

@@ -4,7 +4,7 @@ title:  "Session locking – big bad and sometimes (or mostly) unnoticed until i
 date:  2016-03-03 18:33:28 +0200
 categories: jekyll update
 author: Jacob Shapira
-tags: ["BE", "PHP"]
+tags: ["BackEnd"]
 ---
 
 * TOC

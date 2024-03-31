@@ -1,4 +1,93 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2024-02-11T19:47:08+02:00</updated><id>/feed.xml</id><title type="html">Jacob Shapira | Software architecture, engineering and AI</title><subtitle></subtitle><entry><title type="html">Improving consistency in distributed applications using Saga pattern with Orkes (Netflix) conductor</title><link href="/jekyll/update/2024/01/28/mircroservice-transactions.html" rel="alternate" type="text/html" title="Improving consistency in distributed applications using Saga pattern with Orkes (Netflix) conductor" /><published>2024-01-28T11:31:29+02:00</published><updated>2024-01-28T11:31:29+02:00</updated><id>/jekyll/update/2024/01/28/mircroservice-transactions</id><content type="html" xml:base="/jekyll/update/2024/01/28/mircroservice-transactions.html"><![CDATA[<ul id="markdown-toc">
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2024-03-31T19:52:38+03:00</updated><id>/feed.xml</id><title type="html">Jacob Shapira | Software architecture, engineering and AI</title><subtitle></subtitle><entry><title type="html">Visualizing data processing progress with tqdm</title><link href="/jekyll/update/2024/03/30/visualizing-data-processing-with-tqdm.html" rel="alternate" type="text/html" title="Visualizing data processing progress with tqdm" /><published>2024-03-30T12:31:29+03:00</published><updated>2024-03-30T12:31:29+03:00</updated><id>/jekyll/update/2024/03/30/visualizing-data-processing-with-tqdm</id><content type="html" xml:base="/jekyll/update/2024/03/30/visualizing-data-processing-with-tqdm.html"><![CDATA[<ul id="markdown-toc">
+  <li><a href="#intro" id="markdown-toc-intro">Intro</a></li>
+  <li><a href="#integrations-advanced-features-and-performance" id="markdown-toc-integrations-advanced-features-and-performance">Integrations, advanced features and performance</a></li>
+</ul>
+
+<h3 id="intro">Intro</h3>
+<p>This entry would be just a quick tip for those of you who are working with data processing in Python and would benefit from a visualizing the progress.
+There’s a simple library called <code class="language-plaintext highlighter-rouge">tqdm</code> which allow you to do that with a minimal overhead.</p>
+
+<p>Let’s check the usage with a model training dummy code:</p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
+
+<span class="n">train</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">data</span><span class="p">:</span> <span class="p">[</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s">"Training"</span><span class="p">,</span> <span class="n">leave</span><span class="o">=</span><span class="bp">False</span><span class="p">)]</span>
+<span class="n">validate</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">data</span><span class="p">:</span> <span class="p">[</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s">"Validating"</span><span class="p">,</span> <span class="n">leave</span><span class="o">=</span><span class="bp">False</span><span class="p">)]</span>
+<span class="n">load_data</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">)]</span>
+
+<span class="n">all_data</span> <span class="o">=</span> <span class="n">load_data</span><span class="p">()</span>
+
+<span class="n">batches</span> <span class="o">=</span> <span class="p">[</span><span class="n">all_data</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="mi">100</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_data</span><span class="p">),</span> <span class="mi">100</span><span class="p">)]</span>
+<span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">batches</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s">"Processing batch"</span><span class="p">,</span> <span class="n">leave</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="n">train</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+    <span class="n">validate</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span></code></pre></figure>
+
+<p>As you can see, we have 3 dummy functions for loading data, training and validating, each of them invoking <code class="language-plaintext highlighter-rouge">sleep</code> function to simulate data processing.<br />
+The main code consists of batch processing of the training data.</p>
+
+<p>If we run the code, we’ll be able to see the progress of the batches, the training and the validation of each batch, separately.</p>
+
+<figure class="highlight"><pre><code class="language-shell" data-lang="shell">Processing batch:   0%|          | 0/10 <span class="o">[</span>00:00&lt;?, ?it/s]
+
+Training:   0%|          | 0/100 <span class="o">[</span>00:00&lt;?, ?it/s]
+Training:  10%|█         | 10/100 <span class="o">[</span>00:00&lt;00:00, 95.57it/s]
+Training:  20%|██        | 20/100 <span class="o">[</span>00:00&lt;00:00, 96.27it/s]
+Training:  30%|███       | 30/100 <span class="o">[</span>00:00&lt;00:00, 95.79it/s]
+Training:  40%|████      | 40/100 <span class="o">[</span>00:00&lt;00:00, 95.70it/s]
+Training:  50%|█████     | 50/100 <span class="o">[</span>00:00&lt;00:00, 95.16it/s]
+Training:  60%|██████    | 60/100 <span class="o">[</span>00:00&lt;00:00, 95.29it/s]
+Training:  70%|███████   | 70/100 <span class="o">[</span>00:00&lt;00:00, 94.88it/s]
+Training:  80%|████████  | 80/100 <span class="o">[</span>00:00&lt;00:00, 94.61it/s]
+Training:  90%|█████████ | 90/100 <span class="o">[</span>00:00&lt;00:00, 94.76it/s]
+Training: 100%|██████████| 100/100 <span class="o">[</span>00:01&lt;00:00, 94.72it/s]
+                                                           
+Validating:   0%|          | 0/100 <span class="o">[</span>00:00&lt;?, ?it/s]
+Validating:  10%|█         | 10/100 <span class="o">[</span>00:00&lt;00:00, 95.87it/s]
+Validating:  20%|██        | 20/100 <span class="o">[</span>00:00&lt;00:00, 95.28it/s]
+Validating:  30%|███       | 30/100 <span class="o">[</span>00:00&lt;00:00, 95.82it/s]
+Validating:  40%|████      | 40/100 <span class="o">[</span>00:00&lt;00:00, 95.41it/s]
+Validating:  50%|█████     | 50/100 <span class="o">[</span>00:00&lt;00:00, 95.66it/s]
+Validating:  60%|██████    | 60/100 <span class="o">[</span>00:00&lt;00:00, 95.02it/s]
+Validating:  70%|███████   | 70/100 <span class="o">[</span>00:00&lt;00:00, 95.23it/s]
+Validating:  80%|████████  | 80/100 <span class="o">[</span>00:00&lt;00:00, 94.96it/s]
+Validating:  90%|█████████ | 90/100 <span class="o">[</span>00:00&lt;00:00, 94.84it/s]
+Validating: 100%|██████████| 100/100 <span class="o">[</span>00:01&lt;00:00, 94.92it/s]
+
+Processing batch:  10%|█         | 1/10 <span class="o">[</span>00:02&lt;00:18,  2.10s/it]
+
+Training:   0%|          | 0/100 <span class="o">[</span>00:00&lt;?, ?it/s]
+Training:  10%|█         | 10/100 <span class="o">[</span>00:00&lt;00:00, 94.69it/s]
+Training:  20%|██        | 20/100 <span class="o">[</span>00:00&lt;00:00, 95.85it/s]
+Training:  30%|███       | 30/100 <span class="o">[</span>00:00&lt;00:00, 95.53it/s]
+Training:  40%|████      | 40/100 <span class="o">[</span>00:00&lt;00:00, 94.67it/s]
+Training:  50%|█████     | 50/100 <span class="o">[</span>00:00&lt;00:00, 95.10it/s]
+Training:  60%|██████    | 60/100 <span class="o">[</span>00:00&lt;00:00, 95.35it/s]
+Training:  70%|███████   | 70/100 <span class="o">[</span>00:00&lt;00:00, 95.70it/s]
+Training:  80%|████████  | 80/100 <span class="o">[</span>00:00&lt;00:00, 96.15it/s]
+Training:  90%|█████████ | 90/100 <span class="o">[</span>00:00&lt;00:00, 96.05it/s]
+Training: 100%|██████████| 100/100 <span class="o">[</span>00:01&lt;00:00, 95.77it/s]
+                                                           
+Validating:   0%|          | 0/100 <span class="o">[</span>00:00&lt;?, ?it/s]
+Validating:  10%|█         | 10/100 <span class="o">[</span>00:00&lt;00:00, 96.14it/s]
+Validating:  20%|██        | 20/100 <span class="o">[</span>00:00&lt;00:00, 96.19it/s]
+Validating:  30%|███       | 30/100 <span class="o">[</span>00:00&lt;00:00, 96.02it/s]
+Validating:  40%|████      | 40/100 <span class="o">[</span>00:00&lt;00:00, 96.20it/s]
+Validating:  50%|█████     | 50/100 <span class="o">[</span>00:00&lt;00:00, 95.70it/s]
+Validating:  60%|██████    | 60/100 <span class="o">[</span>00:00&lt;00:00, 95.70it/s]
+Validating:  70%|███████   | 70/100 <span class="o">[</span>00:00&lt;00:00, 95.40it/s]
+Validating:  80%|████████  | 80/100 <span class="o">[</span>00:00&lt;00:00, 94.90it/s]
+Validating:  90%|█████████ | 90/100 <span class="o">[</span>00:00&lt;00:00, 95.30it/s]
+Validating: 100%|██████████| 100/100 <span class="o">[</span>00:01&lt;00:00, 95.33it/s]
+
+........................</code></pre></figure>
+
+<h3 id="integrations-advanced-features-and-performance">Integrations, advanced features and performance</h3>
+<p>tqdm supports Pandas, Keras, Dask and IPython/Jupyter integrations and provides advances features such as manual updates of the progress,
+callbacks support, custom messages, formatting and more.<br />
+On top of that, even though tqdm claims to add only 60ns per iteration (and 80ns for gui), one of the more important features is the control over performance related properties such as intervals and miniters.</p>
+
+<p>Refer to <a href="https://github.com/tqdm/tqdm" target="_blank">its Github page</a> for the full docs.</p>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="BackEnd" /><category term="DataEngineering" /><category term="LLM/ML/AI" /></entry><entry><title type="html">Improving consistency in distributed applications using Saga pattern with Orkes (Netflix) conductor</title><link href="/jekyll/update/2024/01/28/mircroservice-transactions.html" rel="alternate" type="text/html" title="Improving consistency in distributed applications using Saga pattern with Orkes (Netflix) conductor" /><published>2024-01-28T11:31:29+02:00</published><updated>2024-01-28T11:31:29+02:00</updated><id>/jekyll/update/2024/01/28/mircroservice-transactions</id><content type="html" xml:base="/jekyll/update/2024/01/28/mircroservice-transactions.html"><![CDATA[<ul id="markdown-toc">
   <li><a href="#intro" id="markdown-toc-intro">Intro</a></li>
   <li><a href="#saga-pattern" id="markdown-toc-saga-pattern">Saga Pattern</a></li>
   <li><a href="#orkes-netflix-conductor-as-infrastructure-level-solution" id="markdown-toc-orkes-netflix-conductor-as-infrastructure-level-solution">Orkes (Netflix) Conductor as infrastructure level solution</a></li>
@@ -41,7 +130,7 @@ With that being said, it is not without caveats, starting from maintaining addit
 <p>Conductor offers a concept of a <a href="https://orkes.io/content/error-handling" target="_blank">failureWorkflow</a>.<br />
 Failure workflows can be added to your distributed workflows and triggered if one of the transaction in the Saga did not successfully complete.<br />
 Conductor interface provides a clear visibility over the workflow itself and the routes it can take whether succeeded or failed, making it a solid choice if you’re looking for a
-battle tested infrastructure level microservice orchestration solution.</p>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="BE" /><category term="Architecture" /><category term="Cloud" /></entry><entry><title type="html">Effective LLM fine-tuning for dummies</title><link href="/jekyll/update/2023/09/18/llm-fine-tuning-hypterparameters-simplified.html" rel="alternate" type="text/html" title="Effective LLM fine-tuning for dummies" /><published>2023-09-18T12:31:29+03:00</published><updated>2023-09-18T12:31:29+03:00</updated><id>/jekyll/update/2023/09/18/llm-fine-tuning-hypterparameters-simplified</id><content type="html" xml:base="/jekyll/update/2023/09/18/llm-fine-tuning-hypterparameters-simplified.html"><![CDATA[<ul id="markdown-toc">
+battle tested infrastructure level microservice orchestration solution.</p>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="BackEnd" /><category term="Architecture" /><category term="Cloud" /></entry><entry><title type="html">Effective LLM fine-tuning for dummies</title><link href="/jekyll/update/2023/09/18/llm-fine-tuning-hypterparameters-simplified.html" rel="alternate" type="text/html" title="Effective LLM fine-tuning for dummies" /><published>2023-09-18T12:31:29+03:00</published><updated>2023-09-18T12:31:29+03:00</updated><id>/jekyll/update/2023/09/18/llm-fine-tuning-hypterparameters-simplified</id><content type="html" xml:base="/jekyll/update/2023/09/18/llm-fine-tuning-hypterparameters-simplified.html"><![CDATA[<ul id="markdown-toc">
   <li><a href="#intro" id="markdown-toc-intro">Intro</a></li>
   <li><a href="#base-model-fine-tuned-model-and-initial-weight-and-biases" id="markdown-toc-base-model-fine-tuned-model-and-initial-weight-and-biases">Base model, fine-tuned model and initial weight and biases</a></li>
   <li><a href="#preparing-the-base-model" id="markdown-toc-preparing-the-base-model">Preparing the base model</a></li>
@@ -395,33 +484,7 @@ We can run the evaluation module twice, first time with the pre-quantized infere
 <span class="o">&gt;&gt;&gt;</span> <span class="p">{</span><span class="s">'rouge1'</span><span class="p">:</span> <span class="mf">0.5570469798657718</span><span class="p">,</span> <span class="s">'rouge2'</span><span class="p">:</span> <span class="mf">0.23648648648648649</span><span class="p">,</span> <span class="s">'rougeL'</span><span class="p">:</span> <span class="mf">0.3691275167785235</span><span class="p">,</span> <span class="s">'rougeLsum'</span><span class="p">:</span> <span class="mf">0.3691275167785235</span><span class="p">}</span></code></pre></figure>
 
 <p>As explained above, similar ROUGE score does not guarantee a good post quantization accuracy since it just measures similar terms and phrases, but it’s enough
-to demonstrate the ease of use of the <code class="language-plaintext highlighter-rouge">evaluate</code> package.</p>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="LLM/ML/AI" /></entry><entry><title type="html">Reducing I/O latency on EBS restored from snapshots with AWS FSR</title><link href="/jekyll/update/2023/03/26/aws-fast-snapshot-restore.html" rel="alternate" type="text/html" title="Reducing I/O latency on EBS restored from snapshots with AWS FSR" /><published>2023-03-26T11:31:29+02:00</published><updated>2023-03-26T11:31:29+02:00</updated><id>/jekyll/update/2023/03/26/aws-fast-snapshot-restore</id><content type="html" xml:base="/jekyll/update/2023/03/26/aws-fast-snapshot-restore.html"><![CDATA[<p>When creating an EBS snapshot the data is saved to S3.<br />
-Snapshots are incremental, meaning that only the blocks that have been modified later than the most recent snapshot - are saved.<br />
-For obvious reasons this makes the snapshot faster to save and cheaper to store.</p>
-
-<p>When initiating an EBS volume from a snapshot, the EBS is almost immediately ready for use.<br />
-This is a very neat feature which is available due to the asynchronous nature of how storage blocks are loaded from S3 to EBS.</p>
-
-<p>The data is loaded in 2 ways:</p>
-<ol>
-  <li>Ongoing process in the background</li>
-  <li>In case an access attempt is made to a block which isn’t loaded yet, it immediately downloaded from S3.</li>
-</ol>
-
-<p>The caveat in this approach is that if we’ll attempt to access a block which is not downloaded yet,
-there will be an I/O latency while the data is being downloaded from S3.</p>
-
-<p>To solve this problem, AWS announced a new feature called Fast Snapshot Restore (FSR).<br />
-Enabling FSR for a snapshot increases the amount of resources allocated for the download process.</p>
-
-<p>According to the documentation, enabling FSR on a snapshot can speed up the data loading to ~1TB/Hour,
-with current cost of 0.75$ per hour.
-So for example, initiating EBS from an FSR enabled snapshot of 10TB will take 10 hours and 7.5$.</p>
-
-<p>Some limitations:<br />
-You can enable up to 5 FSR enabled snapshots per region and only to snapshots sized 16TiB or less.</p>
-
-<p>A full documentation of FSR can be found <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-fast-snapshot-restore.html" target="_blank">here</a>.</p>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="DataEngineering" /><category term="BE" /><category term="Performance" /><category term="Cloud" /><category term="Architecture" /></entry><entry><title type="html">Leverage AWS Direct Connect to use AWS services without exposing your data to the public internet</title><link href="/jekyll/update/2023/03/26/using-aws-without-exposing-data-to-public-internet.html" rel="alternate" type="text/html" title="Leverage AWS Direct Connect to use AWS services without exposing your data to the public internet" /><published>2023-03-26T11:31:29+02:00</published><updated>2023-03-26T11:31:29+02:00</updated><id>/jekyll/update/2023/03/26/using-aws-without-exposing-data-to-public-internet</id><content type="html" xml:base="/jekyll/update/2023/03/26/using-aws-without-exposing-data-to-public-internet.html"><![CDATA[<ul id="markdown-toc">
+to demonstrate the ease of use of the <code class="language-plaintext highlighter-rouge">evaluate</code> package.</p>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="LLM/ML/AI" /></entry><entry><title type="html">Leverage AWS Direct Connect to use AWS services without exposing your data to the public internet</title><link href="/jekyll/update/2023/03/26/using-aws-without-exposing-data-to-public-internet.html" rel="alternate" type="text/html" title="Leverage AWS Direct Connect to use AWS services without exposing your data to the public internet" /><published>2023-03-26T11:31:29+02:00</published><updated>2023-03-26T11:31:29+02:00</updated><id>/jekyll/update/2023/03/26/using-aws-without-exposing-data-to-public-internet</id><content type="html" xml:base="/jekyll/update/2023/03/26/using-aws-without-exposing-data-to-public-internet.html"><![CDATA[<ul id="markdown-toc">
   <li><a href="#intro" id="markdown-toc-intro">Intro</a></li>
   <li><a href="#selecting-a-connection" id="markdown-toc-selecting-a-connection">Selecting a connection</a></li>
   <li><a href="#creating-vifs-and-directing-traffic-to-the-correct" id="markdown-toc-creating-vifs-and-directing-traffic-to-the-correct">Creating VIFs and directing traffic to the correct</a></li>
@@ -489,7 +552,33 @@ You can find a neat <a href="https://docs.aws.amazon.com/directconnect/latest/Us
 
 <h3 id="not-only-for-security">Not only for security</h3>
 <p>Security is not the only benefit of using direct connect. 
-You can also get increased bandwidth throughput and a more consistent network performance than what can be achieved with a public internet connection.</p>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="DataEngineering" /><category term="BE" /><category term="Performance" /><category term="Cloud" /><category term="Architecture" /><category term="Devops" /></entry><entry><title type="html">Speeding up spark SQL with adaptive query execution</title><link href="/jekyll/update/2023/02/07/spark-adaptive-query-execution.html" rel="alternate" type="text/html" title="Speeding up spark SQL with adaptive query execution" /><published>2023-02-07T11:31:29+02:00</published><updated>2023-02-07T11:31:29+02:00</updated><id>/jekyll/update/2023/02/07/spark-adaptive-query-execution</id><content type="html" xml:base="/jekyll/update/2023/02/07/spark-adaptive-query-execution.html"><![CDATA[<ul id="markdown-toc">
+You can also get increased bandwidth throughput and a more consistent network performance than what can be achieved with a public internet connection.</p>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="DataEngineering" /><category term="BackEnd" /><category term="Performance" /><category term="Cloud" /><category term="Architecture" /><category term="Devops" /></entry><entry><title type="html">Reducing I/O latency on EBS restored from snapshots with AWS FSR</title><link href="/jekyll/update/2023/03/26/aws-fast-snapshot-restore.html" rel="alternate" type="text/html" title="Reducing I/O latency on EBS restored from snapshots with AWS FSR" /><published>2023-03-26T11:31:29+02:00</published><updated>2023-03-26T11:31:29+02:00</updated><id>/jekyll/update/2023/03/26/aws-fast-snapshot-restore</id><content type="html" xml:base="/jekyll/update/2023/03/26/aws-fast-snapshot-restore.html"><![CDATA[<p>When creating an EBS snapshot the data is saved to S3.<br />
+Snapshots are incremental, meaning that only the blocks that have been modified later than the most recent snapshot - are saved.<br />
+For obvious reasons this makes the snapshot faster to save and cheaper to store.</p>
+
+<p>When initiating an EBS volume from a snapshot, the EBS is almost immediately ready for use.<br />
+This is a very neat feature which is available due to the asynchronous nature of how storage blocks are loaded from S3 to EBS.</p>
+
+<p>The data is loaded in 2 ways:</p>
+<ol>
+  <li>Ongoing process in the background</li>
+  <li>In case an access attempt is made to a block which isn’t loaded yet, it immediately downloaded from S3.</li>
+</ol>
+
+<p>The caveat in this approach is that if we’ll attempt to access a block which is not downloaded yet,
+there will be an I/O latency while the data is being downloaded from S3.</p>
+
+<p>To solve this problem, AWS announced a new feature called Fast Snapshot Restore (FSR).<br />
+Enabling FSR for a snapshot increases the amount of resources allocated for the download process.</p>
+
+<p>According to the documentation, enabling FSR on a snapshot can speed up the data loading to ~1TB/Hour,
+with current cost of 0.75$ per hour.
+So for example, initiating EBS from an FSR enabled snapshot of 10TB will take 10 hours and 7.5$.</p>
+
+<p>Some limitations:<br />
+You can enable up to 5 FSR enabled snapshots per region and only to snapshots sized 16TiB or less.</p>
+
+<p>A full documentation of FSR can be found <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-fast-snapshot-restore.html" target="_blank">here</a>.</p>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="DataEngineering" /><category term="BackEnd" /><category term="Performance" /><category term="Cloud" /><category term="Architecture" /></entry><entry><title type="html">Speeding up spark SQL with adaptive query execution</title><link href="/jekyll/update/2023/02/07/spark-adaptive-query-execution.html" rel="alternate" type="text/html" title="Speeding up spark SQL with adaptive query execution" /><published>2023-02-07T11:31:29+02:00</published><updated>2023-02-07T11:31:29+02:00</updated><id>/jekyll/update/2023/02/07/spark-adaptive-query-execution</id><content type="html" xml:base="/jekyll/update/2023/02/07/spark-adaptive-query-execution.html"><![CDATA[<ul id="markdown-toc">
   <li><a href="#intro" id="markdown-toc-intro">Intro</a></li>
   <li><a href="#dynamically-switching-join-strategies" id="markdown-toc-dynamically-switching-join-strategies">Dynamically switching join strategies</a></li>
   <li><a href="#dynamically-coalescing-shuffle-partitions" id="markdown-toc-dynamically-coalescing-shuffle-partitions">Dynamically coalescing shuffle partitions</a></li>
@@ -553,7 +642,7 @@ The longest task (A P1 to B P1) will take 3 minutes while all the others will ta
 <p><a href="/assets/post-images/2023-3-21-aqe/skew2.JPG" target="_blank"><img src="/assets/post-images/2023-3-21-aqe/skew2.JPG" alt="Skew" /></a></p>
 
 <p>AQE Optimization will split ABP1 into 2 different partitions, duplicate BP1 and join between them,
-increasing the number of tasks to 5, but reducing allowing a better parallelism, thus reducing the overall execution time by half.</p>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="DataEngineering" /><category term="BE" /><category term="Performance" /></entry><entry><title type="html">Examining performance related information of your spark application via spark UI</title><link href="/jekyll/update/2022/11/14/performance-related-info-spark-ui.html" rel="alternate" type="text/html" title="Examining performance related information of your spark application via spark UI" /><published>2022-11-14T11:31:29+02:00</published><updated>2022-11-14T11:31:29+02:00</updated><id>/jekyll/update/2022/11/14/performance-related-info-spark-ui</id><content type="html" xml:base="/jekyll/update/2022/11/14/performance-related-info-spark-ui.html"><![CDATA[<ul id="markdown-toc">
+increasing the number of tasks to 5, but reducing allowing a better parallelism, thus reducing the overall execution time by half.</p>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="DataEngineering" /><category term="BackEnd" /><category term="Performance" /></entry><entry><title type="html">Examining performance related information of your spark application via spark UI</title><link href="/jekyll/update/2022/11/14/performance-related-info-spark-ui.html" rel="alternate" type="text/html" title="Examining performance related information of your spark application via spark UI" /><published>2022-11-14T11:31:29+02:00</published><updated>2022-11-14T11:31:29+02:00</updated><id>/jekyll/update/2022/11/14/performance-related-info-spark-ui</id><content type="html" xml:base="/jekyll/update/2022/11/14/performance-related-info-spark-ui.html"><![CDATA[<ul id="markdown-toc">
   <li><a href="#intro" id="markdown-toc-intro">Intro</a></li>
   <li><a href="#application-event-timeline" id="markdown-toc-application-event-timeline">Application event timeline</a></li>
   <li><a href="#jobs" id="markdown-toc-jobs">Jobs</a></li>
@@ -792,7 +881,7 @@ If we were to remove the repartition command, the column value manipulation woul
 <ol>
   <li>Number of output rows &amp; data size - this is kind of self-explanatory.</li>
   <li>Number of written files - this is important to notice, since constantly creating a lot of small files might impact the performance of whatever reads your data. A good file size will be 512MiB or 1GiB.</li>
-</ol>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="DataEngineering" /><category term="BE" /><category term="Performance" /></entry><entry><title type="html">Improve MTTR’s with observability platforms</title><link href="/jekyll/update/2022/10/23/improve-mttr-with-observability-platform.html" rel="alternate" type="text/html" title="Improve MTTR’s with observability platforms" /><published>2022-10-23T19:31:29+03:00</published><updated>2022-10-23T19:31:29+03:00</updated><id>/jekyll/update/2022/10/23/improve-mttr-with-observability-platform</id><content type="html" xml:base="/jekyll/update/2022/10/23/improve-mttr-with-observability-platform.html"><![CDATA[<ul id="markdown-toc">
+</ol>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="DataEngineering" /><category term="BackEnd" /><category term="Performance" /></entry><entry><title type="html">Improve MTTR’s with observability platforms</title><link href="/jekyll/update/2022/10/23/improve-mttr-with-observability-platform.html" rel="alternate" type="text/html" title="Improve MTTR’s with observability platforms" /><published>2022-10-23T19:31:29+03:00</published><updated>2022-10-23T19:31:29+03:00</updated><id>/jekyll/update/2022/10/23/improve-mttr-with-observability-platform</id><content type="html" xml:base="/jekyll/update/2022/10/23/improve-mttr-with-observability-platform.html"><![CDATA[<ul id="markdown-toc">
   <li><a href="#intro" id="markdown-toc-intro">Intro</a></li>
   <li><a href="#observability-platforms-to-reduce-the-pain" id="markdown-toc-observability-platforms-to-reduce-the-pain">Observability platforms to reduce the pain</a></li>
   <li><a href="#pricing" id="markdown-toc-pricing">Pricing</a></li>
@@ -830,183 +919,7 @@ Obviously the exact price depending on the tool itself and the package you selec
   <li><a href="https://www.youtube.com/watch?v=5hR17z4Qm3g" target="_blank">Lightrun</a></li>
   <li><a href="https://www.youtube.com/watch?v=Tnsd_65jQLY" target="_blank">Rookout</a></li>
   <li><a href="https://www.youtube.com/watch?v=OI5oYxTCiV0&amp;t=957s" target="_blank">Helios</a></li>
-</ul>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="Architecture" /><category term="Cloud" /><category term="BE" /><category term="Devops" /></entry><entry><title type="html">Creating and sharing private npm packages without setting up a repository manager, using git urls</title><link href="/jekyll/update/2022/07/10/using-git-as-npm-registry.html" rel="alternate" type="text/html" title="Creating and sharing private npm packages without setting up a repository manager, using git urls" /><published>2022-07-10T19:31:29+03:00</published><updated>2022-07-10T19:31:29+03:00</updated><id>/jekyll/update/2022/07/10/using-git-as-npm-registry</id><content type="html" xml:base="/jekyll/update/2022/07/10/using-git-as-npm-registry.html"><![CDATA[<ul id="markdown-toc">
-  <li><a href="#intro" id="markdown-toc-intro">Intro</a>    <ul>
-      <li><a href="#package-versioning" id="markdown-toc-package-versioning">Package Versioning</a></li>
-      <li><a href="#caveats-for-npm-packages-consumed-directly-from-git" id="markdown-toc-caveats-for-npm-packages-consumed-directly-from-git">Caveats for npm packages consumed directly from git</a></li>
-      <li><a href="#tree-shaking-to-mitigate-the-caveats" id="markdown-toc-tree-shaking-to-mitigate-the-caveats">Tree shaking to mitigate the caveats</a></li>
-      <li><a href="#wrapping-your-code-as-installable-npm-package" id="markdown-toc-wrapping-your-code-as-installable-npm-package">Wrapping your code as installable npm package</a></li>
-      <li><a href="#expanding-the-default-packagejson" id="markdown-toc-expanding-the-default-packagejson">Expanding the default package.json</a></li>
-    </ul>
-  </li>
-  <li><a href="#hello-world" id="markdown-toc-hello-world">Hello World</a>    <ul>
-      <li><a href="#pushing-to-git" id="markdown-toc-pushing-to-git">Pushing to git</a></li>
-      <li><a href="#using-the-package-from-the-main-project" id="markdown-toc-using-the-package-from-the-main-project">Using the package from the main project</a></li>
-    </ul>
-  </li>
-</ul>
-
-<h3 id="intro">Intro</h3>
-<p>When working on JS/TS components (or any other), most chances are, that on relatively regular basis, you’re required to reuse some code you or your team wrote in multiple projects.</p>
-
-<p>A project can be multiple components of the same product, or completely different products.<br />
-A common approach to conveniently share your code is wrapping it as a package and import it wherever required. 
-But, due to various considerations (security, copyrights, etc’), you may want to refrain from uploading your code to NPM registry.</p>
-
-<p>In this case, you might set up a private repository manager such as Nexus or Verdaccio.<br />
-But if your only goal is to share packages between your team, setting up and maintaining a server might be a bit of an overkill.</p>
-
-<p>Luckily, we can import code as NPM package directly from a private (or public) git repository.</p>
-
-<p>For example,</p>
-
-<figure class="highlight"><pre><code class="language-json" data-lang="json"><span class="p">{</span><span class="w">
-  </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"your-project"</span><span class="p">,</span><span class="w">
-  </span><span class="nl">"version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0.0.0"</span><span class="p">,</span><span class="w">
-  </span><span class="nl">"scripts"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-    </span><span class="err">...</span><span class="w">
-  </span><span class="p">},</span><span class="w">
-  </span><span class="nl">"dependencies"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-    </span><span class="err">...</span><span class="w">
-    </span><span class="nl">"your-package"</span><span class="p">:</span><span class="w"> </span><span class="s2">"git+https://your-private-git-repo-url/your-package.git#semver:^x.x"</span><span class="p">,</span><span class="w">
-    </span><span class="err">...</span><span class="w">
-  </span><span class="p">},</span><span class="w">
-  </span><span class="nl">"devDependencies"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-    </span><span class="err">...</span><span class="w">
-  </span><span class="p">}</span><span class="w">
-</span><span class="p">}</span></code></pre></figure>
-
-<p>In the example above, your shared code will be available as a regular npm package named <i>your-package</i> .</p>
-
-<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="k">import</span> <span class="p">{</span><span class="nx">YourClass</span><span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">your-package</span><span class="dl">'</span><span class="p">;</span></code></pre></figure>
-
-<h4 id="package-versioning">Package Versioning</h4>
-<p>We can control which version of our shared package we install in multiple ways:</p>
-<ol>
-  <li><i>#semver:^x.x</i> - npm will look for any tags or refs matching that range in the remote repository</li>
-  <li><i>#branch-name</i> - npm will take a direct branch name</li>
-  <li><i>#commit</i> - npm will take a specific commit</li>
-</ol>
-
-<h4 id="caveats-for-npm-packages-consumed-directly-from-git">Caveats for npm packages consumed directly from git</h4>
-<p>An NPM package following best practices will usually have magic scripts such as:</p>
-<ol>
-  <li>prepare - usually will run a build script</li>
-  <li>prepublishOnly - will usually run tests and linters</li>
-  <li>preversion - will usually run a linter</li>
-  <li>version - can automatically create commits on version bumps</li>
-  <li>postversion - can automatically push to git</li>
-</ol>
-
-<p>We can’t have this in a package consumed directly from git, since there is no publish process.</p>
-
-<p>Another disadvantage will be the size of the package. 
-In a regular package we publish the compiled code, but don’t commit it to a source control.
-Meaning we have less code in git and consumers of our package will not receive the source code.</p>
-
-<p>In a git based npm packaged we must commit the compiled code together with the source code, otherwise our main project
-will not be able to use the package.</p>
-
-<h4 id="tree-shaking-to-mitigate-the-caveats">Tree shaking to mitigate the caveats</h4>
-<p>For inconvenience in the lack of magic commands there’s no straightforward solution (at least not one I’m aware of).<br />
-But for the size issue, we have tree shaking.
-If you’re not familiar with the term, tree-shaking is a step in build process that removes unused code, thus reducing the size of the final application.
-If you’re not using extremely outdated frameworks and build tools, you’ll usually get it with tools which come bundled with the framework.</p>
-
-<p>This means that even if you install a git based npm package, the unnecessary source code will not be part of your compiled production application.</p>
-
-<h4 id="wrapping-your-code-as-installable-npm-package">Wrapping your code as installable npm package</h4>
-<p>Initialize NPM package:</p>
-
-<figure class="highlight"><pre><code class="language-bash" data-lang="bash">npm init <span class="nt">-y</span></code></pre></figure>
-
-<p>Add typescript as a development dependency:</p>
-
-<figure class="highlight"><pre><code class="language-bash" data-lang="bash">npm <span class="nb">install</span> <span class="nt">--save-dev</span> typescript</code></pre></figure>
-
-<p>Create tsconfig.json:</p>
-
-<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="o">{</span>
-  <span class="s2">"compilerOptions"</span>: <span class="o">{</span>
-    <span class="s2">"target"</span>: <span class="s2">"es5"</span>,
-    <span class="s2">"module"</span>: <span class="s2">"commonjs"</span>,
-    <span class="s2">"declaration"</span>: <span class="nb">true</span>,
-    <span class="s2">"outDir"</span>: <span class="s2">"./lib"</span>,
-    <span class="s2">"strict"</span>: <span class="nb">true</span>
-  <span class="o">}</span>,
-  <span class="s2">"include"</span>: <span class="o">[</span><span class="s2">"src"</span><span class="o">]</span>,
-  <span class="s2">"exclude"</span>: <span class="o">[</span><span class="s2">"node_modules"</span>, <span class="s2">"**/__tests__/*"</span><span class="o">]</span>
-<span class="o">}</span></code></pre></figure>
-
-<p>I’m not going to go into tsconfig.json options since it’s out of context.<br />
-You can find a <a href="https://www.typescriptlang.org/tsconfig" target="_blank">comprehensive documentation</a> in the official website.</p>
-
-<h4 id="expanding-the-default-packagejson">Expanding the default package.json</h4>
-<p>The final basic version of the package.json should look like this:</p>
-
-<figure class="highlight"><pre><code class="language-json" data-lang="json"><span class="p">{</span><span class="w">
-  </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"your-package"</span><span class="p">,</span><span class="w">
-  </span><span class="nl">"version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1.0.0"</span><span class="p">,</span><span class="w">
-  </span><span class="nl">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"You package description"</span><span class="p">,</span><span class="w">
-  </span><span class="nl">"main"</span><span class="p">:</span><span class="w"> </span><span class="s2">"lib/index.js"</span><span class="p">,</span><span class="w">
-  </span><span class="nl">"types"</span><span class="p">:</span><span class="w"> </span><span class="s2">"lib/index.d.ts"</span><span class="p">,</span><span class="w">
-  </span><span class="nl">"scripts"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-    </span><span class="nl">"build"</span><span class="p">:</span><span class="w"> </span><span class="s2">"tsc"</span><span class="w">
-  </span><span class="p">},</span><span class="w">
-  </span><span class="nl">"dependencies"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-    </span><span class="err">...dependencies</span><span class="w"> </span><span class="err">of</span><span class="w"> </span><span class="err">your</span><span class="w"> </span><span class="err">package</span><span class="w">
-  </span><span class="p">},</span><span class="w">
-  </span><span class="nl">"devDependencies"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-    </span><span class="err">...</span><span class="w">
-    </span><span class="nl">"typescript"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^4.0.5"</span><span class="w">
-    </span><span class="err">...</span><span class="w">
-  </span><span class="p">},</span><span class="w">
-  </span><span class="nl">"repository"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-    </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"git"</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"url"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://your-private-git-repo-url/your-package.git"</span><span class="w">
-  </span><span class="p">},</span><span class="w">
-  </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"commonjs"</span><span class="p">,</span><span class="w">
-  </span><span class="nl">"author"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Your-name"</span><span class="p">,</span><span class="w">
-  </span><span class="nl">"license"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ISC"</span><span class="w">
-</span><span class="p">}</span></code></pre></figure>
-
-<p>The main keys here are <i>main</i> and <i>types</i> .</p>
-
-<ul>
-  <li><i>main<i></i> - indicates to npm from where to import the modules</i></li>
-  <li><i>types</i> - indicates for typescript and IDEs from where they can get type definitions for better developer experience</li>
-</ul>
-
-<h3 id="hello-world">Hello World</h3>
-<p>Once we got our basics ready, we can create a simple hello world package.</p>
-
-<p>Let’s create a file: <i>src/hello-world.ts<i></i></i></p>
-
-<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="k">export</span> <span class="kd">class</span> <span class="nx">HelloWorld</span> <span class="p">{</span>
-    <span class="kr">public</span> <span class="nx">greet</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="dl">'</span><span class="s1">Hello World</span><span class="dl">'</span><span class="p">;</span>
-<span class="p">}</span></code></pre></figure>
-
-<p>Now we need to make it exportable, create a file <i>src/index.ts</i></p>
-
-<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="k">export</span> <span class="p">{</span><span class="nx">HelloWorld</span><span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">./hello-world</span><span class="dl">'</span><span class="p">;</span></code></pre></figure>
-
-<p>Next, lets build it:</p>
-
-<figure class="highlight"><pre><code class="language-bash" data-lang="bash">npm run build</code></pre></figure>
-
-<p>After this, you’ll see new files added to the <i>/lib</i> folder of your project.</p>
-
-<h4 id="pushing-to-git">Pushing to git</h4>
-<p>For simplicity let’s use a simple branch name and not semvers, name your branch: <i>my-first-release</i>, and push the code.</p>
-
-<h4 id="using-the-package-from-the-main-project">Using the package from the main project</h4>
-<p>Let’s install the package:</p>
-
-<figure class="highlight"><pre><code class="language-bash" data-lang="bash">npm <span class="nb">install </span>git+https://your-private-git-repo-url/your-package.git#my-first-release <span class="nt">--save</span></code></pre></figure>
-
-<p>Now we can use it from the main project:</p>
-
-<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="k">import</span> <span class="p">{</span><span class="nx">HelloWorld</span><span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">your-package</span><span class="dl">'</span><span class="p">;</span></code></pre></figure>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="Architecture" /><category term="FE" /><category term="BE" /><category term="Devops" /><category term="JS/TS" /></entry><entry><title type="html">Extending Flyweight pattern ideas to improve system-wide performance and reduce costs</title><link href="/jekyll/update/2022/07/10/leveraging-flyweight-pattern-to-system-arch.html" rel="alternate" type="text/html" title="Extending Flyweight pattern ideas to improve system-wide performance and reduce costs" /><published>2022-07-10T19:31:29+03:00</published><updated>2022-07-10T19:31:29+03:00</updated><id>/jekyll/update/2022/07/10/leveraging-flyweight-pattern-to-system-arch</id><content type="html" xml:base="/jekyll/update/2022/07/10/leveraging-flyweight-pattern-to-system-arch.html"><![CDATA[<ul id="markdown-toc">
+</ul>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="Architecture" /><category term="Cloud" /><category term="BackEnd" /><category term="Devops" /></entry><entry><title type="html">Extending Flyweight pattern ideas to improve system-wide performance and reduce costs</title><link href="/jekyll/update/2022/07/10/leveraging-flyweight-pattern-to-system-arch.html" rel="alternate" type="text/html" title="Extending Flyweight pattern ideas to improve system-wide performance and reduce costs" /><published>2022-07-10T19:31:29+03:00</published><updated>2022-07-10T19:31:29+03:00</updated><id>/jekyll/update/2022/07/10/leveraging-flyweight-pattern-to-system-arch</id><content type="html" xml:base="/jekyll/update/2022/07/10/leveraging-flyweight-pattern-to-system-arch.html"><![CDATA[<ul id="markdown-toc">
   <li><a href="#intro" id="markdown-toc-intro">Intro</a>    <ul>
       <li><a href="#taking-the-general-idea-to-a-system-wide-level" id="markdown-toc-taking-the-general-idea-to-a-system-wide-level">Taking the general idea to a system-wide level</a></li>
       <li><a href="#be-careful-with-the-tradeoffs" id="markdown-toc-be-careful-with-the-tradeoffs">Be careful with the tradeoffs</a></li>
@@ -1133,4 +1046,4 @@ which will mean two things:</p>
 
 <p>Another thing to consider is the usage of the data, the analytics in our case - <br />
 can we preload the intrinsic data in the analytics? If not, will JOINing (with spark, for example) of small amount of intrinsic data
-will be faster than working with 84% more data which is already in the same dataframes?</p>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="Architecture" /><category term="DataEngineering" /><category term="BE" /><category term="Performance" /><category term="Cloud" /></entry></feed>
+will be faster than working with 84% more data which is already in the same dataframes?</p>]]></content><author><name>Jacob Shapira</name></author><category term="jekyll" /><category term="update" /><category term="Architecture" /><category term="DataEngineering" /><category term="BackEnd" /><category term="Performance" /><category term="Cloud" /></entry></feed>

@@ -4,7 +4,8 @@ title:  "Make your Kubernetes workloads more robust with startup, readiness and 
 date:  2022-07-08 18:31:29 +0200
 categories: jekyll update
 author: Jacob Shapira
-tags: ["Architecture", "Devops", "BE"]
+sticky: "true"
+tags: ["Architecture", "Devops", "BackEnd"]
 ---
 
 * TOC

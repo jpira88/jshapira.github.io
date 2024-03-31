@@ -4,7 +4,7 @@ title:  "Debugging memory leaks: When the famous 3 snapshot technique can cost y
 date:  2016-01-17 18:33:28 +0200
 categories: jekyll update
 author: Jacob Shapira
-tags: ["FE", "JS/TS"]
+tags: ["FrontEnd"]
 ---
 
 

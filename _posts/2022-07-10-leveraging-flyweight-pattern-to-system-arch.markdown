@@ -4,7 +4,8 @@ title:  "Extending Flyweight pattern ideas to improve system-wide performance an
 date:  2022-07-10 18:31:29 +0200
 categories: jekyll update
 author: Jacob Shapira
-tags: ["Architecture", "DataEngineering", "BE", "Performance", "Cloud"]
+sticky: "true"
+tags: ["Architecture", "DataEngineering", "BackEnd", "Performance", "Cloud"]
 ---
 
 * TOC

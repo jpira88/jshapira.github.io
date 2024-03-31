@@ -4,6 +4,7 @@ title:  "Reducing resource requirements: Hands-on LLM quantization and post-quan
 date:  2023-09-18 11:31:29 +0200
 categories: jekyll update
 author: Jacob Shapira
+sticky: "true"
 tags: ["LLM/ML/AI"]
 ---
 

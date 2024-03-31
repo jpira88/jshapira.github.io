@@ -4,7 +4,7 @@ title:  "Improving consistency in distributed applications using Saga pattern wi
 date:  2024-01-28 11:31:29 +0200
 categories: jekyll update
 author: Jacob Shapira
-tags: ["BE","Architecture","Cloud"]
+tags: ["BackEnd","Architecture","Cloud"]
 ---
 
 * TOC
